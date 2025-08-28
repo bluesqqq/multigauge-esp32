@@ -1,0 +1,48 @@
+{
+    "Brightness": 255,
+    "Rotation": 0,
+    
+    "UserColors" :
+    {
+        "Primary" : 65535,
+        "Accent" : 63488,
+        "Background" : 0
+    },
+
+    "Vehicle" :
+    {
+        "Year"  : 1989,
+        "Make"  : "Toyota",
+        "Model" : "Corolla",
+
+        "Engine" :
+        {
+            "Name" : "4AF",
+            "Displacement" : 1600,
+            "Type" : 0,
+            "Configuration" : 3,
+            "RPMs" :
+            {
+                "Idle" : 1000,
+                "Warning" : 6000,
+                "Redline" : 6500,
+                
+                "Shift" : 5500
+            }
+        },
+
+        "TopSpeed" : 180,
+        "FuelCapacity" : 50
+    },
+
+    "Units": {
+        "Temperature": 0,
+        "Distance": 0,
+        "Pressure": 0,
+        "Velocity": 0,
+        "Acceleration": 0,
+        "Volume": 0,
+        "VolumePerTime": 0,
+        "Time": 0
+    }
+}
