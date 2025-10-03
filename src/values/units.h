@@ -8,9 +8,9 @@ namespace Units {
     struct Unit {
         const char* name;
         const char* abbreviation;
-        const float factor;
-        const float offset;
-        const uint8_t decimalPlaces;
+        float factor;
+        float offset;
+        uint8_t decimalPlaces;
     };
 
     #define DEFAULT_UNIT -1

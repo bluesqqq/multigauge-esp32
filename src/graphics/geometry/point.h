@@ -8,6 +8,9 @@ template <typename T>
 struct Rectangle;
 
 template <typename T>
+struct Line;
+
+template <typename T>
 struct Point {
     T x, y;
 
@@ -33,6 +36,7 @@ struct Point {
 
     inline Point<T> operator-() const;
 
+    inline Point<T>& operator=(const Point<T>& other);
     inline Point<T>& operator+=(const Point<T>& other);
     inline Point<T>& operator-=(const Point<T>& other);
     inline Point<T>& operator*=(const Point<T>& other);
@@ -64,19 +68,21 @@ struct Point {
 
     void translate(T deltaX, T deltaY);
     void translate(const Point<T>& other);
-    Point<T> translated(T deltaX, T deltaY);
-    Point<T> translated(const Point<T>& other);
+    Point<T> translated(T deltaX, T deltaY) const;
+    Point<T> translated(const Point<T>& other) const;
 
     Point<T> midpoint(const Point<T>& other) const;
 
     void interpolate(const Point<T>& other, float t);
     Point<T> interpolated(const Point<T>& other, float t) const;
 
-    void scaleFromOrigin(float scale);
-    Point<T> scaledFromOrigin(float scale);
+    // ====== [SCALE] ====== //
 
-    void scaledFromPoint(const Point<T>& other, float scale);
-    Point<T> scaledFromPoint(const Point<T>& other, float scale);
+    void scaleFromOrigin(float scale);
+    Point<T> scaledFromOrigin(float scale) const;
+
+    void scaleFromPoint(const Point<T>& other, float scale);
+    Point<T> scaledFromPoint(const Point<T>& other, float scale) const;
 
     // ====== [ROTATION] ====== //
 
@@ -84,13 +90,24 @@ struct Point {
     float angleTo(const Point<T>& other) const;
 
     void rotateAroundOrigin(float angle);
-    Point<T> rotatedAroundOrigin(float angle);
+    Point<T> rotatedAroundOrigin(float angle) const;
 
     void rotateAroundPoint(const Point<T>& other, float angle);
-    Point<T> rotatedAroundPoint(const Point<T>& other, float angle);
+    Point<T> rotatedAroundPoint(const Point<T>& other, float angle) const;
+
+    // ====== [REFLECTION] ====== //
+
+    void reflectAcrossHorizontal(T horizontal);
+    Point<T> reflectedAcrossHorizontal(T horizontal) const;
+
+    void reflectAcrossVertical(T vertical);
+    Point<T> reflectedAcrossVertical(T vertical) const;
+
+    void reflectAcrossLine(Line<T> line);
+    Point<T> reflectedAcrossLine(Line<T> line) const;
 
     // ====== [CONVERSION] ====== //
 
-    Point<int> toInt();
-    Point<float> toFloat();
+    Point<int> toInt() const;
+    Point<float> toFloat() const;
 };

@@ -20,7 +20,7 @@ struct Rectangle {
     T perimeter() const;
     bool isEmpty() const;
     
-    // ====== [INTERSECTING] ====== //
+    // ====== [INTERSECTIONS] ====== //
 
     /// @brief Checks if a point lies inside this rectangle.
     /// @param point The point to test.
@@ -119,12 +119,15 @@ struct Rectangle {
     Rectangle<T> translated(T deltaX, T deltaY) const;
     Rectangle<T> translated(Point<T> delta) const;
 
+    void interpolate(const Rectangle<T>& other, float t);
+    Rectangle<T> interpolated(const Rectangle<T>& other, float t) const;
+
     // ====== [SCALING] ====== //
 
     void scaleFromOrigin(float scale);
     Point<T> scaledFromOrigin(float scale);
 
-    void scaledFromPoint(const Point<T>& other, float scale);
+    void scaleFromPoint(const Point<T>& other, float scale);
     Point<T> scaledFromPoint(const Point<T>& other, float scale);
 
     void reduce(T deltaX, T deltaY);
@@ -144,6 +147,17 @@ struct Rectangle {
 
     void rotateAroundPoint(const Point<T>& other, float angle);
     Rectangle<T> rotatedAroundPoint(const Point<T>& other, float angle);
+
+    // ====== [REFLECTION] ====== //
+
+    void reflectAcrossHorizontal(T horizontal);
+    Rectangle<T> reflectedAcrossHorizontal(T horizontal);
+
+    void reflectAcrossVertical(T vertical);
+    Rectangle<T> reflectedAcrossVertical(T vertical);
+
+    // Reflecting across a line should return a path
+    //Rectangle<T> reflectedAcrossLine(Line<T> line);
 
     // ====== [CONVERSION] ====== //
 
