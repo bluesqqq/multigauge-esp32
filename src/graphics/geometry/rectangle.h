@@ -66,11 +66,6 @@ struct Rectangle {
     bool operator==(const Rectangle<T>& other);
     bool operator!=(const Rectangle<T>& other);
 
-    void translate(T deltaX, T deltaY);
-    void translate(Point<T> delta);
-    Rectangle<T> translated(T deltaX, T deltaY) const;
-    Rectangle<T> translated(Point<T> delta) const;
-
     void setTop(T top);
     void setBottom(T bottom);
     void setLeft(T left);
@@ -103,16 +98,6 @@ struct Rectangle {
     Rectangle<T>  operator/(float scale);
     Rectangle<T>& operator/=(float scale);
 
-    Rectangle<T> reduced(T deltaX, T deltaY);
-    Rectangle<T> reduced(T delta);
-    void reduce(T deltaX, T deltaY);
-    void reduce(T delta);
-
-    Rectangle<T> expanded(T deltaX, T deltaY);
-    Rectangle<T> expanded(T delta);
-    void expand(T deltaX, T deltaY);
-    void expand(T delta);
-
     void trimTop(T amount);
     void trimBottom(T amount);
     void trimLeft(T amount);
@@ -127,7 +112,38 @@ struct Rectangle {
     Rectangle<T> removeFromLeft(T amount);
     Rectangle<T> removeFromRight(T amount);
 
-    Rectangle<T> withSize(T width, T height) const;
+    // ====== [TRANSLATION] ====== //
+
+    void translate(T deltaX, T deltaY);
+    void translate(Point<T> delta);
+    Rectangle<T> translated(T deltaX, T deltaY) const;
+    Rectangle<T> translated(Point<T> delta) const;
+
+    // ====== [SCALING] ====== //
+
+    void scaleFromOrigin(float scale);
+    Point<T> scaledFromOrigin(float scale);
+
+    void scaledFromPoint(const Point<T>& other, float scale);
+    Point<T> scaledFromPoint(const Point<T>& other, float scale);
+
+    void reduce(T deltaX, T deltaY);
+    void reduce(T delta);
+    Rectangle<T> reduced(T deltaX, T deltaY);
+    Rectangle<T> reduced(T delta);
+
+    void expand(T deltaX, T deltaY);
+    void expand(T delta);
+    Rectangle<T> expanded(T deltaX, T deltaY);
+    Rectangle<T> expanded(T delta);
+
+    // ====== [ROTATION] ====== //
+
+    void rotateAroundOrigin(float angle);
+    Rectangle<T> rotatedAroundOrigin(float angle);
+
+    void rotateAroundPoint(const Point<T>& other, float angle);
+    Rectangle<T> rotatedAroundPoint(const Point<T>& other, float angle);
 
     // ====== [CONVERSION] ====== //
 

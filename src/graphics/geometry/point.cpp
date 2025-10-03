@@ -9,10 +9,10 @@ template <typename T>
 Point<T>::Point(T x, T y) : x(x), y(y) { }
 
 template <typename T>
-Point<float> Point<T>::unitVector(float angle) { return Point<T>(static_cast<T>(cosf(angle)), static_cast<T>(sinf(angle))); }
+Point<float> Point<T>::getPointOnUnitCircle(float angle) { return Point<T>(static_cast<T>(cosf(angle)), static_cast<T>(sinf(angle))); }
 
 template <typename T>
-Point<T> Point<T>::align(T x, T y, T width, T height, Alignment alignment) {
+Point<T> Point<T>::getAligned(T x, T y, T width, T height, Alignment alignment) {
     switch (alignment) {
         case Alignment::TopLeft:
             return Point(x, y);
@@ -38,10 +38,10 @@ Point<T> Point<T>::align(T x, T y, T width, T height, Alignment alignment) {
 }
 
 template <typename T>
-Point<T> Point<T>::align(const Point<T>& point, T width, T height, Alignment alignment) { return Point<T>::align(point.x, point.y, width, height, alignment); }
+Point<T> Point<T>::getAligned(const Point<T>& point, T width, T height, Alignment alignment) { return Point<T>::align(point.x, point.y, width, height, alignment); }
 
 template <typename T>
-Point<T> Point<T>::align(const Rectangle<T>& rectangle) { return Point<T>::align(rectangle.position.point.x, rectangle.position.point.y, rectangle.width, rectangle.height, rectangle.alignment); }
+Point<T> Point<T>::getAligned(const Rectangle<T>& rectangle) { return Point<T>::align(rectangle.position.point.x, rectangle.position.point.y, rectangle.width, rectangle.height, rectangle.alignment); }
 
 template <typename T>
 bool Point<T>::operator==(const Point<T>& other) const { return x == other.x && y == other.y; }
@@ -101,13 +101,13 @@ template <typename T>
 float Point<T>::magnitude() const { return std::sqrt(x*x + y*y); }
 
 template <typename T>
-Point<T> Point<T>::normalize() const {
+Point<float> Point<T>::normalized() const {
     float mag = magnitude();
     return Point<T>(x / mag, y / mag);
 }
 
 template <typename T>
-float Point<T>::distance(const Point<T>& other) const {
+float Point<T>::distanceTo(const Point<T>& other) const {
 return std::sqrt((other.x - x)*(other.x - x) + (other.y - y)*(other.y - y));
 }
 
@@ -128,6 +128,3 @@ float Point<T>::dot(const Point<T>& other) const { return x * other.x + y * othe
 
 template <typename T>
 float Point<T>::cross(const Point<T>& other) const { return x * other.y - y * other.x; }
-
-template <typename T>
-void Point<T>::print() { Serial.printf("point: (%f, %f)\n", static_cast<float>(x), static_cast<float>(y)); }
