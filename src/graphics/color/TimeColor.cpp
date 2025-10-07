@@ -32,13 +32,15 @@ TimeColor::TimeColor() : timeline(ColorTimeline()), loopType(LoopType::Forward) 
 TimeColor::TimeColor(const ColorTimeline &timeline, LoopType loopType) : timeline(timeline), loopType(loopType) {}
 
 TimeColor::TimeColor(JsonObject timeColorJson) {
-    timeline = timeColorJson.containsKey("timeline") ? ColorTimeline(timeColorJson["timeline"]) : ColorTimeline();
-    if (timeColorJson.containsKey("loopType")) {
+    timeline = timeColorJson["timeline"].is<JsonObject>() ? ColorTimeline(timeColorJson["timeline"].as<JsonObject>()) : ColorTimeline();
+    if (timeColorJson["loopType"].is<const char*>()) {
         const char* loopStr = timeColorJson["loopType"].as<const char*>();
         if (strcmp(loopStr, "forward") == 0) loopType = LoopType::Forward;
         else if (strcmp(loopStr, "reverse") == 0) loopType = LoopType::Reverse;
         else if (strcmp(loopStr, "pingpong") == 0) loopType = LoopType::PingPong;
         else loopType = LoopType::Forward;
+    } else {
+        loopType = LoopType::Forward;
     }
 }
 

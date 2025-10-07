@@ -4,11 +4,15 @@
 UserColor::UserColor(Slot slot) : slot(slot) { }
 
 UserColor::UserColor(JsonObject userColorJson) {
-    std::string slot = std::string(userColorJson["slot"].as<const char*>());
+    if (userColorJson["slot"].is<const char*>()) {
+        std::string slotStr(userColorJson["slot"].as<const char*>());
 
-    if (slot == "primary")     this->slot = Slot::Primary;
-    else if (slot == "secondary") this->slot = Slot::Secondary;
-    else this->slot = Slot::Background;
+        if (slotStr == "primary")       slot = Slot::Primary;
+        else if (slotStr == "secondary") slot = Slot::Secondary;
+        else                             slot = Slot::Background;
+    } else {
+        slot = Slot::Background;
+    }
 }
 
 uint16_t UserColor::getColor() const { return userColors[static_cast<size_t>(slot)]; }

@@ -14,7 +14,7 @@ template <typename T>
 bool Rectangle<T>::isEmpty() const { return width == 0 && height == 0; }
 
 template <typename T>
-bool Rectangle<T>::contains(const Point<T> &point) const { return x >= getLeft() && x <= getRight() && y >= getTop() && y <= getBottom(); }
+bool Rectangle<T>::contains(const Point<T> &point) const { return point.x >= getLeft() && point.x <= getRight() && point.y >= getTop() && point.y <= getBottom(); }
 
 template <typename T>
 void Rectangle<T>::translate(T deltaX, T deltaY) { position.translate(deltaX, deltaY); }

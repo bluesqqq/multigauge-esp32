@@ -88,7 +88,7 @@ bool Line<T>::intersects(const Line<T> &other) {
     float uA = (otherDx * (p1.y - other.p1.y) - otherDy * (p1.x - other.p1.x)) / denom;
     float uB = (thisDx * (p1.y - other.p1.y) - thisDy * (p1.x - other.p1.x)) / denom;
 
-    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1)
+    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1);
 }
 
 template <typename T>

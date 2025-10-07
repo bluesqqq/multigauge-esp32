@@ -1,3 +1,5 @@
+#pragma once
+
 #include "color.h"
 #include "ColorTimeline.h"
 

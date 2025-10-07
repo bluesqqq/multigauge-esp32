@@ -1,3 +1,5 @@
+#pragma once
+
 #include "color.h"
 
 struct ColorKeyframe {
@@ -11,6 +13,9 @@ struct ColorKeyframe {
     /// @brief Constructs a color keyframe from JSON.
     /// @param colorKeyframeJson The JSON object containing keyframe data
     ColorKeyframe(JsonObject colorKeyframeJson);
+
+    ColorKeyframe(const ColorKeyframe&) = delete;
+    ColorKeyframe& operator=(const ColorKeyframe&) = delete;
 };
 
 class ColorTimeline {

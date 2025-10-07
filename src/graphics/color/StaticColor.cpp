@@ -4,7 +4,7 @@ StaticColor::StaticColor() : color(DEFAULT_COLOR) { }
 
 StaticColor::StaticColor(uint32_t color) : color(color) {}
 
-StaticColor::StaticColor(JsonObject staticColorJson) : color(staticColorJson.containsKey("color") ? staticColorJson["color"].as<uint16_t>() : 0) { }
+StaticColor::StaticColor(JsonObject staticColorJson) : color(staticColorJson["color"].is<uint16_t>() ? staticColorJson["color"].as<uint16_t>() : 0) { }
 
 std::unique_ptr<Color> StaticColor::blended(uint16_t color, float alpha) const { return std::make_unique<StaticColor>(Color::blend(this->color, color, alpha)); }
 

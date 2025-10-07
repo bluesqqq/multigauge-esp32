@@ -6,8 +6,8 @@
 ColorKeyframe::ColorKeyframe(std::unique_ptr<Color> color, float position) : color(std::move(color)), position(position) { }
 
 ColorKeyframe::ColorKeyframe(JsonObject colorKeyframeJson) {
-    position = colorKeyframeJson.containsKey("position") ? colorKeyframeJson["position"].as<float>() : 0.0f;
-    color    = colorKeyframeJson.containsKey("color") ? Color::loadFromJson(colorKeyframeJson["color"].as<JsonObject>()) : std::make_unique<StaticColor>();
+    position = colorKeyframeJson["position"].is<float>() ? colorKeyframeJson["position"].as<float>() : 0.0f;
+    color = colorKeyframeJson["color"].is<JsonObject>() ? Color::loadFromJson(colorKeyframeJson["color"].as<JsonObject>()) : std::make_unique<StaticColor>();
 }
 
 
@@ -33,7 +33,7 @@ ColorTimeline::ColorTimeline() {}
 ColorTimeline::ColorTimeline(uint16_t color) { addKeyframe(color, 0.0f); }
 
 ColorTimeline::ColorTimeline(JsonObject colorTimelineJson) {
-    if (!colorTimelineJson.containsKey("keyframes")) return;
+    if (!colorTimelineJson["keyframes"].is<JsonArray>()) return;
 
     JsonArray keyframesJson = colorTimelineJson["keyframes"].as<JsonArray>();
     for (JsonObject keyframeJson : keyframesJson)

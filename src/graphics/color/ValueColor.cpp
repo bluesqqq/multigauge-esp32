@@ -7,8 +7,8 @@ ValueColor::ValueColor(Value *value) : timeline(ColorTimeline()), value(value) {
 ValueColor::ValueColor(Value *value, const ColorTimeline &timeline) : timeline(timeline), value(value) { }
 
 ValueColor::ValueColor(JsonObject valueColorJson) {
-    timeline = valueColorJson.containsKey("timeline") ? ColorTimeline(valueColorJson["timeline"]) : ColorTimeline();
-    value    = valueColorJson.containsKey("value") ? Value::find(valueColorJson["value"].as<std::string>()) : nullptr;
+    timeline = valueColorJson["timeline"].is<JsonObject>() ? ColorTimeline(valueColorJson["timeline"].as<JsonObject>()) : ColorTimeline();
+    value    = valueColorJson["value"].is<std::string>() ? Value::find(valueColorJson["value"].as<std::string>()) : nullptr;
 }
 
 std::unique_ptr<Color> ValueColor::blended(uint16_t color, float alpha) const { return std::make_unique<ValueColor>(timeline.blended(color, alpha)); }
