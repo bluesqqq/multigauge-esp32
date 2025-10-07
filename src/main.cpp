@@ -9,9 +9,9 @@
 
 #ifndef PIO_UNIT_TESTING
 
-SensorLinear sensor1(1, &Values::boostPressure, 0, 3.3, 0, 100);
-SensorLinear sensor2(1, &Values::engineCoolantTemp, 0, 3.3, 0, 100);
-SensorLinear sensor3(1, &Values::engineRPM, 0, 3.3, 0, 8000);
+SensorLinear sensor1(1, &boostPressure, 0, 3.3, 0, 100);
+SensorLinear sensor2(1, &engineCoolantTemp, 0, 3.3, 0, 100);
+SensorLinear sensor3(1, &engineRPM, 0, 3.3, 0, 8000);
 
 void sensorTask(void* parameter) {
     SensorLinear* sensor = (SensorLinear*)parameter;
@@ -29,7 +29,7 @@ void setup() {
     sensor2.begin();
     sensor3.begin();
 
-    Values::boostPressure.onChange = [](float newValue) {
+    boostPressure.onChange = [](float newValue) {
         Serial.print("Boost Pressure changed: ");
         Serial.println(newValue);
     };

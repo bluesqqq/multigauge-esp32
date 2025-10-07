@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include "utils.h"
 
-SensorLinear::SensorLinear(uint pin, Values::Value* value, float lowerVoltage, float upperVoltage, float lowerValue, float upperValue, int unitIndex, std::string name)
+SensorLinear::SensorLinear(uint pin, Value* value, float lowerVoltage, float upperVoltage, float lowerValue, float upperValue, int unitIndex, std::string name)
     : Sensor(name), pin(pin), value(value),
       lowerVoltage(lowerVoltage), upperVoltage(upperVoltage),
       lowerValue(lowerValue), upperValue(upperValue),

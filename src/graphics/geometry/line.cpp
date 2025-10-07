@@ -6,7 +6,7 @@ template <typename T>
 Line<T>::Line(T x1, T y1, T x2, T y2) : p1(Point<T>(x1, y1)), p2(Point<T>(x2, y2)) {}
 
 template <typename T>
-Line<T>::Line(Point<T> p1, Point<T> p2) : p1(p1), p2(p2) {}
+Line<T>::Line(const Point<T>& p1, const Point<T>& p2) : p1(p1), p2(p2) {}
 
 template <typename T>
 Line<float> Line<T>::radialLine(float angle, float startRadius, float endRadius) {
@@ -68,16 +68,31 @@ template <typename T>
 float Line<T>::normal() const { return p1.angleTo(p2) - HALF_PI; }
 
 template <typename T>
-float Line<T>::slope() { return (p2.y - p1.y) / (p2.x - p1.x); }
+float Line<T>::slope() { return (p2.x == p1.x) ? std::numeric_limits<float>::infinity() : (p2.y - p1.y) / (p2.x - p1.x); }
 
 template <typename T>
-float Line<T>::intercept() {
-    if (p2.x == p1.x) return std::numeric_limits<float>::infinity();
-    return p1.y - slope() * p1.x; 
-}
+float Line<T>::intercept() { return (p2.x == p1.x) ? std::numeric_limits<float>::infinity() : p1.y - slope() * p1.x; }
 
 template <typename T>
 Point<T> Line<T>::midpoint() const { return p1.midpoint(p2); }
+
+template <typename T>
+bool Line<T>::intersects(const Line<T> &other) {
+    float otherDx = other.p2.x - other.p1.x;
+    float otherDy = other.p2.y - other.p1.y;
+    float thisDx  = p2.x - p1.x;
+    float thisDy  = p2.y - p1.y;
+    float denom = otherDy * thisDx - otherDx * thisDy;
+
+    if (denom == 0.0f) return false;
+    float uA = (otherDx * (p1.y - other.p1.y) - otherDy * (p1.x - other.p1.x)) / denom;
+    float uB = (thisDx * (p1.y - other.p1.y) - thisDy * (p1.x - other.p1.x)) / denom;
+
+    return (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1)
+}
+
+template <typename T>
+bool Line<T>::slopesIntersect(const Line<T> &other) { return slope() != other.slope(); }
 
 template <typename T>
 std::optional<Point<T>> Line<T>::intersection(const Line<T> &other) const {
@@ -91,7 +106,7 @@ std::optional<Point<T>> Line<T>::intersection(const Line<T> &other) const {
     float uA = (otherDx * (p1.y - other.p1.y) - otherDy * (p1.x - other.p1.x)) / denom;
     float uB = (thisDx * (p1.y - other.p1.y) - thisDy * (p1.x - other.p1.x)) / denom;
 
-    if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) return Point<T>(p1.x + (uA * thisDx), p1.y + (uA * thisDy));
+    if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) return Point<T>(p1.x + uA * thisDx, p1.y + uA * thisDy);
     
     return std::nullopt; // No intersection found
 }
@@ -108,7 +123,7 @@ std::optional<Point<T>> Line<T>::slopeIntersection(const Line<T> &other) const {
 
     float uA = (otherDx * (p1.y - other.p1.y) - otherDy * (p1.x - other.p1.x)) / denom;
 
-    return Point<T>(p1.x + uA * (thisDx), p1.x + uA * thisDy);
+    return Point<T>(p1.x + uA * thisDx, p1.y + uA * thisDy);
 }
 
 template <typename T>

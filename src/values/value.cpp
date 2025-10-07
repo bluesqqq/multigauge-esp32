@@ -3,8 +3,15 @@
 
 namespace Values {
 
-    Value::Value(const char* name, const Units::UnitType& unitType, float minimumValue, float maximumValue) 
-        : name(name), unitType(unitType), value(minimumValue), minimumValue(minimumValue), maximumValue(maximumValue) { }
+    Value::Value(const char* name, const UnitType& unitType, float minimumValue, float maximumValue) 
+        : name(name), unitType(unitType), value(minimumValue), minimumValue(minimumValue), maximumValue(maximumValue) { 
+        registry[name] = this;
+    }
+
+    Value *Value::find(std::string name) {
+        auto it = registry.find(name);
+        return (it != registry.end()) ? it->second : nullptr;
+    }
 
     Value::operator float() const { return getValueBase(); }
 
@@ -37,7 +44,7 @@ namespace Values {
 
     const char* Value::getName() const { return name; }
 
-    const Units::UnitType& Value::getUnitType() const { return unitType; }
+    const UnitType& Value::getUnitType() const { return unitType; }
 
     float Value::getInterpolationValue() const { return (value - minimumValue) / (maximumValue - minimumValue); }
 
@@ -49,23 +56,23 @@ namespace Values {
         return (maximumString.length() > minimumString.length()) ? maximumString : minimumString;
     }
 
-    Value engineRPM("RPM", Units::revolutions, 0, 8000);
-    Value engineCoolantTemp("Coolant Temp", Units::temperature, -40, 120);
-    Value engineOilTemp("Oil Temp", Units::temperature, -40, 120);
-    Value transmissionTemp("Transmission Temp", Units::temperature, -40, 120);
-    Value engineOilPressure("Oil Pressure", Units::pressure, 0, 100);
-    Value transmissionFluidPressure("Transmission Fluid Pressure", Units::pressure, 0, 100);
-    Value fuelPressure("Fuel Pressure", Units::pressure, 0, 100);
-    Value boostPressure("Boost Pressure", Units::pressure, 0, 100);
-    Value fuelLevel("Fuel Level", Units::volume, 0, 12);
-    Value distanceDriven("Distance Driven", Units::distance, 0, 999999);
-    Value speed("Speed", Units::velocity, 0, 160);
-    Value verticalAcceleration("Vertical Accel", Units::acceleration, -4, 4);
-    Value longitudinalAcceleration("Longitudinal Accel", Units::acceleration, -4, 4);
-    Value lateralAcceleration("Lateral Accel", Units::acceleration, -4, 4);
-    Value calculatedEngineLoad("Engine Load", Units::percentage, 0.0, 100.0);
-    Value throttlePosition("Throttle Position", Units::percentage, 0.0, 100.0);
-    Value engineFuelRate("Engine Fuel Rate", Units::volumePerTime, 0, 3212.75);
-    Value engineRunTimeSinceStart("Run Time Since Start", Units::time, 0.0, 65535.0); // 65535 is max defined by OBD2 protocol
+    Value engineRPM("RPM", revolutions, 0, 8000);
+    Value engineCoolantTemp("Coolant Temp", temperature, -40, 120);
+    Value engineOilTemp("Oil Temp", temperature, -40, 120);
+    Value transmissionTemp("Transmission Temp", temperature, -40, 120);
+    Value engineOilPressure("Oil Pressure", pressure, 0, 100);
+    Value transmissionFluidPressure("Transmission Fluid Pressure", pressure, 0, 100);
+    Value fuelPressure("Fuel Pressure", pressure, 0, 100);
+    Value boostPressure("Boost Pressure", pressure, 0, 100);
+    Value fuelLevel("Fuel Level", volume, 0, 12);
+    Value distanceDriven("Distance Driven", distance, 0, 999999);
+    Value speed("Speed", velocity, 0, 160);
+    Value verticalAcceleration("Vertical Accel", acceleration, -4, 4);
+    Value longitudinalAcceleration("Longitudinal Accel", acceleration, -4, 4);
+    Value lateralAcceleration("Lateral Accel", acceleration, -4, 4);
+    Value calculatedEngineLoad("Engine Load", percentage, 0.0, 100.0);
+    Value throttlePosition("Throttle Position", percentage, 0.0, 100.0);
+    Value engineFuelRate("Engine Fuel Rate", volumePerTime, 0, 3212.75);
+    Value engineRunTimeSinceStart("Run Time Since Start", time, 0.0, 65535.0); // 65535 is max defined by OBD2 protocol
 
 }

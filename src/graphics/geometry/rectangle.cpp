@@ -2,7 +2,10 @@
 #include "line.h"
 
 template <typename T>
-inline T Rectangle<T>::area() const { return width * height; }
+Rectangle<T>::Rectangle(const Point<T>& pos, T w, T h, Alignment align) : position(pos), width(w), height(h), alignment(align) { }
+
+template <typename T>
+T Rectangle<T>::area() const { return width * height; }
 
 template <typename T>
 T Rectangle<T>::perimeter() const { width + width + height + height; }
@@ -11,13 +14,16 @@ template <typename T>
 bool Rectangle<T>::isEmpty() const { return width == 0 && height == 0; }
 
 template <typename T>
+bool Rectangle<T>::contains(const Point<T> &point) const { return x >= getLeft() && x <= getRight() && y >= getTop() && y <= getBottom(); }
+
+template <typename T>
 void Rectangle<T>::translate(T deltaX, T deltaY) { position.translate(deltaX, deltaY); }
 
 template <typename T>
-inline void Rectangle<T>::translate(Point<T> delta) { position += delta; }
+void Rectangle<T>::translate(Point<T> delta) { position += delta; }
 
 template <typename T>
-inline T Rectangle<T>::getTop() const { return Point<T>::align(*this).y; }
+T Rectangle<T>::getTop() const { return Point<T>::align(*this).y; }
 
 template <typename T>
 T Rectangle<T>::getBottom() const { return Point<T>::align(*this).y + height; }
@@ -60,3 +66,6 @@ Line<T> Rectangle<T>::getLeftLine() const { return Line<T>(getBottomLeft(), getT
 
 template <typename T>
 Line<T> Rectangle<T>::getRightLine() const { return Line<T>(getTopRight(), getBottomRight()); }
+
+template <typename T>
+std::optional<Line<T>> Rectangle<T>::intersection(const Line<T> &line) { return line.intersection(*this); }

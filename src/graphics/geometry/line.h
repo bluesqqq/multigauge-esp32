@@ -12,7 +12,7 @@ struct Line {
     Point<T> p1, p2;
     
     Line(T x1, T y1, T x2, T y2);
-    Line(Point<T> p1, Point<T> p2);
+    Line(const Point<T>& p1, const Point<T>& p2);
 
     static Line<float> radialLine(float angle, float startRadius, float endRadius);
     static Line<float> radialLine(float angle, float startRadiusX, float startRadiusY, float endRadiusX, float endRadiusY);
@@ -47,6 +47,8 @@ struct Line {
 
     // ====== [INTERSECTIONS] ====== //
 
+    bool intersects(const Line<T>& other);
+    bool slopesIntersect(const Line<T>& other);
     std::optional<Point<T>> intersection(const Line<T>& other) const;
     std::optional<Point<T>> slopeIntersection(const Line<T>& other) const;
 

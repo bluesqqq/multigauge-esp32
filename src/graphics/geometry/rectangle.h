@@ -12,7 +12,7 @@ struct Rectangle {
     T width, height;
     Alignment alignment;
 
-    Rectangle(Point<T> position, T width, T height, Alignment alignment = Alignment::TopLeft);
+    Rectangle(const Point<T>& position, T width, T height, Alignment alignment = Alignment::TopLeft);
 
     static Rectangle<T> fromPoints(Point<T> p1, Point<T> p2);
 

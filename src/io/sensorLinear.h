@@ -4,7 +4,7 @@
 
 class SensorLinear : public Sensor {
     private:
-        Values::Value* value;
+        Value* value;
 
         float lowerVoltage;
         float upperVoltage;
@@ -17,7 +17,7 @@ class SensorLinear : public Sensor {
         uint pin;
     
     public:
-        SensorLinear(uint pin, Values::Value* value, float lowerVoltage, float upperVoltage, float lowerValue, float upperValue, int unitIndex = 0, std::string name = "Sensor");
+        SensorLinear(uint pin, Value* value, float lowerVoltage, float upperVoltage, float lowerValue, float upperValue, int unitIndex = 0, std::string name = "Sensor");
 
         bool begin() override;
 
