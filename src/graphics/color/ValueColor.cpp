@@ -4,14 +4,14 @@ const ColorTimeline *ValueColor::getTimeline() const { return &timeline; }
 
 ValueColor::ValueColor(Value *value) : timeline(ColorTimeline()), value(value) {}
 
-ValueColor::ValueColor(Value *value, const ColorTimeline &timeline) : timeline(timeline), value(value) { }
+ValueColor::ValueColor(Value *value, ColorTimeline timeline) : timeline(std::move(timeline)), value(value) { }
 
 ValueColor::ValueColor(JsonObject valueColorJson) {
     timeline = valueColorJson["timeline"].is<JsonObject>() ? ColorTimeline(valueColorJson["timeline"].as<JsonObject>()) : ColorTimeline();
     value    = valueColorJson["value"].is<std::string>() ? Value::find(valueColorJson["value"].as<std::string>()) : nullptr;
 }
 
-std::unique_ptr<Color> ValueColor::blended(uint16_t color, float alpha) const { return std::make_unique<ValueColor>(timeline.blended(color, alpha)); }
+std::unique_ptr<Color> ValueColor::blended(uint16_t color, float alpha) const { return std::make_unique<ValueColor>(this->value, timeline.blended(color, alpha)); }
 
 std::unique_ptr<Color> ValueColor::blended(const Color &other, float alpha) const{
     switch(other.getType()) {
@@ -25,7 +25,8 @@ std::unique_ptr<Color> ValueColor::blended(const Color &other, float alpha) cons
         }
     }
 
-    return std::make_unique<ValueColor>(this->value, this->timeline);
+    //return std::make_unique<ValueColor>(this->value, this->timeline);
+    return std::make_unique<ValueColor>(this->value);
 }
 
 uint16_t ValueColor::getColor() const { return timeline.getColor((value != nullptr) ? value->getValueBase() : 0.0f); }

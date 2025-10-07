@@ -11,7 +11,7 @@ class ValueColor : public Color {
     public:
         ValueColor(Value* value);
 
-        ValueColor(Value* value, const ColorTimeline& timeline);
+        ValueColor(Value* value, ColorTimeline timeline);
 
         /// @brief Constructs a ValueColor from JSON
         /// @param valueColorJson The JSON object containing color data

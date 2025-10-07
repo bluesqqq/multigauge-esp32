@@ -37,7 +37,7 @@ ColorTimeline::ColorTimeline(JsonObject colorTimelineJson) {
 
     JsonArray keyframesJson = colorTimelineJson["keyframes"].as<JsonArray>();
     for (JsonObject keyframeJson : keyframesJson)
-        timeline.push_back(ColorKeyframe(keyframeJson));
+        timeline.emplace_back(ColorKeyframe(keyframeJson));
 }
 
 ColorTimeline ColorTimeline::blended(uint16_t color, float alpha) const {
@@ -46,7 +46,7 @@ ColorTimeline ColorTimeline::blended(uint16_t color, float alpha) const {
     std::vector<ColorKeyframe>& tl = newTimeline.getTimeline();
 
     for (const auto& keyframe : timeline)
-        tl.push_back({keyframe.color->blended(color, alpha), keyframe.position});
+        tl.emplace_back(ColorKeyframe(keyframe.color->blended(color, alpha), keyframe.position));
 
     return newTimeline;
 }
@@ -79,7 +79,7 @@ void ColorTimeline::addKeyframe(std::unique_ptr<Color> color, float position) { 
 void ColorTimeline::addKeyframe(ColorKeyframe keyframe) {
     auto it = timeline.begin();
     while(it != timeline.end() && it->position < keyframe.position) ++it;
-    timeline.insert(it, keyframe);
+    timeline.insert(it, std::move(keyframe));
 }
 
 void ColorTimeline::clear() { timeline.clear(); }

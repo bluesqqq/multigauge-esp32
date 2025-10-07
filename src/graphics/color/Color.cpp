@@ -23,7 +23,7 @@ uint16_t Color::blend(const uint16_t &base, const uint16_t &blend, float alpha) 
 }
 
 std::unique_ptr<Color> Color::loadFromJson(JsonObject colorJson) {
-    if (!colorJson.containsKey("type")) return std::make_unique<StaticColor>();
+    if (!colorJson["type"].is<const char*>()) return std::make_unique<StaticColor>();
     
     std::string type = std::string(colorJson["type"].as<const char*>());
 

@@ -16,6 +16,9 @@ struct ColorKeyframe {
 
     ColorKeyframe(const ColorKeyframe&) = delete;
     ColorKeyframe& operator=(const ColorKeyframe&) = delete;
+
+    ColorKeyframe(ColorKeyframe&&) = default;
+    ColorKeyframe& operator=(ColorKeyframe&&) = default;
 };
 
 class ColorTimeline {
@@ -35,6 +38,12 @@ class ColorTimeline {
         /// @brief Constructs a timeline from JSON.
         /// @param colorTimelineJson The JSON object containing timeline data
         ColorTimeline(JsonObject colorTimelineJson);
+
+        ColorTimeline(const ColorTimeline&) = delete;
+        ColorTimeline& operator=(const ColorTimeline&) = delete;
+
+        ColorTimeline(ColorTimeline&&) = default;
+        ColorTimeline& operator=(ColorTimeline&&) = default;
 
         /// @brief Blends this timeline with a static color value.
         /// @param color The 16-bit color value to blend with

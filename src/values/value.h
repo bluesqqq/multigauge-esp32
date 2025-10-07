@@ -7,6 +7,8 @@
 
 class Value {
     private:
+        static std::unordered_map<std::string, Value*> registry;
+
         const char* name;
 
         float value;
@@ -14,8 +16,6 @@ class Value {
         const float maximumValue;
 
         const UnitType& unitType;
-
-        static std::unordered_map<std::string, Value*> registry;
 
     public:
         Value(const char* name, const UnitType& unitType, float minimumValue, float maximumValue);

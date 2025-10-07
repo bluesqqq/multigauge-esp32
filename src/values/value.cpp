@@ -1,6 +1,8 @@
 #include "value.h"
 #include <Arduino.h>
 
+std::unordered_map<std::string, Value*> Value::registry;
+
 Value::Value(const char* name, const UnitType& unitType, float minimumValue, float maximumValue) 
     : name(name), unitType(unitType), value(minimumValue), minimumValue(minimumValue), maximumValue(maximumValue) { 
     registry[name] = this;
