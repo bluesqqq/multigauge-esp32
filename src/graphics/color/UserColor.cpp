@@ -15,6 +15,8 @@ UserColor::UserColor(JsonObject userColorJson) {
     }
 }
 
+std::unique_ptr<Color> UserColor::clone() const { return std::make_unique<UserColor>(*this); }
+
 uint16_t UserColor::getColor() const { return userColors[static_cast<size_t>(slot)]; }
 
 Color::Type UserColor::getType() const { return Type::User; }

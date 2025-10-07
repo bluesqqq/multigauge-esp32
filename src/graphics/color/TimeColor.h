@@ -36,6 +36,12 @@ class TimeColor : public Color {
         /// @param timeColorJson The JSON object containing color data
         TimeColor(JsonObject timeColorJson);
 
+        TimeColor(const TimeColor& other);
+        
+        TimeColor& operator=(const TimeColor& other);
+
+        std::unique_ptr<Color> clone() const override;
+
         /// @brief Gets the current color value on the timeline.
         /// @return The current 16-bit color value
         uint16_t getColor() const override;

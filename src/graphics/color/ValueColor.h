@@ -17,6 +17,12 @@ class ValueColor : public Color {
         /// @param valueColorJson The JSON object containing color data
         ValueColor(JsonObject valueColorJson);
 
+        ValueColor(const ValueColor& other);
+        
+        ValueColor& operator=(const ValueColor& other);
+
+        std::unique_ptr<Color> clone() const override;
+
         /// @brief Gets the current color value on the timeline.
         /// @return The current 16-bit color value
         uint16_t getColor() const override;

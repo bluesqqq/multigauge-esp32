@@ -10,7 +10,15 @@ ColorKeyframe::ColorKeyframe(JsonObject colorKeyframeJson) {
     color = colorKeyframeJson["color"].is<JsonObject>() ? Color::loadFromJson(colorKeyframeJson["color"].as<JsonObject>()) : std::make_unique<StaticColor>();
 }
 
+ColorKeyframe::ColorKeyframe(const ColorKeyframe &other) : position(other.position), color(other.color ? other.color->clone() : nullptr) {}
 
+ColorKeyframe &ColorKeyframe::operator=(const ColorKeyframe &other) {
+    if (this != &other) {
+        this->position = other.position;
+        this->color = other.color ? other.color->clone() : nullptr;
+    }
+    return *this;
+}
 
 size_t ColorTimeline::getKeyframeIndexAtPosition(float position) const {
     if (timeline.empty() || position <= timeline.front().position) return 0;
@@ -40,13 +48,30 @@ ColorTimeline::ColorTimeline(JsonObject colorTimelineJson) {
         timeline.emplace_back(ColorKeyframe(keyframeJson));
 }
 
+ColorTimeline::ColorTimeline(const ColorTimeline &other) {
+    const std::vector<ColorKeyframe>& timeline = other.getTimeline();
+
+    for (const auto& keyframe : timeline)
+        this->timeline.emplace_back(keyframe);
+}
+
+ColorTimeline &ColorTimeline::operator=(const ColorTimeline &other) {
+    timeline.clear();
+
+    const std::vector<ColorKeyframe>& timeline = other.getTimeline();
+
+    for (const auto& keyframe : timeline)
+        this->timeline.emplace_back(keyframe);
+
+    return *this;
+}
+
 ColorTimeline ColorTimeline::blended(uint16_t color, float alpha) const {
     ColorTimeline newTimeline;
 
-    std::vector<ColorKeyframe>& tl = newTimeline.getTimeline();
-
+    // TODO: addKeyframe is inefficient in this case. emplace_back directly into the timeline would be better
     for (const auto& keyframe : timeline)
-        tl.emplace_back(ColorKeyframe(keyframe.color->blended(color, alpha), keyframe.position));
+        newTimeline.addKeyframe(ColorKeyframe(keyframe.color->blended(color, alpha), keyframe.position));
 
     return newTimeline;
 }
@@ -70,7 +95,7 @@ ColorTimeline ColorTimeline::blended(const ColorTimeline &other, float alpha) co
     return newTimeline;
 }
 
-std::vector<ColorKeyframe> &ColorTimeline::getTimeline() { return timeline; }
+const std::vector<ColorKeyframe> &ColorTimeline::getTimeline() const { return timeline; }
 
 void ColorTimeline::addKeyframe(uint16_t color, float position) { addKeyframe(ColorKeyframe(std::make_unique<StaticColor>(color), position)); }
 

@@ -10,6 +10,8 @@ class ColorTimeline;
 
 class Color {
     public:
+        virtual std::unique_ptr<Color> clone() const = 0;
+
         /// @brief Blends two 16-bit (RGB565) color values together.
         /// @param base The base color value
         /// @param blend The color value to blend with

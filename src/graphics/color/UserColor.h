@@ -22,6 +22,8 @@ class UserColor : public Color {
         /// @param userColorJson The JSON object containing color data
         UserColor(JsonObject userColorJson);
 
+        std::unique_ptr<Color> clone() const override;
+        
         /// @brief Gets the user-defined color value.
         /// @return The 16-bit color value
         uint16_t getColor() const override;

@@ -44,6 +44,16 @@ TimeColor::TimeColor(JsonObject timeColorJson) {
     }
 }
 
+TimeColor::TimeColor(const TimeColor &other) : timeline(other.timeline), loopType(other.loopType) {}
+
+TimeColor &TimeColor::operator=(const TimeColor &other) {
+    if (this != &other) {
+        this->timeline = other.timeline;
+        this->loopType = other.loopType;
+    }
+    return *this;
+}
+
 std::unique_ptr<Color> TimeColor::blended(uint16_t color, float alpha) const { return std::make_unique<TimeColor>(timeline.blended(color, alpha)); }
 
 std::unique_ptr<Color> TimeColor::blended(const Color &other, float alpha) const {
@@ -61,6 +71,8 @@ std::unique_ptr<Color> TimeColor::blended(const Color &other, float alpha) const
     //return std::make_unique<TimeColor>(this->timeline, this->loopType);
     return std::make_unique<TimeColor>();
 }
+
+std::unique_ptr<Color> TimeColor::clone() const { return std::make_unique<TimeColor>(*this); }
 
 uint16_t TimeColor::getColor() const { return timeline.getColor(getTime()); }
 

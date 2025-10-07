@@ -14,10 +14,12 @@ struct ColorKeyframe {
     /// @param colorKeyframeJson The JSON object containing keyframe data
     ColorKeyframe(JsonObject colorKeyframeJson);
 
-    ColorKeyframe(const ColorKeyframe&) = delete;
-    ColorKeyframe& operator=(const ColorKeyframe&) = delete;
+    ColorKeyframe(const ColorKeyframe& other);
+
+    ColorKeyframe& operator=(const ColorKeyframe& other);
 
     ColorKeyframe(ColorKeyframe&&) = default;
+    
     ColorKeyframe& operator=(ColorKeyframe&&) = default;
 };
 
@@ -39,10 +41,12 @@ class ColorTimeline {
         /// @param colorTimelineJson The JSON object containing timeline data
         ColorTimeline(JsonObject colorTimelineJson);
 
-        ColorTimeline(const ColorTimeline&) = delete;
-        ColorTimeline& operator=(const ColorTimeline&) = delete;
+        ColorTimeline(const ColorTimeline& other);
+
+        ColorTimeline& operator=(const ColorTimeline& other);
 
         ColorTimeline(ColorTimeline&&) = default;
+
         ColorTimeline& operator=(ColorTimeline&&) = default;
 
         /// @brief Blends this timeline with a static color value.
@@ -57,7 +61,7 @@ class ColorTimeline {
         /// @return A new ColorTimeline object with the blended result
         ColorTimeline blended(const ColorTimeline& other, float alpha) const;
         
-        std::vector<ColorKeyframe>& getTimeline();
+        const std::vector<ColorKeyframe>& getTimeline() const;
 
         /// @brief Adds a StaticColor color keyframe to the timeline
         /// @param color The 16-bit color value
