@@ -2,6 +2,7 @@
 #include "StaticColor.h"
 #include "utils.h"
 #include <set>
+#include <algorithm>
 
 ColorKeyframe::ColorKeyframe(std::unique_ptr<Color> color, float position) : color(std::move(color)), position(position) { }
 
@@ -21,19 +22,21 @@ ColorKeyframe &ColorKeyframe::operator=(const ColorKeyframe &other) {
 }
 
 size_t ColorTimeline::getKeyframeIndexAtPosition(float position) const {
-    if (timeline.empty() || position <= timeline.front().position) return 0;
-    if (position >= timeline.back().position) return timeline.size() - 1;
+    const size_t n = timeline.size();
+    if (n <= 1) return 0;
+    if (position < timeline[1].position) return 0;
+    if (position >= timeline.back().position) return n - 1;
 
-    size_t left = 0;
-    size_t right = timeline.size() - 2;
+    size_t left = 1;
+    size_t right = n - 1;
     while (left < right) {
-        size_t middle = left + (right - left) / 2;
-        if (timeline[middle].position <= position) left = middle + 1;
+        size_t middle = (left + right) / 2;
+        if (timeline[middle].position < position) 
+            left = middle + 1;
         else right = middle;
     }
-    left--;
 
-    return left;
+    return left - 1;
 }
 
 ColorTimeline::ColorTimeline() {}

@@ -10,6 +10,8 @@ class ColorTimeline;
 
 class Color {
     public:
+        /// @brief Creates a clone of this Color object
+        /// @return A unique pointer to the created Color object
         virtual std::unique_ptr<Color> clone() const = 0;
 
         /// @brief Blends two 16-bit (RGB565) color values together.
