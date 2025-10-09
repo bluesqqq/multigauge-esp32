@@ -43,8 +43,8 @@ class Graphics final {
 
 
         void fillAll() const;
-        void fillAll(Color* color) const;
-
+        void fillAll(Color* color);
+        void fillAll(uint16_t color) const;
 
 
         void fillRect(int x, int y, int width, int height);

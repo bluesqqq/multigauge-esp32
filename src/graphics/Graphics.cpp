@@ -12,8 +12,7 @@ uint16_t Graphics::getCachedColor(Color *color) {
 
 Graphics::Graphics(GraphicsContext *context) : context(context) { }
 
-void Graphics::clearColorCache()
-{
+void Graphics::clearColorCache() {
     colorCache.clear();
     if (fill != nullptr) fillValue = getCachedColor(fill);
     if (stroke != nullptr) fillValue = getCachedColor(fill);
@@ -39,18 +38,22 @@ void Graphics::setStroke(Color *color) {
     strokeValue = getCachedColor(color);
 }
 
-void Graphics::fillAll() const { fillAll(fill); }
+void Graphics::fillAll() const { fillAll(fillValue); }
 
-void Graphics::fillAll(Color *color) const { if (color) context->fillAll(color->getColor()); }
+void Graphics::fillAll(Color *color) { 
+    context->fillAll(getCachedColor(color)); 
+}
 
-void Graphics::fillRect(int x, int y, int width, int height) { if (fill) context->fillRectangle(x, y, width, height, fill->getColor()); }
+void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
+
+void Graphics::fillRect(int x, int y, int width, int height) { context->fillRectangle(x, y, width, height, fillValue); }
 
 void Graphics::fillRect(const Rectangle<int> &rectangle) { 
     Point<int> pos = rectangle.getTopLeft();
     fillRect(pos.x, pos.y, rectangle.width, rectangle.height);
 }
 
-void Graphics::strokeRect(int x, int y, int width, int height) { if (fill) context->fillRectangle(x, y, width, height, fill->getColor()); }
+void Graphics::strokeRect(int x, int y, int width, int height) { if (fill) context->fillRectangle(x, y, width, height, fillValue); }
 
 void Graphics::strokeRect(const Rectangle<int> &rectangle) {
     Point<int> pos = rectangle.getTopLeft();
@@ -58,5 +61,9 @@ void Graphics::strokeRect(const Rectangle<int> &rectangle) {
 }
 
 void Graphics::fillCircle(int cx, int cy, int radius) const {
-    if (fill) context->fillCircle(cx, cy, radius, fill->getColor());
+    context->fillCircle(cx, cy, radius, fillValue);
+}
+
+void Graphics::strokeCircle(int cx, int cy, int radius) const {
+    context->strokeCircle(cx, cy, radius, strokeValue, 1);
 }

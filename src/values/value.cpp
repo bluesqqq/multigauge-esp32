@@ -38,9 +38,9 @@ void Value::setValue(float newValue, int index) {
     if (onChange) onChange(value);
 }
 
-float Value::getMinimum(int index) const { return unitType.convertToBase(minimumValue, index); }
+float Value::getMinimum(int index) const { return unitType.convertFromBase(minimumValue, index); }
 
-float Value::getMaximum(int index) const { return unitType.convertToBase(maximumValue, index); }
+float Value::getMaximum(int index) const { return unitType.convertFromBase(maximumValue, index); }
 
 const char* Value::getName() const { return name; }
 
