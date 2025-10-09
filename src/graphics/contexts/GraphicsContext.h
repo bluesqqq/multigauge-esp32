@@ -5,9 +5,7 @@
 class GraphicsContext {
     public:
         /// @brief Called once during initialization
-        virtual void init() {
-            Serial.println("INITIALIZED GRAPHICS CONTEXT");
-        };
+        virtual void init() {}
 
         /// @brief Called before drawing a new frame
         virtual void beginFrame() {};
