@@ -3,7 +3,7 @@
 #include <freertos/task.h>
 
 #include "graphics/Graphics.h"
-#include "graphics/contexts/GraphicsContextTFT_eSPI.h"
+#include "graphics/contexts/GraphicsContextLovyanGFX.h"
 
 #include "graphics/colors/ColorTimeline.h"
 #include "graphics/colors/StaticColor.h"
@@ -15,8 +15,7 @@
 
 #ifndef PIO_UNIT_TESTING
 
-
-GraphicsContext* context = new GraphicsContextTFT_eSPI();
+GraphicsContext* context = new GraphicsContextLovyanGFX();
 
 Graphics g(context);
 
