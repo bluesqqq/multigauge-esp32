@@ -12,16 +12,35 @@ GaugeFace::GaugeFace(JsonObject json)
     
     if (json["elements"].is<JsonArray>()) {
         JsonArray elementsJson = json["elements"].as<JsonArray>();
+        elements.reserve(elementsJson.size());
 
         for (const auto& elementJson : elementsJson)
-            addGaugeElement(GaugeElement::loadFromJson(elementJson));
+            if (elementJson.is<JsonObject>()) addElement(elementJson.as<JsonObject>());
     }
+}
+
+void GaugeFace::addElement(std::unique_ptr<GaugeElement> element) {
+    if (element != nullptr) elements.push_back(std::move(element));
+}
+
+void GaugeFace::addElement(JsonObject json) { addElement(GaugeElement::loadFromJson(json)); }
+
+bool GaugeFace::init() {
+    bool result = true;
+
+    for (const auto& element : elements) 
+        if (!element->init()) result = false;
+        
+    return result;
 }
 
 void GaugeFace::draw(Graphics &g) const {
     g.fillAll(backgroundColor->getColor());
 
-    for (const auto& element : elements) element->draw(g);
+    const Rectangle<int> bounds = g.getScreenBounds().reduced(padding);
+    
+    // Currently just draws all elements relative
+    for (const auto& element : elements) element->draw(g, bounds);
 }
 
 void GaugeFace::update() {

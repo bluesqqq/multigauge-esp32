@@ -7,6 +7,8 @@
 
 #include "graphics/colors/ColorTimeline.h"
 #include "graphics/colors/StaticColor.h"
+#include "graphics/gauge/GaugeFace.h"
+#include "graphics/gauge/elements/utilities/GroupElement.h"
 
 #include <xtensa/hal.h>
 #include "utils.h"
@@ -19,9 +21,18 @@ GraphicsContext* context = new GraphicsContextLovyanGFX();
 
 Graphics g(context);
 
+GaugeFace face = GaugeFace();
+
 void setup() { 
     Serial.begin(115200);
 
+    std::unique_ptr<GroupElement> group = std::make_unique<GroupElement>();
+    group->addElement(std::make_unique<GroupElement>());
+    group->addElement(std::make_unique<GroupElement>());
+    face.addElement(std::move(group));
+    
+    face.init();
+    
     context->init();
 }
 
@@ -39,19 +50,12 @@ void loop() {
     }
     
     t++;
+
+    face.update();
+
     context->beginFrame();
 
-    g.fillAll((uint16_t)TFT_BLACK);
-
-    g.setStroke(TFT_WHITE);
-    g.setFill(TFT_WHITE);
-
-    for (int i = 0; i < 24; i++) {
-        int r = (i * 10) + (t % 10);
-        g.strokeCircle(120, 120, r);
-    }
-
-    g.fillCircle(120, 120, 20);
+    face.draw(g);
 
     context->endFrame();
 

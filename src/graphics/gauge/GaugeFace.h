@@ -18,6 +18,8 @@ class GaugeFace {
 
         unsigned long lastUpdateTime = 0;
 
+        int padding = 10;
+
     public:
         GaugeFace();
 
@@ -25,13 +27,13 @@ class GaugeFace {
 
         GaugeFace(JsonObject json);
 
-        void addGaugeElement(std::unique_ptr<GaugeElement> element);
+        void addElement(std::unique_ptr<GaugeElement> element);
 
-        void init();
+        void addElement(JsonObject json);
+
+        bool init();
 
         void draw(Graphics& g) const;
 
         void update();
-
-        JsonObject serialize();
 };

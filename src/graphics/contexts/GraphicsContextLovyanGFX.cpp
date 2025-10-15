@@ -9,6 +9,9 @@ void GraphicsContextLovyanGFX::init() {
     buffer.setColorDepth(16);
     buffer.setPsram(false);
     buffer.createSprite(display.width(), display.height());
+
+    width = display.width();
+    height = display.height();
 }
 
 void GraphicsContextLovyanGFX::endFrame() {
@@ -18,7 +21,7 @@ void GraphicsContextLovyanGFX::endFrame() {
 void GraphicsContextLovyanGFX::fillRectangle(float x, float y, float w, float h, uint16_t color) { buffer.fillRect(x, y, w, h, color); }
 
 void GraphicsContextLovyanGFX::strokeRectangle(float x, float y, float w, float h, uint16_t color, float thickness) {
-
+    buffer.drawRect(x, y, w, h, color);
 }
 
 void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, uint16_t color) { buffer.fillCircle(cx, cy, r, color); }

@@ -6,7 +6,10 @@ void GraphicsContextTFT_eSPI::init() {
     display.fillScreen(TFT_BLACK);
 
     buffer.setColorDepth(8);
-    buffer.createSprite(240, 240);
+    buffer.createSprite(display.width(), display.height());
+
+    width = display.width();
+    height = display.height();
 }
 
 void GraphicsContextTFT_eSPI::endFrame() {

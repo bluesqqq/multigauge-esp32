@@ -18,6 +18,10 @@ void Graphics::clearColorCache() {
     if (stroke != nullptr) fillValue = getCachedColor(fill);
 }
 
+Rectangle<int> Graphics::getScreenBounds() {
+    return Rectangle<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
+}
+
 void Graphics::setFill(uint16_t color) {
     fill = nullptr;
     fillValue = color;
@@ -40,30 +44,18 @@ void Graphics::setStroke(Color *color) {
 
 void Graphics::fillAll() const { fillAll(fillValue); }
 
-void Graphics::fillAll(Color *color) { 
-    context->fillAll(getCachedColor(color)); 
-}
+void Graphics::fillAll(Color *color) { context->fillAll(getCachedColor(color)); }
 
 void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
 
 void Graphics::fillRect(int x, int y, int width, int height) { context->fillRectangle(x, y, width, height, fillValue); }
 
-void Graphics::fillRect(const Rectangle<int> &rectangle) { 
-    Point<int> pos = rectangle.getTopLeft();
-    fillRect(pos.x, pos.y, rectangle.width, rectangle.height);
-}
+void Graphics::fillRect(const Rectangle<int> &rectangle) { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
 
-void Graphics::strokeRect(int x, int y, int width, int height) { if (fill) context->fillRectangle(x, y, width, height, fillValue); }
+void Graphics::strokeRect(int x, int y, int width, int height) { context->strokeRectangle(x, y, width, height, strokeValue, 1); }
 
-void Graphics::strokeRect(const Rectangle<int> &rectangle) {
-    Point<int> pos = rectangle.getTopLeft();
-    strokeRect(pos.x, pos.y, rectangle.width, rectangle.height);
-}
+void Graphics::strokeRect(const Rectangle<int> &rectangle) { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
 
-void Graphics::fillCircle(int cx, int cy, int radius) const {
-    context->fillCircle(cx, cy, radius, fillValue);
-}
+void Graphics::fillCircle(int cx, int cy, int radius) const { context->fillCircle(cx, cy, radius, fillValue); }
 
-void Graphics::strokeCircle(int cx, int cy, int radius) const {
-    context->strokeCircle(cx, cy, radius, strokeValue, 1);
-}
+void Graphics::strokeCircle(int cx, int cy, int radius) const { context->strokeCircle(cx, cy, radius, strokeValue, 1); }

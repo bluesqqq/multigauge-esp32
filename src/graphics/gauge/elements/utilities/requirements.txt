@@ -1,0 +1,66 @@
+
+You should be able to define layouts as such:
+
+┌─────┬───┐
+│  A  │ B │
+├─────┴───┤ (Example)
+│    C    │
+└─────────┘
+
+Here the groups would be defined as [[A B] C]
+
+[A B] and C would be the first layout, a vertical layout splitting the two segments 50/50, while keeping their width (100%).
+
+A and B would be a nested layout, being a 75/25 split of the width, while keeping the parent's height.
+
+┌───────────┬─────┐
+│     A     │  B  │
+├───────────┴─────┤ (x2 width, or 2:1 ratio)
+│        C        │
+└─────────────────┘
+
+┌─────┬───┐
+│     │   │
+│  A  │ B │
+│     │   │
+├─────┴───┤ (x2 height, or 1:2 ratio)
+│         │
+│    C    │
+│         │
+└─────────┘
+
+This should keep true as the size changes, whether it be width or height.
+This is the most basic form of a dynamic layout.
+
+
+
+┌─────────────────┐
+│        A        │
+├─────────────────┤
+│        B        │
+├─────────────────┤
+│        C        │
+└─────────────────┘
+
+You should be able to make layouts have more than just two sections. Three, four, or even more sections should be easily made.
+
+┌─────────────────┐
+│        A        │ (25%) or (1)
+├─────────────────┤      
+│                 │      
+│        B        │ (50%) or (2)
+│                 │      
+├─────────────────┤      
+│        C        │ (25%) or (1)
+└─────────────────┘      
+
+Furthermore, you should be able to define the size of each section
+
+
+
+┌─────────┐     ┌─────────┬───┐     ┌─────────┬─────────┐     ┌─────────────┬─────────────┐
+│         │     │         │   │     │         │         │     │             │             │
+│    A    │ --> │    A    │ B │ --> │    A    │    B    │ --> │      A      │      B      │
+│         │     │         │   │     │         │         │     │             │             │
+└─────────┘     └─────────┴───┘     └─────────┴─────────┘     └─────────────┴─────────────┘
+

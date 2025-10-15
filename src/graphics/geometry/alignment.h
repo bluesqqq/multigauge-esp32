@@ -7,7 +7,7 @@ enum class Direction {
     Up
 };
 
-enum class Alignment {
+enum class Anchor {
     TopLeft,
     TopCenter,
     TopRight,
@@ -28,4 +28,18 @@ enum class EdgeAlignment {
 enum class Orientation {
     Horizontal,
     Vertical
+};
+
+enum class Justify {
+    Start,
+    Center,
+    End,
+    SpaceBetween,
+    SpaceAround
+};
+
+enum class Align {
+    Start,
+    Center,
+    End
 };

@@ -32,7 +32,7 @@ class Graphics final {
 
         void clearColorCache();
 
-
+        Rectangle<int> getScreenBounds();
         
         void setFill(uint16_t color);
         void setFill(Color* color);
@@ -106,8 +106,8 @@ class Graphics final {
 
 
 
-        void drawText(const std::string& text, int x, int y, int width, int height, Alignment alignment, bool useEllipses = true) const;
-        void drawText(const std::string& text, Rectangle<int> rectangle, Alignment alignment, bool useEllipses = true) const;
+        void drawText(const std::string& text, int x, int y, int width, int height, Anchor anchor, bool useEllipses = true) const;
+        void drawText(const std::string& text, Rectangle<int> rectangle, Anchor anchor, bool useEllipses = true) const;
 
 
 

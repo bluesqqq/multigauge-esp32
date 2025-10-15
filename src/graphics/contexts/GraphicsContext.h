@@ -3,6 +3,10 @@
 #include "graphics/colors/Color.h"
 
 class GraphicsContext {
+    protected:
+        int width;
+        int height;
+
     public:
         /// @brief Called once during initialization
         virtual void init() {}
@@ -13,6 +17,9 @@ class GraphicsContext {
         /// @brief Called after all draw calls for the current frame are finished
         virtual void endFrame() {};
 
+        int getScreenWidth() const;
+        int getScreenHeight() const;
+        
         virtual void fillRectangle(float x, float y, float w, float h, uint16_t color) = 0;
         virtual void strokeRectangle(float x, float y, float w, float h, uint16_t color, float thickness) = 0;
         virtual void fillCircle(int cx, int cy, int r, uint16_t color) = 0;
