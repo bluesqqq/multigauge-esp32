@@ -6,6 +6,7 @@
 #include "alignment.h"
 #include "line.h"
 #include "utils.h"
+#include "graphics/gauge/Element.h"
 
 template <typename T>
 struct Rectangle {
@@ -145,13 +146,39 @@ struct Rectangle {
 
     void reduce(T deltaX, T deltaY) { position.translate(deltaX, deltaY);  width -= 2 * deltaX; height -= 2 * deltaY; }
     void reduce(T delta) { reduce(delta, delta); }
-    Rectangle<T> reduced(T deltaX, T deltaY) { return Rectangle<T>(position.translated(deltaX, deltaY), width - (2 * deltaX), height - (2 * deltaY)); }
-    Rectangle<T> reduced(T delta) { return reduced(delta, delta); }
+    void reduce(BoxSpacing spacing, const Rectangle<T>& parentBounds) {
+        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
+        position.translate(spacingPx.left, spacingPx.top);
+        width -= (spacingPx.left + spacingPx.right);
+        height -= (spacingPx.top - spacingPx.bottom);
+    }
+    void reduce(BoxSpacing spacing) { reduce(spacing, *this); }
+    Rectangle<T> reduced(T deltaX, T deltaY) const{ return Rectangle<T>(position.translated(deltaX, deltaY), width - (2 * deltaX), height - (2 * deltaY)); }
+    Rectangle<T> reduced(T delta) const { return reduced(delta, delta); }
+    Rectangle<T> reduced(BoxSpacing spacing, const Rectangle<T>& parentBounds) const {
+        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
+        return Rectangle<T>(position.translated(spacingPx.left, spacingPx.top), width - spacingPx.left - spacingPx.right, height - spacingPx.top - spacingPx.bottom);
+    }
+    Rectangle<T> reduced(BoxSpacing spacing) const { return reduced(spacing, *this); }
+
+    
 
     void expand(T deltaX, T deltaY) { position.translate(-deltaX, -deltaY);  width += 2 * deltaX; height += 2 * deltaY; }
     void expand(T delta) { expand(delta, delta); };
-    Rectangle<T> expanded(T deltaX, T deltaY) { return Rectangle<T>(position.translated(-deltaX, -deltaY), width + (2 * deltaX), height + (2 * deltaY)); }
-    Rectangle<T> expanded(T delta) { return expanded(delta, delta); }
+    void expand(BoxSpacing spacing, const Rectangle<T>& parentBounds) {
+        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
+        position.translate(-spacingPx.left, -spacingPx.top);
+        width += (spacingPx.left + spacingPx.right);
+        height += (spacingPx.top - spacingPx.bottom);
+    }
+    void expand(BoxSpacing spacing) { expand(spacing, *this); }
+    Rectangle<T> expanded(T deltaX, T deltaY) const { return Rectangle<T>(position.translated(-deltaX, -deltaY), width + (2 * deltaX), height + (2 * deltaY)); }
+    Rectangle<T> expanded(T delta) const { return expanded(delta, delta); }
+    Rectangle<T> expanded(BoxSpacing spacing, const Rectangle<T>& parentBounds) const {
+        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
+        return Rectangle<T>(position.translated(-spacingPx.left, -spacingPx.top), width + spacingPx.left + spacingPx.right, height + spacingPx.top + spacingPx.bottom);
+    }
+    Rectangle<T> expanded(BoxSpacing spacing) const { return expanded(spacing, *this); }
 
     // ====== [ROTATION] ====== //
 

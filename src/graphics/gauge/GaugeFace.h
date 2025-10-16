@@ -2,11 +2,12 @@
 
 #include "GaugeElement.h"
 #include <memory>
+#include "graphics/gauge/Element.h"
 
 #define NO_TITLE_TEXT "No Title"
 #define NO_DESCRIPTION_TEXT "No description."
 
-class GaugeFace {
+class GaugeFace : public Element {
     private:
         std::vector<std::unique_ptr<GaugeElement>> elements;
 
@@ -18,18 +19,12 @@ class GaugeFace {
 
         unsigned long lastUpdateTime = 0;
 
-        int padding = 10;
-
     public:
         GaugeFace();
 
         GaugeFace(const char* title, const char* description);
 
         GaugeFace(JsonObject json);
-
-        void addElement(std::unique_ptr<GaugeElement> element);
-
-        void addElement(JsonObject json);
 
         bool init();
 

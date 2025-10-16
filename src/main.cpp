@@ -27,9 +27,14 @@ void setup() {
     Serial.begin(115200);
 
     std::unique_ptr<GroupElement> group = std::make_unique<GroupElement>();
-    group->addElement(std::make_unique<GroupElement>());
-    group->addElement(std::make_unique<GroupElement>());
-    face.addElement(std::move(group));
+
+    group->addChild(std::make_unique<GroupElement>());
+    group->addChild(std::make_unique<GroupElement>());
+    group->addChild(std::make_unique<GroupElement>());
+    group->addChild(std::make_unique<GroupElement>());
+    group->addChild(std::make_unique<GroupElement>());
+
+    face.addChild(std::move(group));
     
     face.init();
     
@@ -50,6 +55,8 @@ void loop() {
     }
     
     t++;
+
+    face.layout(g.getScreenBounds());
 
     face.update();
 
