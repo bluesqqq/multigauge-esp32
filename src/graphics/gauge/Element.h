@@ -2,164 +2,122 @@
 
 #include "graphics/colors/Color.h"
 #include "graphics/geometry/alignment.h"
-#include "graphics/geometry/rectangle.h"
+#include "graphics/geometry/Rectangle.h"
+#include "graphics/geometry/Length.h"
+#include "graphics/geometry/BoxSpacing.h"
 
-enum class LengthType {
-    Pixels,
-    Percent
-};
-
-struct Length {
-    float value;
-    LengthType type;
-
-    constexpr Length(float value = 0.0f, LengthType type = LengthType::Pixels) : value(value), type(type) {}
-
-    static constexpr Length px(float value = 1.0f) { return { value, LengthType::Pixels}; }
-    static constexpr Length percent(float value = 100.0f) { return { value, LengthType::Percent}; }
-
-    int resolve(int parent) const {
-        if (type == LengthType::Percent) return (int)(parent * (value / 100.0f));
-        return (int)value;
-    }
-};
-
-struct BoxSpacing {
-    Length top;
-    Length right;
-    Length bottom;
-    Length left;
-
-    constexpr BoxSpacing() = default;
-    constexpr BoxSpacing(Length all) : top(all),  bottom(all), right(all), left(all) {}
-    constexpr BoxSpacing(Length vertical, Length horizontal) : top(vertical), bottom(vertical), left(horizontal), right(horizontal) {}
-    constexpr BoxSpacing(Length t, Length r, Length b, Length l) : top(t), bottom(b), left(l), right(r) {}
-    
-    BoxSpacing resolve(float parentWidth, float parentHeight) {
-        return {
-            Length::px(top.resolve(parentHeight)),
-            Length::px(bottom.resolve(parentHeight)),
-            Length::px(left.resolve(parentWidth)),
-            Length::px(right.resolve(parentWidth))
-        };
-    }
-
-    BoxSpacing resolve(const Rectangle<int>& rectangle) { return resolve(rectangle.width, rectangle.height); }
-};
-
-enum class PositionType { Auto, Absolute, Relative };
+#include "graphics/Graphics.h"
+#include <yoga/Yoga.h>
+#include "layout.h"
 
 class Element {
     private:
-        // ====== [HIERARCHY] ====== //
-
         /// @brief Parent element in the hierarchy, or nullptr if root
         Element* parent = nullptr;
         /// @brief Owned child elements
         std::vector<std::unique_ptr<Element>> children;
+
+        Rectangle<float> bounds = Rectangle<float>(0.0f, 0.0f, 0.0f, 0.0f);
+
+        YGNodeRef node = nullptr;
+        YGConfigRef config = nullptr;        
+
+        bool needsLayout_ = true;
+
+        void syncLayoutRecursive(float parentAbsX, float parentAbsY) {
+            const float left = YGNodeLayoutGetLeft(node);
+            const float top = YGNodeLayoutGetTop(node);
+            const float width = YGNodeLayoutGetWidth(node);
+            const float height = YGNodeLayoutGetHeight(node);
+
+            const float absX = parentAbsX + left;
+            const float absY = parentAbsY + top;
+
+            bounds = Rectangle<float>(absX, absY, width, height);
+
+            for (auto& child : children) {
+                child->syncLayoutRecursive(absX, absY);
+            }
+        }
+
+        void clearLayoutDirtyRecursive() {
+            needsLayout_ = false;
+            for (auto& child : children) child->clearLayoutDirtyRecursive();
+        }
+
+        void initializeNode(YGConfigRef config) {
+            node = YGNodeNewWithConfig(config);
+
+            YGNodeSetContext(node, this);
+        }
         
-        // ====== [LAYOUT] ====== //
-
-        PositionType positionType = PositionType::Auto;
-        Length width = Length::percent();
-        Length height = Length::percent();
-
-        Length minimumWidth = Length::px(0);
-        Length minimumHeight = Length::px(0);
-
-        Length maximumWidth = Length::px(10000);
-        Length maximumHeight = Length::px(10000);
-
-        float grow = 0;
-        float shrink = 0;
-
-        /// @brief Spacing outside the element between its bounds and border
-        BoxSpacing margin;
-        /// @brief Spacing inside the element between its content and border
-        BoxSpacing padding;
-
-        /// @brief Child layout direction
-        Orientation orientation = Orientation::Vertical;
-        /// @brief Main-axis alignment
-        Justify justify = Justify::Start;
-        /// @brief Cross-axis alignment
-        Align align = Align::Center;
-
-        Length gap = Length::px(10.0f);
-
-        // ====== [STYLE] ====== //
-
-        std::unique_ptr<Color> backgroundColor = nullptr;
-        std::unique_ptr<Color> strokeColor = nullptr;
-        int strokeThickness = 0;
-        bool visible = true;
-        Length cornerRadius = Length::px(0.0f);
-
     protected:
-        Rectangle<int> bounds;
+        void markLayoutDirty() {
+            Element* n = this;
+            while (n->parent) n = n->parent;
+            n->needsLayout_ = true;
+        }
+
+        bool needsLayout() const { return needsLayout_; }
 
     public:
-        void addChild(std::unique_ptr<Element> child);
+        explicit Element(YGConfigRef config) : config(config) {
+            initializeNode(config);
+        }
+
+        virtual ~Element() {
+            if (parent && parent->node) YGNodeRemoveChild(parent->node, node);
+
+            YGNodeRemoveAllChildren(node);
+            YGNodeFree(node);
+            node = nullptr;
+        }
+
+        // Tree
+
+        YGNodeRef getNode() const { return node; }
+
+        void addChild(std::unique_ptr<Element> child) {
+            child->parent = this;
+
+            const uint32_t index = (uint32_t)children.size();
+            YGNodeInsertChild(this->node, child->node, index);
+
+            children.push_back(std::move(child));
+        }
 
         void addChild(JsonObject json);
 
-        void layout(Rectangle<int> parentBounds) {
-            BoxSpacing p = padding.resolve(parentBounds);
+        bool removeChild(Element* child) {
+            if (!child) return false;
 
-            auto contentBounds = bounds.reduced(p);
-
-            int totalContentWidthPx = gap.resolve(parentBounds.width) * (children.size() - 1);
-            int totalContentHeightPx = 0;
-
-            std::vector<std::pair<int, int>> desiredBoundsPx;
-            std::vector<std::pair<int, int>> minMaxWidths;
-            std::vector<std::pair<int, int>> minMaxHeights;
-
-            for (auto& child : children) {
-                int widthPx    = width.resolve(bounds.width);
-                int minWidthPx = minimumWidth.resolve(bounds.width);
-                int maxWidthPx = maximumWidth.resolve(bounds.width);
-
-                minMaxWidths.emplace_back(minWidthPx, maxWidthPx);
-
-                int heightPx    = height.resolve(bounds.height);
-                int minHeightPx = minimumHeight.resolve(bounds.height);
-                int maxHeightPx = maximumHeight.resolve(bounds.height);
-
-                minMaxHeights.emplace_back(minHeightPx, maxHeightPx);
-
-                int desiredWidthPx = std::clamp(widthPx, minWidthPx, maxWidthPx);
-                int desiredHeightPx = std::clamp(heightPx, minHeightPx, maxHeightPx);
-
-                desiredBoundsPx.emplace_back(desiredWidthPx, desiredHeightPx);
-
-                totalContentWidthPx += desiredWidthPx;
-                totalContentHeightPx += desiredHeightPx;
-            }
-
-            int deltaPx = parentBounds.width - totalContentWidthPx;
-
-            if (deltaPx < 0) { // Shrink
-                float totalShrink = 0;
-                for (auto& child : children)
-                    totalShrink += child->shrink;
-
-                for (int i = 0; i < children.size(); i++) {
-                    auto& child = children[i];
-                    int reductionPixels = (child->shrink / totalShrink) * std::abs(deltaPx);
-                    desiredBoundsPx[i].first -= reductionPixels;
-                }
-
-            } else if (deltaPx > 0) { // Grow
-                float totalGrow = 0;
-                for (auto& child : children)
-                    totalGrow += child->grow;
-
-                for (int i = 0; i < children.size(); i++) {
-                    auto& child = children[i];
-                    int expandPixels = (child->grow / totalGrow) * deltaPx;
-                    desiredBoundsPx[i].first += expandPixels;
+            for (size_t i = 0; i < children.size(); ++i) {
+                if (children[i].get() == child) {
+                    YGNodeRemoveChild(node, child->node);
+                    child->parent = nullptr;
+                    children.erase(children.begin() + i);
+                    markLayoutDirty();
+                    return true;
                 }
             }
+            return false;
         }
+
+        // Layout + bounds
+
+        void calculateLayout(float width, float height, YGDirection direction = YGDirectionLTR) {
+            YGNodeCalculateLayout(node, width, height, direction);
+            syncLayoutRecursive(0, 0);
+            clearLayoutDirtyRecursive();
+        }
+
+        const Rectangle<float>& getBounds() const { return bounds; }
+
+        // Update + draw
+
+        virtual bool init();
+
+        virtual void draw(Graphics& g) const;
+
+        virtual void update(int deltaTime);
 };

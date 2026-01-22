@@ -13,8 +13,8 @@ class GraphicsContextTFT_eSPI : public GraphicsContext {
 
         void endFrame() override;
 
-        void fillRectangle(float x, float y, float w, float h, uint16_t color) override;
-        void strokeRectangle(float x, float y, float w, float h, uint16_t color, float thickness) override;
+        void fillRectangle(int x, int y, int w, int h, uint16_t color) override;
+        void strokeRectangle(int x, int y, int w, int h, uint16_t color, float thickness) override;
         void fillCircle(int cx, int cy, int r, uint16_t color) override;
         void strokeCircle(int cx, int cy, int r, uint16_t color, float thickness) override;
         void fillRing(int cx, int cy, int r, uint16_t color) override;

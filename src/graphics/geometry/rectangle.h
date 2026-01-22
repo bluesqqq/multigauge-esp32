@@ -4,65 +4,53 @@
 
 #include "point.h"
 #include "alignment.h"
-#include "line.h"
+#include "Line.h"
+#include "path.h"
 #include "utils.h"
-#include "graphics/gauge/Element.h"
+
+#include "graphics/geometry/BoxSpacing.h"
+#include <vector>
 
 template <typename T>
 struct Rectangle {
     Point<T> position;
     T width, height;
 
-    Rectangle(T x, T y, T width, T height) : Rectangle(Point<T>(x, y), width, height) {}
+    Rectangle(T x, T y, T width, T height);
+    Rectangle(const Point<T>& pos, T w, T h);
 
-    Rectangle(const Point<T>& pos, T w, T h) : position(pos), width(w), height(h) {}
+    static Rectangle<T> fromPoints(Point<T> p1, Point<T> p2);
 
-    static Rectangle<T> fromPoints(Point<T> p1, Point<T> p2) { return Rectangle<T>(p1, p2.x - p1.x, p2.y - p1.y); }
-
-    T area() const { return width * height; }
-    T perimeter() const { width + width + height + height; }
-    bool isEmpty() const { return width == 0 && height == 0; }
+    T area() const;
+    T perimeter() const;
+    bool isEmpty() const;
     
-    bool operator==(const Rectangle<T>& other) { return position == other.position && width == width && height == height; }
-    bool operator!=(const Rectangle<T>& other) { return position != other.position || width != width || height != height; }
+    bool operator==(const Rectangle<T>& other) const;
+    bool operator!=(const Rectangle<T>& other) const;
     
     // ====== [INTERSECTIONS] ====== //
 
-    /// @brief Checks if a point lies inside this rectangle.
-    /// @param point The point to test.
-    /// @return True if the point is inside the rectangle, false otherwise.
-    bool contains(const Point<T>& point) const { return point.x >= getLeft() && point.x <= getRight() && point.y >= getTop() && point.y <= getBottom(); }
+    // Point
 
-    /// @brief Checks if this rectangle intersects with another rectangle.
-    /// @param other The other rectangle to test against.
-    /// @return True if the rectangles overlap, false otherwise.
-    bool intersects(const Rectangle<T>& other) {
-        return (getRight() >= other.getLeft() && getLeft() <= other.getRight() && getBottom() >= other.getTop() && getTop() <= other.getBottom());
-    };
+    bool contains(const Point<T>& point) const;
 
-    /// @brief Computes the intersection of this rectangle with another rectangle.
-    /// @param other The other rectangle to intersect with.
-    /// @return An optional containing the intersecting rectangle if an intersection exists, std::nullopt otherwise.
-    std::optional<Rectangle<T>> intersection(const Rectangle<T>& other);
+    // Line
 
-    /// @brief Checks if a line intersects with this rectangle.
-    /// @param line The line to test.
-    /// @return True if the line intersects the rectangle, false otherwise.
-    bool intersects(const Line<T>& line) { return line.intersects(*this); };
+    bool intersects(const Line<T>& line) const;
+    std::optional<Line<T>> intersection(const Line<T>& line) const;
+    bool contains(const Line<T>& line);
 
-    /// @brief Computes the intersection of this rectangle with a line.
-    /// @param line The line to intersect with.
-    /// @return An optional containing the intersecting line segment if an intersection exists, std::nullopt otherwise.
-    std::optional<Line<T>> intersection(const Line<T>& line) { return line.intersection(*this); }
+    // Rectangle 
 
-    /// @brief Clips this rectangle so that it lies completely within another rectangle.
-    /// @param other The rectangle to use as the clipping bounds.
-    void clip(const Rectangle<T>& other);
+    bool intersects(const Rectangle<T>& other) const;
+    std::optional<Rectangle<T>> intersection(const Rectangle<T>& other) const;
+    bool contains(const Rectangle<T>& other) const;
 
-    /// @brief Returns a new rectangle that is clipped by another rectangle.
-    /// @param other The rectangle to use as the clipping bounds.
-    /// @return A new rectangle representing this rectangle clipped by the bounds of the other rectangle.
-    Rectangle<T> clipped(const Rectangle<T>& other) const;
+    // Circle
+
+    bool intersects(const Circle<T>& circle) const;
+    std::optional<Path<T>> intersection(const Circle<T>& circle) const;
+    bool contains(const Circle<T>& circle) const;
 
     // ====== [POSITIONING] ====== //
 
@@ -73,31 +61,24 @@ struct Rectangle {
     void setCenterX(T centerX);
     void setCenterY(T centerY);
 
-    T getTop()     const { return position.y; }
-    T getBottom()  const { return position.y + height; }
-    T getLeft()    const { return position.x; }
-    T getRight()   const { return position.x + width; }
-    T getCenterX() const { return getLeft() + (width / 2); }
-    T getCenterY() const { return getTop() + (height / 2); }
+    T getTop()     const;
+    T getBottom()  const;
+    T getLeft()    const;
+    T getRight()   const;
+    T getCenterX() const;
+    T getCenterY() const;
 
-    Point<T> getTopLeft()     const { return position; }
-    Point<T> getBottomLeft()  const { return position.translated(0.0f, height); }
-    Point<T> getTopRight()    const { return position.translated(width, 0.0f); }
-    Point<T> getBottomRight() const { return position.translated(width, height); }
-    Point<T> getCenter()      const { return position.translated(width / 2.0f, height / 2.0f); }
+    Point<T> getTopLeft()     const;
+    Point<T> getBottomLeft()  const;
+    Point<T> getTopRight()    const;
+    Point<T> getBottomRight() const;
+    Point<T> getCenter()      const;
 
-    Line<T> getTopEdge()    const { return Line<T>(getTopLeft(), getTopRight()); }
-    Line<T> getBottomEdge() const { return Line<T>(getBottomRight(), getBottomLeft()); }
-    Line<T> getLeftEdge()   const { return Line<T>(getBottomLeft(), getTopLeft()); }
-    Line<T> getRightEdge()  const { return Line<T>(getTopRight(), getBottomRight()); }
-    std::vector<Line<T>> getEdges() const { 
-        std::vector<Line<T>> edges;
-        edges.reserve(4);
-        edges.push_back(getTopEdge());
-        edges.push_back(getRightEdge());
-        edges.push_back(getBottomEdge());
-        edges.push_back(getLeft());
-    }
+    Line<T> getTopEdge()    const;
+    Line<T> getBottomEdge() const;
+    Line<T> getLeftEdge()   const;
+    Line<T> getRightEdge()  const;
+    std::vector<Line<T>> getEdges() const;
 
     // ====== [SHAPING] ====== //
 
@@ -106,10 +87,10 @@ struct Rectangle {
     void trimLeft(T amount);
     void trimRight(T amount);
 
-    Rectangle<T> trimmedTop(T amount);
-    Rectangle<T> trimmedBottom(T amount);
-    Rectangle<T> trimmedLeft(T amount);
-    Rectangle<T> trimmedRight(T amount);
+    Rectangle<T> trimmedTop(T amount) const;
+    Rectangle<T> trimmedBottom(T amount) const;
+    Rectangle<T> trimmedLeft(T amount) const;
+    Rectangle<T> trimmedRight(T amount) const;
 
     Rectangle<T> removeFromTop(T amount);
     Rectangle<T> removeFromBottom(T amount);
@@ -118,89 +99,74 @@ struct Rectangle {
 
     // ====== [TRANSLATION] ====== //
 
-    Rectangle<T> operator+(Point<T> delta) { return translated(delta); }
-    Rectangle<T>& operator+=(Point<T> delta) { translate(delta); }
-    Rectangle<T> operator-(Point<T> delta) { return translated(-delta); }
-    Rectangle<T>& operator-=(Point<T> delta) { translate(-delta); }
+    Rectangle<T> operator+(Point<T> delta) const;
+    Rectangle<T>& operator+=(Point<T> delta);
+    Rectangle<T> operator-(Point<T> delta) const;
+    Rectangle<T>& operator-=(Point<T> delta);
 
-    void translate(T deltaX, T deltaY) { position.translate(deltaX, deltaY); }
-    void translate(Point<T> delta) { position += delta; }
-    Rectangle<T> translated(T deltaX, T deltaY) const { return Rectangle<T>(Point<T>(position.x + deltaX, position.y + deltaY), width, height); }
-    Rectangle<T> translated(Point<T> delta) const { return Rectangle<T>(position + delta, width, height); };
+    void translate(T deltaX, T deltaY);
+    void translate(Point<T> delta);
+    Rectangle<T> translated(T deltaX, T deltaY) const;
+    Rectangle<T> translated(Point<T> delta) const;
 
-    void interpolate(const Rectangle<T>& other, float t) { position.interpolate(other, t); width = lerp(width, other.width, t); height = lerp(height, other.height, t); }
-    Rectangle<T> interpolated(const Rectangle<T>& other, float t) const { return Rectangle<T>(position.interpolated(other, t),  lerp(width, other.width, t), lerp(height, other.height, t)); }
+    void interpolate(const Rectangle<T>& other, float t);
+    Rectangle<T> interpolated(const Rectangle<T>& other, float t) const;
 
     // ====== [SCALING] ====== //
 
-    Rectangle<T>  operator*(float scale) { return Rectangle<T>(position * scale, width * scale, height * scale); }
-    Rectangle<T>& operator*=(float scale) { position *= scale; width *= scale; height *= scale; };
-    Rectangle<T>  operator/(float scale) { return Rectangle<T>(position / scale, width / scale, height / scale); }
-    Rectangle<T>& operator/=(float scale) { position /= scale; width /= scale; height /= scale; };
+    Rectangle<T>  operator*(float scale) const;
+    Rectangle<T>& operator*=(float scale);
+    Rectangle<T>  operator/(float scale) const;
+    Rectangle<T>& operator/=(float scale);
 
-    void scaleFromOrigin(float scale) { position.scaleFromOrigin(scale); width *= scale; height *= scale; }
-    Point<T> scaledFromOrigin(float scale) { return Rectangle<T>(position.scaledFromOrigin(scale), width * scale, height * scale); }
+    void scaleFromOrigin(float scale);
+    Rectangle<T> scaledFromOrigin(float scale) const;
 
-    void scaleFromPoint(const Point<T>& other, float scale) { position.scaleFromPoint(other, scale); width *= scale; height *= scale; }
-    Point<T> scaledFromPoint(const Point<T>& other, float scale) { return Rectangle<T>(position.scaledFromPoint(other, scale), width * scale, height * scale); }
+    void scaleFromPoint(const Point<T>& other, float scale);
+    Rectangle<T> scaledFromPoint(const Point<T>& other, float scale) const;
 
-    void reduce(T deltaX, T deltaY) { position.translate(deltaX, deltaY);  width -= 2 * deltaX; height -= 2 * deltaY; }
-    void reduce(T delta) { reduce(delta, delta); }
-    void reduce(BoxSpacing spacing, const Rectangle<T>& parentBounds) {
-        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
-        position.translate(spacingPx.left, spacingPx.top);
-        width -= (spacingPx.left + spacingPx.right);
-        height -= (spacingPx.top - spacingPx.bottom);
-    }
-    void reduce(BoxSpacing spacing) { reduce(spacing, *this); }
-    Rectangle<T> reduced(T deltaX, T deltaY) const{ return Rectangle<T>(position.translated(deltaX, deltaY), width - (2 * deltaX), height - (2 * deltaY)); }
-    Rectangle<T> reduced(T delta) const { return reduced(delta, delta); }
-    Rectangle<T> reduced(BoxSpacing spacing, const Rectangle<T>& parentBounds) const {
-        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
-        return Rectangle<T>(position.translated(spacingPx.left, spacingPx.top), width - spacingPx.left - spacingPx.right, height - spacingPx.top - spacingPx.bottom);
-    }
-    Rectangle<T> reduced(BoxSpacing spacing) const { return reduced(spacing, *this); }
+    void reduce(T deltaX, T deltaY);
+    void reduce(T delta);
+    void reduce(BoxSpacing spacing, const Rectangle<float>& parentBounds);
+    void reduce(BoxSpacing spacing);
 
-    
+    Rectangle<T> reduced(T deltaX, T deltaY) const;
+    Rectangle<T> reduced(T delta) const;
+    Rectangle<T> reduced(BoxSpacing spacing, const Rectangle<float>& parentBounds) const;
+    Rectangle<T> reduced(BoxSpacing spacing) const;
 
-    void expand(T deltaX, T deltaY) { position.translate(-deltaX, -deltaY);  width += 2 * deltaX; height += 2 * deltaY; }
-    void expand(T delta) { expand(delta, delta); };
-    void expand(BoxSpacing spacing, const Rectangle<T>& parentBounds) {
-        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
-        position.translate(-spacingPx.left, -spacingPx.top);
-        width += (spacingPx.left + spacingPx.right);
-        height += (spacingPx.top - spacingPx.bottom);
-    }
-    void expand(BoxSpacing spacing) { expand(spacing, *this); }
-    Rectangle<T> expanded(T deltaX, T deltaY) const { return Rectangle<T>(position.translated(-deltaX, -deltaY), width + (2 * deltaX), height + (2 * deltaY)); }
-    Rectangle<T> expanded(T delta) const { return expanded(delta, delta); }
-    Rectangle<T> expanded(BoxSpacing spacing, const Rectangle<T>& parentBounds) const {
-        BoxSpacing spacingPx = spacing.resolve(parentBounds.width, parentBounds.height);
-        return Rectangle<T>(position.translated(-spacingPx.left, -spacingPx.top), width + spacingPx.left + spacingPx.right, height + spacingPx.top + spacingPx.bottom);
-    }
-    Rectangle<T> expanded(BoxSpacing spacing) const { return expanded(spacing, *this); }
+    void expand(T deltaX, T deltaY);
+    void expand(T delta);
+    void expand(BoxSpacing spacing, const Rectangle<float>& parentBounds);
+    void expand(BoxSpacing spacing);
+
+    Rectangle<T> expanded(T deltaX, T deltaY) const;
+    Rectangle<T> expanded(T delta) const;
+    Rectangle<T> expanded(BoxSpacing spacing, const Rectangle<float>& parentBounds) const;
+    Rectangle<T> expanded(BoxSpacing spacing) const;
 
     // ====== [ROTATION] ====== //
 
     void rotateAroundOrigin(float angle);
-    Rectangle<T> rotatedAroundOrigin(float angle);
+    Rectangle<T> rotatedAroundOrigin(float angle) const;
 
     void rotateAroundPoint(const Point<T>& other, float angle);
-    Rectangle<T> rotatedAroundPoint(const Point<T>& other, float angle);
+    Rectangle<T> rotatedAroundPoint(const Point<T>& other, float angle) const;
 
     // ====== [REFLECTION] ====== //
 
     void reflectAcrossHorizontal(T horizontal);
-    Rectangle<T> reflectedAcrossHorizontal(T horizontal);
+    Rectangle<T> reflectedAcrossHorizontal(T horizontal) const;
 
     void reflectAcrossVertical(T vertical);
-    Rectangle<T> reflectedAcrossVertical(T vertical);
-
-    // Reflecting across a line should return a path
-    //Rectangle<T> reflectedAcrossLine(Line<T> line);
+    Rectangle<T> reflectedAcrossVertical(T vertical) const;
 
     // ====== [CONVERSION] ====== //
 
-    Rectangle<float> toFloat() const { return Rectangle<float>(position.toFloat(), (float)width, (float)height); };
-    Rectangle<int> toInt() const { return Rectangle<int>(position.toInt(), (int)width, (int)height); };
+    Rectangle<float> toFloat() const;
+    Rectangle<int> toInt() const;
+    Path<T> asPath() const;
 };
+
+extern template struct Rectangle<int>;
+extern template struct Rectangle<float>;

@@ -6,6 +6,7 @@ template <typename T>
 class Path {
     public:
         Path();
+        Path(const Rectangle<T>& rectangle);
 
         Rectangle<T> getBounds() const;
 
@@ -64,3 +65,8 @@ class Path {
         Path<int> toInt() const;
         Path<float> toFloat() const;
 };
+
+template <typename T>
+inline Path<T>::Path(const Rectangle<T> &rectangle) {
+    addRectangle(rectangle);
+}

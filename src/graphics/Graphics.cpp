@@ -28,6 +28,7 @@ void Graphics::setFill(uint16_t color) {
 }
 
 void Graphics::setFill(Color *color) {
+    if (!color) return;
     fill = color;
     fillValue = getCachedColor(color);
 }
@@ -38,6 +39,7 @@ void Graphics::setStroke(uint16_t color) {
 }
 
 void Graphics::setStroke(Color *color) {
+    if (!color) return;
     stroke = color; 
     strokeValue = getCachedColor(color);
 }
@@ -59,3 +61,234 @@ void Graphics::strokeRect(const Rectangle<int> &rectangle) { strokeRect(rectangl
 void Graphics::fillCircle(int cx, int cy, int radius) const { context->fillCircle(cx, cy, radius, fillValue); }
 
 void Graphics::strokeCircle(int cx, int cy, int radius) const { context->strokeCircle(cx, cy, radius, strokeValue, 1); }
+
+void Graphics::strokeLine(int x0, int y0, int x1, int y1) const { context->strokeLine(x0, y0, x1, y1, strokeValue); }
+
+void Graphics::strokeLine(const Point<int> &p1, const Point<int> &p2) const { strokeLine(p1.x, p1.y, p2.x, p2.y); }
+
+void Graphics::strokeLine(const Line<int> &line) const { strokeLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y); }
+
+void Graphics::setTextPoint(float point) { textPoint = point; }
+
+void Graphics::drawText(const std::string &text, int x, int y, Anchor anchor) { context->drawText(text.c_str(), x, y, fillValue, textPoint, anchor); }
+
+void Graphics::drawText(const std::string &text, Point<int> pos, Anchor anchor) { drawText(text, pos.x, pos.y, anchor); }
+
+void Graphics::drawTextArea(const std::string& text, int x, int y, int width, int height, Anchor anchor, bool useEllipses, bool useHyphens) {
+    if (width <= 0 || height <= 0 || text.empty()) return;
+
+    Rectangle<int> rect(x, y, width, height);
+
+    const int lineHeight = textPoint;
+    if (lineHeight <= 0) return;
+
+    const int maxLines = rect.height / lineHeight;
+    if (maxLines <= 0) return;
+
+    uint16_t textColor = fill ? getCachedColor(fill) : fillValue;
+
+    std::string scratch;
+    scratch.reserve(128);
+
+    auto measureString = [&](const std::string& s) -> int { return s.empty() ? 0 : context->getTextWidth(s.c_str(), textPoint); };
+
+    auto measureRange = [&](int start, int len) -> int {
+        if (len <= 0) return 0;
+        scratch.assign(text.data() + start, (size_t)len);
+        return context->getTextWidth(scratch.c_str(), textPoint);
+    };
+
+    const int n = (int)text.size();
+    const int ellW = context->getTextWidth("...", textPoint);
+    const int hyW  = context->getTextWidth("-", textPoint);
+
+    std::vector<std::string> lines;
+    lines.reserve(maxLines);
+
+    int cursor = 0;
+
+    auto skipSpaces = [&]() { while (cursor < n && text[cursor] == ' ') cursor++; };
+
+    while (cursor < n && (int)lines.size() < maxLines) {
+        if (text[cursor] == '\n') {
+            lines.emplace_back("");
+            cursor++;
+            continue;
+        }
+
+        skipSpaces();
+        if (cursor >= n) break;
+
+        std::string line;
+
+        while (cursor < n && text[cursor] != '\n') {
+            int wordStart = cursor;
+            while (cursor < n && text[cursor] != '\n' && text[cursor] != ' ') cursor++;
+            int wordEnd = cursor;
+            int wordLen = wordEnd - wordStart;
+
+            while (cursor < n && text[cursor] == ' ') cursor++;
+
+            std::string candidate = line;
+            if (!candidate.empty()) candidate.push_back(' ');
+            candidate.append(text.data() + wordStart, (size_t)wordLen);
+
+            if (measureString(candidate) <= rect.width) {
+                line.swap(candidate);
+                continue;
+            }
+
+            if (!useHyphens) {
+                cursor = wordStart;
+                break;
+            }
+
+            std::string base = line;
+            if (!base.empty()) base.push_back(' ');
+            int baseW = measureString(base);
+
+            if (baseW > rect.width) {
+                cursor = wordStart;
+                break;
+            }
+
+            int available = rect.width - baseW - hyW;
+            if (available <= 0) {
+                cursor = wordStart;
+                break;
+            }
+
+            // Binary search largest prefix that fits
+            int lo = 1;
+            int hi = wordLen;
+            int best = 0;
+
+            while (lo <= hi) {
+                int mid = (lo + hi) / 2;
+                int w = measureRange(wordStart, mid);
+                if (w <= available) {
+                    best = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+
+            if (best <= 0) {
+                cursor = wordStart;
+                break;
+            }
+
+            if (best < MIN_HYPHEN_PREFIX) {
+                cursor = wordStart;
+                break;
+            }
+
+            line = base;
+            line.append(text.data() + wordStart, (size_t)best);
+            if (best < wordLen) line.push_back('-');
+
+            cursor = wordStart + best;
+            break;
+        }
+
+        while (!line.empty() && line.back() == ' ') line.pop_back();
+        lines.push_back(line);
+
+        if (cursor < n && text[cursor] == '\n') cursor++;
+    }
+
+    const bool truncatedVertically = (cursor < n);
+
+    if (truncatedVertically && useEllipses && !lines.empty()) {
+        std::string& last = lines.back();
+
+        if ((int)last.size() >= 3) {
+            last.resize(last.size() - 3);
+            last += "...";
+        } else {
+            last = "...";
+        }
+
+        while (measureString(last) > rect.width) {
+            if ((int)last.size() <= 3) break;
+            last.erase(last.size() - 4, 1);
+        }
+
+        if (measureString(last) > rect.width) last.clear();
+    }
+
+    enum class HAlign { Left, Center, Right };
+    enum class VAlign { Top, Middle, Bottom };
+
+    auto anchorToH = [&](Anchor a) -> HAlign {
+        switch (a) {
+            case Anchor::TopLeft:
+            case Anchor::CenterLeft:
+            case Anchor::BottomLeft:
+                return HAlign::Left;
+
+            case Anchor::TopCenter:
+            case Anchor::Center:
+            case Anchor::BottomCenter:
+                return HAlign::Center;
+
+            case Anchor::TopRight:
+            case Anchor::CenterRight:
+            case Anchor::BottomRight:
+                return HAlign::Right;
+        }
+        return HAlign::Left;
+    };
+
+    auto anchorToV = [&](Anchor a) -> VAlign {
+        switch (a) {
+            case Anchor::TopLeft:
+            case Anchor::TopCenter:
+            case Anchor::TopRight:
+                return VAlign::Top;
+
+            case Anchor::CenterLeft:
+            case Anchor::Center:
+            case Anchor::CenterRight:
+                return VAlign::Middle;
+
+            case Anchor::BottomLeft:
+            case Anchor::BottomCenter:
+            case Anchor::BottomRight:
+                return VAlign::Bottom;
+        }
+        return VAlign::Top;
+    };
+
+    HAlign hAlign = anchorToH(anchor);
+    VAlign vAlign = anchorToV(anchor);
+
+    const int visibleLines = (int)lines.size();
+    if (visibleLines <= 0) return;
+
+    const int blockHeight = visibleLines * lineHeight;
+
+    int blockTop = rect.position.y;
+    if (vAlign == VAlign::Middle) blockTop = rect.position.y + (rect.height - blockHeight) / 2;
+    if (vAlign == VAlign::Bottom) blockTop = rect.position.y + (rect.height - blockHeight);
+
+    for (int i = 0; i < visibleLines; ++i) {
+        int drawY = blockTop + i * lineHeight;
+        if (drawY + lineHeight > rect.position.y + rect.height) break;
+
+        const std::string& line = lines[i];
+        if (line.empty()) continue;
+
+        int lineW = context->getTextWidth(line.c_str(), textPoint);
+
+        int drawX = rect.position.x;
+        if (hAlign == HAlign::Center) drawX = rect.position.x + (rect.width - lineW) / 2;
+        if (hAlign == HAlign::Right)  drawX = rect.position.x + rect.width - lineW;
+
+        context->drawText(line.c_str(), drawX, drawY, textColor, textPoint);
+    }
+}
+
+
+void Graphics::drawTextArea(const std::string &text, Rectangle<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }

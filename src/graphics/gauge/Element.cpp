@@ -1,6 +1,7 @@
 #include "Element.h"
 
-void Element::addChild(std::unique_ptr<Element> child) { 
-    child->parent = this;
-    children.push_back(std::move(child));
-}
+bool Element::init() { return true; }
+
+void Element::draw(Graphics &g) const { for (auto const& c : children) { c->draw(g); } }
+
+void Element::update(int deltaTime) { for (auto& c : children) c->update(deltaTime); }

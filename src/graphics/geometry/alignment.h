@@ -39,6 +39,7 @@ enum class Justify {
 };
 
 enum class Align {
+    Stretch,
     Start,
     Center,
     End
