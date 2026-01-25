@@ -10,7 +10,7 @@
 #include "graphics/gauge/GaugeFace.h"
 #include "graphics/gauge/elements/primitives/CircleElement.h"
 #include "graphics/gauge/elements/primitives/RectangleElement.h"
-#include "graphics/gauge/elements/primitives/TextElement.h"
+#include "graphics/gauge/elements/ShiftLightElement.h"
 
 #include <xtensa/hal.h>
 #include "utils.h"
@@ -35,25 +35,25 @@ void setup() {
 
     face = std::make_unique<GaugeFace>(config);
 
+    // Root fills the screen and centers its only child
+    YGNodeStyleSetWidthPercent(face->getNode(), 100);
+    YGNodeStyleSetHeightPercent(face->getNode(), 100);
     YGNodeStyleSetFlexDirection(face->getNode(), YGFlexDirectionRow);
-    
+    YGNodeStyleSetJustifyContent(face->getNode(), YGJustifyCenter);
+    YGNodeStyleSetAlignItems(face->getNode(), YGAlignCenter);
 
-    auto circle = std::make_unique<CircleElement>(config);
-    auto textElement = std::make_unique<TextElement>(config, "TESTING OF THE TEXT ELEMENT. SCALING TEXT AND WRAP.", 15.0f, new StaticColor(0xFFFF));
-    
-    auto styleEqual = [](YGNodeRef n) {
-        YGNodeStyleSetFlexGrow(n, 1.0f);
-        YGNodeStyleSetFlexShrink(n, 1.0f);
-        YGNodeStyleSetFlexBasis(n, 0.0f);
-        YGNodeStyleSetAlignSelf(n, YGAlignStretch);
-    };
+    // One element
+    auto graphElement = std::make_unique<ShiftLightElement>(
+        config, engineRPM, new StaticColor(0xFFFF)
+    );
 
-    styleEqual(circle->getNode());
-    styleEqual(textElement->getNode());
+    // Half width + half height, centered by parent settings above
+    YGNodeStyleSetWidthPercent(graphElement->getNode(), 50);
+    YGNodeStyleSetHeightPercent(graphElement->getNode(), 50);
 
-    face->addChild(std::move(circle));
-    face->addChild(std::move(textElement));
+    face->addChild(std::move(graphElement));
 }
+
 
 int t = 0;
 
@@ -86,7 +86,7 @@ void loop() {
 
     lastTime = currentTime;
 
-    engineRPM.setValueBase(sin((float)currentTime / 10000000.0f) * 1000 + 2000);
+    engineRPM.setValueBase(sin((float)currentTime / 1000000.0f) * 3000 + 4000);
 }
 
 #endif

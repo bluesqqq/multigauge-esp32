@@ -16,11 +16,11 @@ void GraphicsContextTFT_eSPI::endFrame() {
     buffer.pushSprite(0, 0);
 }
 
-void GraphicsContextTFT_eSPI::fillRectangle(int x, int y, int w, int h, uint16_t color) {
+void GraphicsContextTFT_eSPI::fillRect(int x, int y, int w, int h, uint16_t color) {
     buffer.fillRect((int)x, (int)y, (int)w, (int)h, color);
 }
 
-void GraphicsContextTFT_eSPI::strokeRectangle(int x, int y, int w, int h, uint16_t color, float thickness) {
+void GraphicsContextTFT_eSPI::strokeRect(int x, int y, int w, int h, uint16_t color, float thickness) {
     int t = (int)thickness;
     for (int i = 0; i < t; ++i) {
         buffer.drawRect((int)x + i, (int)y + i, (int)w - 2*i, (int)h - 2*i, color);

@@ -15,11 +15,11 @@ Graphics::Graphics(GraphicsContext *context) : context(context) { }
 void Graphics::clearColorCache() {
     colorCache.clear();
     if (fill != nullptr) fillValue = getCachedColor(fill);
-    if (stroke != nullptr) fillValue = getCachedColor(fill);
+    if (stroke != nullptr) strokeValue = getCachedColor(stroke);
 }
 
-Rectangle<int> Graphics::getScreenBounds() {
-    return Rectangle<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
+Rect<int> Graphics::getScreenBounds() {
+    return Rect<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
 }
 
 void Graphics::setFill(uint16_t color) {
@@ -50,13 +50,13 @@ void Graphics::fillAll(Color *color) { context->fillAll(getCachedColor(color)); 
 
 void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
 
-void Graphics::fillRect(int x, int y, int width, int height) { context->fillRectangle(x, y, width, height, fillValue); }
+void Graphics::fillRect(int x, int y, int width, int height) { context->fillRect(x, y, width, height, fillValue); }
 
-void Graphics::fillRect(const Rectangle<int> &rectangle) { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+void Graphics::fillRect(const Rect<int> &rectangle) { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
 
-void Graphics::strokeRect(int x, int y, int width, int height) { context->strokeRectangle(x, y, width, height, strokeValue, 1); }
+void Graphics::strokeRect(int x, int y, int width, int height) { context->strokeRect(x, y, width, height, strokeValue, 1); }
 
-void Graphics::strokeRect(const Rectangle<int> &rectangle) { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+void Graphics::strokeRect(const Rect<int> &rectangle) { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
 
 void Graphics::fillCircle(int cx, int cy, int radius) const { context->fillCircle(cx, cy, radius, fillValue); }
 
@@ -68,16 +68,64 @@ void Graphics::strokeLine(const Point<int> &p1, const Point<int> &p2) const { st
 
 void Graphics::strokeLine(const Line<int> &line) const { strokeLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y); }
 
+void Graphics::fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2) { context->fillTriangle(x0, y0, x1, y1, x2, y2, fillValue); }
+
+void Graphics::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2) { context->strokeTriangle(x0, y0, x1, y1, x2, y2, strokeValue); }
+
 void Graphics::setTextPoint(float point) { textPoint = point; }
 
 void Graphics::drawText(const std::string &text, int x, int y, Anchor anchor) { context->drawText(text.c_str(), x, y, fillValue, textPoint, anchor); }
 
 void Graphics::drawText(const std::string &text, Point<int> pos, Anchor anchor) { drawText(text, pos.x, pos.y, anchor); }
 
+void Graphics::drawTextVertical(const std::string& text, int x, int y, Anchor anchor) {
+    if (text.empty()) return;
+
+    const int step = textPoint;
+    if (step <= 0) return;
+
+    int glyphCount = 0;
+    for (char c : text) if (c != '\n') glyphCount++;
+    if (glyphCount <= 0) return;
+
+    const int blockH = glyphCount * step;
+
+    Rect<int> box(x, y, 0, blockH);
+    Point<int> start = Point<int>::getAnchored(box, anchor);
+
+    int drawX = start.x;
+    int drawY = start.y;
+
+    Point<int> topP    = Point<int>::getAnchored(box, Anchor::TopLeft);
+    Point<int> midP    = Point<int>::getAnchored(box, Anchor::CenterLeft);
+    Point<int> bottomP = Point<int>::getAnchored(box, Anchor::BottomLeft);
+
+    int dir = (start.y == bottomP.y) ? -1 : 1;
+
+    if (start.y == midP.y) {
+        drawY -= (blockH / 2);
+        dir = 1;
+    } else if (start.y == bottomP.y) {
+        drawY -= step;
+        dir = -1;
+    }
+
+    char buf[2] = {0, 0};
+
+    for (char c : text) {
+        if (c == '\n') continue;
+
+        buf[0] = c;
+        context->drawText(buf, drawX, drawY, fillValue, textPoint, Anchor::TopLeft);
+
+        drawY += dir * step;
+    }
+}
+
 void Graphics::drawTextArea(const std::string& text, int x, int y, int width, int height, Anchor anchor, bool useEllipses, bool useHyphens) {
     if (width <= 0 || height <= 0 || text.empty()) return;
 
-    Rectangle<int> rect(x, y, width, height);
+    Rect<int> rect(x, y, width, height);
 
     const int lineHeight = textPoint;
     if (lineHeight <= 0) return;
@@ -291,4 +339,22 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
 }
 
 
-void Graphics::drawTextArea(const std::string &text, Rectangle<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
+void Graphics::drawTextArea(const std::string &text, Rect<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
+
+void Graphics::fillEllipse(int x, int y, int width, int height) const {
+    fillEllipse(Rect<int>(x, y, width, height));
+}
+
+void Graphics::fillEllipse(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->fillEllipse(center.x, center.y, area.width / 2, area.height / 2, fillValue);
+}
+
+void Graphics::strokeEllipse(int x, int y, int width, int height) const {
+    strokeEllipse(Rect<int>(x, y, width, height));
+}
+
+void Graphics::strokeEllipse(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->strokeEllipse(center.x, center.y, area.width / 2, area.height / 2, strokeValue, 1);
+}

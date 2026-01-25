@@ -1,18 +1,18 @@
 #pragma once
 
-#include "rectangle.h"
+#include "Rect.h"
 
 template <typename T>
 class Path {
     public:
         Path();
-        Path(const Rectangle<T>& rectangle);
+        Path(const Rect<T>& rectangle);
 
-        Rectangle<T> getBounds() const;
+        Rect<T> getBounds() const;
 
         bool contains(Point<T>);
         bool intersects(Line<T> line);
-        bool intersects(Rectangle<T> rectangle);
+        bool intersects(Rect<T> rectangle);
 
         Point<float> getPointAlongPath(float distanceFromStart) const;
 
@@ -22,7 +22,7 @@ class Path {
         void startNewSubPath(Point<T> start);
         void closeSubPath();
         void lineTo(Point<T> end);
-        void addRectangle(Rectangle<T> rectangle);
+        void addRect(Rect<T> rectangle);
 
         // ====== [TRANSLATION] ====== //
 
@@ -67,6 +67,6 @@ class Path {
 };
 
 template <typename T>
-inline Path<T>::Path(const Rectangle<T> &rectangle) {
-    addRectangle(rectangle);
+inline Path<T>::Path(const Rect<T> &rectangle) {
+    addRect(rectangle);
 }

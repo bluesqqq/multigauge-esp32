@@ -18,29 +18,3 @@ enum class Anchor {
     BottomCenter,
     BottomRight
 };
-
-enum class EdgeAlignment {
-    Outer = -1,
-    Center = 0,
-    Inner = 1
-};
-
-enum class Orientation {
-    Horizontal,
-    Vertical
-};
-
-enum class Justify {
-    Start,
-    Center,
-    End,
-    SpaceBetween,
-    SpaceAround
-};
-
-enum class Align {
-    Stretch,
-    Start,
-    Center,
-    End
-};

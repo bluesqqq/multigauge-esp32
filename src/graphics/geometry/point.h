@@ -8,7 +8,7 @@ template <typename T>
 struct Line;
 
 template <typename T>
-struct Rectangle;
+struct Rect;
 
 template <typename T>
 struct Circle;
@@ -30,7 +30,7 @@ struct Point {
 
     static Point<T> getAnchored(T x, T y, T width, T height, Anchor anchor);
     static Point<T> getAnchored(const Point<T>& point, T width, T height, Anchor anchor);
-    static Point<T> getAnchored(const Rectangle<T>& rectangle, Anchor anchor);
+    static Point<T> getAnchored(const Rect<T>& rectangle, Anchor anchor);
 
     inline bool operator==(const Point<T>& other) const;
     inline bool operator!=(const Point<T>& other) const;
@@ -67,7 +67,7 @@ struct Point {
 
     // ====== [INTERSECTIONS] ====== //
 
-    bool isContainedBy(const Rectangle<T>& rectangle);
+    bool isContainedBy(const Rect<T>& rectangle);
     bool isContainedBy(const Circle<T>& circle);
 
     // ====== [TRANSLATION] ====== //

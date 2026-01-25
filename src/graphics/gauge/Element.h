@@ -2,9 +2,7 @@
 
 #include "graphics/colors/Color.h"
 #include "graphics/geometry/alignment.h"
-#include "graphics/geometry/Rectangle.h"
-#include "graphics/geometry/Length.h"
-#include "graphics/geometry/BoxSpacing.h"
+#include "graphics/geometry/Rect.h"
 
 #include "graphics/Graphics.h"
 #include <yoga/Yoga.h>
@@ -17,7 +15,7 @@ class Element {
         /// @brief Owned child elements
         std::vector<std::unique_ptr<Element>> children;
 
-        Rectangle<float> bounds = Rectangle<float>(0.0f, 0.0f, 0.0f, 0.0f);
+        Rect<float> bounds = Rect<float>(0.0f, 0.0f, 0.0f, 0.0f);
 
         YGNodeRef node = nullptr;
         YGConfigRef config = nullptr;        
@@ -33,7 +31,7 @@ class Element {
             const float absX = parentAbsX + left;
             const float absY = parentAbsY + top;
 
-            bounds = Rectangle<float>(absX, absY, width, height);
+            bounds = Rect<float>(absX, absY, width, height);
 
             for (auto& child : children) {
                 child->syncLayoutRecursive(absX, absY);
@@ -111,7 +109,7 @@ class Element {
             clearLayoutDirtyRecursive();
         }
 
-        const Rectangle<float>& getBounds() const { return bounds; }
+        const Rect<float>& getBounds() const { return bounds; }
 
         // Update + draw
 

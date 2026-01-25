@@ -3,7 +3,7 @@
 #include "point.h"
 
 template <typename T>
-class Rectangle;
+class Rect;
 
 template <typename T>
 class Circle;
@@ -48,14 +48,14 @@ struct Line {
 
     std::optional<Point<T>> slopeIntersection(const Line<T>& other) const;
 
-    bool intersects(const Rectangle<T>& rect) const;
+    bool intersects(const Rect<T>& rect) const;
 
-    std::optional<Line<T>> intersection(const Rectangle<T>& rect) const;
+    std::optional<Line<T>> intersection(const Rect<T>& rect) const;
 
-    bool intersects(const std::vector<Rectangle<T>>& rectangles) const { for (const auto& rectangle : rectangles) if (intersects(rectangle)) return true; return false; }
+    bool intersects(const std::vector<Rect<T>>& rectangles) const { for (const auto& rectangle : rectangles) if (intersects(rectangle)) return true; return false; }
 
-    std::vector<Line<T>> intersection(const std::vector<Rectangle<T>>& rectangles) const;
-    bool isContainedBy(const Rectangle<T>& rectangle);
+    std::vector<Line<T>> intersection(const std::vector<Rect<T>>& rectangles) const;
+    bool isContainedBy(const Rect<T>& rectangle);
     bool isContainedBy(const Circle<T>& circle);
 
     // ====== [TRANSLATION] ====== //

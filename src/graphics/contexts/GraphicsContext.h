@@ -29,8 +29,8 @@ class GraphicsContext {
         virtual void strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
         virtual void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
 
-        virtual void fillRectangle(int x, int y, int w, int h, uint16_t color) = 0;
-        virtual void strokeRectangle(int x, int y, int w, int h, uint16_t color, float thickness) = 0;
+        virtual void fillRect(int x, int y, int w, int h, uint16_t color) = 0;
+        virtual void strokeRect(int x, int y, int w, int h, uint16_t color, float thickness) = 0;
 
         virtual void fillCircle(int cx, int cy, int r, uint16_t color) = 0;
         virtual void strokeCircle(int cx, int cy, int r, uint16_t color, float thickness) = 0;

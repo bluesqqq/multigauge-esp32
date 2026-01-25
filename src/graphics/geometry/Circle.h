@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Point.h"
-#include "Rectangle.h"
+#include "Rect.h"
 
 template <typename T>
 struct Circle {
@@ -14,8 +14,8 @@ struct Circle {
     T area() const;
     T circumference() const;
 
-    bool operator==(const Rectangle<T>& other) const;
-    bool operator!=(const Rectangle<T>& other) const;
+    bool operator==(const Rect<T>& other) const;
+    bool operator!=(const Rect<T>& other) const;
 
     // ====== [INTERSECTIONS] ====== //
 
@@ -29,11 +29,11 @@ struct Circle {
     std::optional<Line<T>> intersection(const Line<T>& line) const;
     bool contains(const Line<T>& line) const;
 
-    // Rectangle 
+    // Rect 
 
-    bool intersects(const Rectangle<T>& other) const;
-    std::optional<Path<T>> intersection(const Rectangle<T>& other) const;
-    bool contains(const Rectangle<T>& other) const;
+    bool intersects(const Rect<T>& other) const;
+    std::optional<Path<T>> intersection(const Rect<T>& other) const;
+    bool contains(const Rect<T>& other) const;
 
     // Circle
 

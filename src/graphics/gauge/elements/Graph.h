@@ -105,9 +105,9 @@ class Graph : public Element {
                 g.strokeLine(b.getLeft() + offset + (i * secondLength), b.getBottom(), b.getLeft() + offset + (i * secondLength), b.getBottom() + 3);
             }
 
+            g.setFill(0xFFFF);
             g.strokeRect(b.toInt());
-            //canvas.drawString(value.getValueString(DEFAULT, true), x, y - 2);
-            //canvas.setTextDatum(BL_DATUM);
+            g.drawText(value.getValueString(DEFAULT, true), b.getTopLeft().toInt().translated(0, -2), Anchor::BottomLeft);
         }
 
         void update(int deltaTime) override {

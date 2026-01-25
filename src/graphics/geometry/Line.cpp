@@ -6,7 +6,7 @@
 #include <vector>
 #include <limits>
 
-#include "Rectangle.h"
+#include "Rect.h"
 #include "Circle.h"
 
 template<typename T>
@@ -91,7 +91,7 @@ std::optional<Point<T>> Line<T>::slopeIntersection(const Line<T>& other) const {
 }
 
 template<typename T>
-bool Line<T>::intersects(const Rectangle<T>& rect) const {
+bool Line<T>::intersects(const Rect<T>& rect) const {
     const auto& edges = rect.getEdges();
 
     int count = 0;
@@ -106,7 +106,7 @@ bool Line<T>::intersects(const Rectangle<T>& rect) const {
 }
 
 template<typename T>
-std::optional<Line<T>> Line<T>::intersection(const Rectangle<T>& rect) const {
+std::optional<Line<T>> Line<T>::intersection(const Rect<T>& rect) const {
     const auto& edges = rect.getEdges();
 
     std::vector<Point<T>> points;
@@ -127,7 +127,7 @@ std::optional<Line<T>> Line<T>::intersection(const Rectangle<T>& rect) const {
 }
 
 template<typename T>
-std::vector<Line<T>> Line<T>::intersection(const std::vector<Rectangle<T>>& rectangles) const {
+std::vector<Line<T>> Line<T>::intersection(const std::vector<Rect<T>>& rectangles) const {
     std::vector<Line<T>> lines;
 
     for (const auto& rectangle : rectangles) {
@@ -139,7 +139,7 @@ std::vector<Line<T>> Line<T>::intersection(const std::vector<Rectangle<T>>& rect
 }
 
 template<typename T>
-bool Line<T>::isContainedBy(const Rectangle<T>& rectangle) { return true; //return rectangle.contains(*this);
+bool Line<T>::isContainedBy(const Rect<T>& rectangle) { return true; //return rectangle.contains(*this);
     }
 
 template<typename T>

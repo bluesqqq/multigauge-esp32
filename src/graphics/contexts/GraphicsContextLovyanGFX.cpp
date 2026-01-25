@@ -56,10 +56,10 @@ void GraphicsContextLovyanGFX::fillTriangle(int x0, int y0, int x1, int y1, int 
     buffer.fillTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 
-void GraphicsContextLovyanGFX::fillRectangle(int x, int y, int w, int h, uint16_t color) { buffer.fillRect(x, y, w, h, color); }
+void GraphicsContextLovyanGFX::fillRect(int x, int y, int w, int h, uint16_t color) { buffer.fillRect(x, y, w + 1, h + 1, color); }
 
-void GraphicsContextLovyanGFX::strokeRectangle(int x, int y, int w, int h, uint16_t color, float thickness) {
-    buffer.drawRect(x, y, w, h, color);
+void GraphicsContextLovyanGFX::strokeRect(int x, int y, int w, int h, uint16_t color, float thickness) {
+    buffer.drawRect(x, y, w + 1, h + 1, color);
 }
 
 void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, uint16_t color) { buffer.fillCircle(cx, cy, r, color); }

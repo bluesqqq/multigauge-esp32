@@ -1,0 +1,48 @@
+#pragma once
+
+#include "graphics/gauge/Element.h"
+#include "graphics/colors/StaticColor.h"
+#include <algorithm>
+
+class ShiftLightElement : public Element {
+private:
+    Value& value;
+    float warningValue = 5000;
+
+    Color* lightColor = nullptr;
+
+    // Optional label
+    const char* label = "Shift";
+
+public:
+    ShiftLightElement(YGConfigRef config, Value& value, Color* color) : Element(config), value(value), lightColor(color) {
+        if (!lightColor) lightColor = new StaticColor(0xFFFF);
+    }
+
+    void draw(Graphics& g) const override {
+        const auto b = getBounds().toFloat();
+        if (b.width <= 0.0f || b.height <= 0.0f) return;
+
+        const float diameter = std::min(b.width, b.height);
+        const float radius   = diameter * 0.5f;
+
+        const float cx = b.position.x + b.width  * 0.5f;
+        const float cy = b.position.y + b.height * 0.5f;
+
+        const uint16_t c = lightColor->getColor();
+
+        // "On" when value exceeds warning
+        if (value.getValueBase() > warningValue) {
+            g.setFill(c);
+            g.fillCircle((int)cx, (int)cy, (int)radius);
+        } else {
+            g.setStroke(c);
+            g.strokeCircle((int)cx, (int)cy, (int)radius);
+
+            g.setFill(c);
+            g.drawText("label", b.getCenter().toInt(), Anchor::Center);
+        }
+
+        Element::draw(g);
+    }
+};

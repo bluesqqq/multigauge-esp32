@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include "Line.h"
-#include "Rectangle.h"
+#include "Rect.h"
 #include "Circle.h"
 
 template <typename T>
@@ -48,7 +48,7 @@ Point<T> Point<T>::getAnchored(const Point<T>& point, T width, T height, Anchor 
 }
 
 template <typename T>
-Point<T> Point<T>::getAnchored(const Rectangle<T>& rectangle, Anchor anchor) {
+Point<T> Point<T>::getAnchored(const Rect<T>& rectangle, Anchor anchor) {
     return Point<T>::getAnchored(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor);
 }
 
@@ -115,7 +115,7 @@ float Point<T>::cross(const Point<T>& other) const { return x * other.y - y * ot
 // ====== [INTERSECTIONS] ====== //
 
 template <typename T>
-bool Point<T>::isContainedBy(const Rectangle<T>& rectangle) { return rectangle.contains(*this); }
+bool Point<T>::isContainedBy(const Rect<T>& rectangle) { return rectangle.contains(*this); }
 template <typename T>
 bool Point<T>::isContainedBy(const Circle<T>& circle) { return circle.contains(*this); }
 
