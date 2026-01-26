@@ -17,16 +17,28 @@
 #include <random>
 #include <functional>
 
+#include "io/file/FileSystem.h"
+#include "io/file/LittleFsFileSystem.h"
+
+#include "io/logging/Logger.h"
+#include "io/logging/SerialLogger.h"
+
 #ifndef PIO_UNIT_TESTING
+
+SerialLogger logger = SerialLogger();
+
+FileSystem* fileSystem = new LittleFsFileSystem();
 
 GraphicsContext* context = new GraphicsContextLovyanGFX();
 
 Graphics g(context);
-
 static std::unique_ptr<GaugeFace> face;
 
 void setup() { 
-    Serial.begin(115200);
+    logger.init();
+
+    if (!fileSystem->init()) LOG_ERROR(logger, "file", "FileSystem failed to mount.");
+    else LOG_INFO(logger, "file", "FileSystem successfully mounted.");
 
     context->init();
 
@@ -78,7 +90,7 @@ void loop() {
     uint32_t lastFrameTime = currentTime - lastTime;          // microseconds
     float lastFPS = 1000000.0f / (float)lastFrameTime;        // FPS from us
 
-    if (t % 60 == 0) Serial.println(lastFPS);
+    if (t % 60 == 0) LOG_INFO(logger, "perf", "fps=%.2f dt_us=%u", lastFPS, (unsigned)lastFrameTime);
     
     t++;
 

@@ -40,6 +40,10 @@ void GraphicsContextLovyanGFX::endFrame() {
     buffer.pushSprite(0, 0);
 }
 
+void GraphicsContextLovyanGFX::drawPixel(int x, int y, uint16_t color) {
+    buffer.drawPixel(x, y, color);
+}
+
 void GraphicsContextLovyanGFX::strokeLine(int x0, int y0, int x1, int y1, uint16_t color) {
     buffer.drawLine(x0, y0, x1, y1, color);
 }
@@ -48,7 +52,7 @@ void GraphicsContextLovyanGFX::fillWideLine(int x0, int y0, int x1, int y1, uint
     buffer.drawWideLine(x0, y0, x1, y1, thickness, color);
 }
 
-void GraphicsContextLovyanGFX::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
+void GraphicsContextLovyanGFX::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color, float thickness) {
     buffer.drawTriangle(x0, y0, x1, y1, x2, y2, color);
 }
 
@@ -74,10 +78,13 @@ void GraphicsContextLovyanGFX::fillRing(int cx, int cy, int r, uint16_t color) {
 void GraphicsContextLovyanGFX::strokeRing(int cx, int cy, int r, uint16_t color, float thickness) {
 }
 
+void GraphicsContextLovyanGFX::fillArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color) { buffer.fillArc(cx, cy, r1, r2, start, end, color); }
+
+void GraphicsContextLovyanGFX::strokeArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color, float thickness) { buffer.drawArc(cx, cy, r1, r2, start, end, color); }
+
 void GraphicsContextLovyanGFX::fillEllipse(int cx, int cy, int rx, int ry, uint16_t color) { buffer.fillEllipse(cx, cy, rx, ry, color); }
 
-void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, uint16_t color, float thickness) {
-}
+void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, uint16_t color, float thickness) { buffer.drawEllipse(cx, cy, rx, ry, color);  }
 
 void GraphicsContextLovyanGFX::fillAll(uint16_t color) { buffer.fillScreen(color); }
 
@@ -92,3 +99,17 @@ void GraphicsContextLovyanGFX::drawText(const char *text, int x, int y, uint16_t
     buffer.setTextSize(getFontScaleFactor(point));
     buffer.drawString(text, x, y);
 }
+
+void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor anchor) {
+    switch (img.type) {
+        case Image::Type::LGFX: {
+            auto* spr = static_cast<LGFX_Sprite*>(img.native);
+            spr->pushSprite(&buffer, x, y);
+        }
+    }
+}
+
+//----------[ CLIP ]----------//
+void GraphicsContextLovyanGFX::setClipRect(int x, int y, int w, int h) { buffer.setClipRect(x, y, w, h); }
+
+void GraphicsContextLovyanGFX::clearClipRect() { buffer.clearClipRect(); }

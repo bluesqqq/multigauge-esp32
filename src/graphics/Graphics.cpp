@@ -12,14 +12,16 @@ uint16_t Graphics::getCachedColor(Color *color) {
 
 Graphics::Graphics(GraphicsContext *context) : context(context) { }
 
+Rect<int> Graphics::getScreenBounds() {
+    return Rect<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
+}
+
+//----------[ COLOR ]----------//
+
 void Graphics::clearColorCache() {
     colorCache.clear();
     if (fill != nullptr) fillValue = getCachedColor(fill);
     if (stroke != nullptr) strokeValue = getCachedColor(stroke);
-}
-
-Rect<int> Graphics::getScreenBounds() {
-    return Rect<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
 }
 
 void Graphics::setFill(uint16_t color) {
@@ -44,23 +46,23 @@ void Graphics::setStroke(Color *color) {
     strokeValue = getCachedColor(color);
 }
 
+void Graphics::setStrokeThickness(float t) { thickness = t; }
+
+//----------[ FILL ]----------//
+
 void Graphics::fillAll() const { fillAll(fillValue); }
 
 void Graphics::fillAll(Color *color) { context->fillAll(getCachedColor(color)); }
 
 void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
 
-void Graphics::fillRect(int x, int y, int width, int height) { context->fillRect(x, y, width, height, fillValue); }
+//----------[ PIXEL ]----------//
 
-void Graphics::fillRect(const Rect<int> &rectangle) { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+void Graphics::fillPixel(int x, int y) const { context->drawPixel(x, y, fillValue); }
 
-void Graphics::strokeRect(int x, int y, int width, int height) { context->strokeRect(x, y, width, height, strokeValue, 1); }
+void Graphics::fillPixel(const Point<int> &pos) const { context->drawPixel(pos.x, pos.y, fillValue); }
 
-void Graphics::strokeRect(const Rect<int> &rectangle) { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
-
-void Graphics::fillCircle(int cx, int cy, int radius) const { context->fillCircle(cx, cy, radius, fillValue); }
-
-void Graphics::strokeCircle(int cx, int cy, int radius) const { context->strokeCircle(cx, cy, radius, strokeValue, 1); }
+//----------[ LINE ]----------//
 
 void Graphics::strokeLine(int x0, int y0, int x1, int y1) const { context->strokeLine(x0, y0, x1, y1, strokeValue); }
 
@@ -68,9 +70,99 @@ void Graphics::strokeLine(const Point<int> &p1, const Point<int> &p2) const { st
 
 void Graphics::strokeLine(const Line<int> &line) const { strokeLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y); }
 
-void Graphics::fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2) { context->fillTriangle(x0, y0, x1, y1, x2, y2, fillValue); }
+void Graphics::fillWideLine(int x0, int y0, int x1, int y1, float t) const { context->fillWideLine(x0, y0, x1, y1, strokeValue, t); }
 
-void Graphics::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2) { context->strokeTriangle(x0, y0, x1, y1, x2, y2, strokeValue); }
+void Graphics::fillWideLine(const Point<int> &p1, const Point<int> &p2, float t) const { context->fillWideLine(p1.x, p1.y, p2.x, p2.y, strokeValue, t); }
+
+void Graphics::fillWideLine(const Line<int> &line) const { context->fillWideLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y, strokeValue, thickness); }
+
+//----------[ RECTANGLE ]----------//
+
+void Graphics::fillRect(int x, int y, int w, int h) const { context->fillRect(x, y, w, h, fillValue); }
+
+void Graphics::fillRect(const Rect<int> &rectangle) const { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+
+void Graphics::fillRoundedRect(int x, int y, int w, int h, float radius) const { context->fillRoundRect(x, y, w, h, radius, fillValue); }
+
+void Graphics::fillRoundedRect(const Rect<int> &rect, float radius) const { context->fillRoundRect(rect.position.x, rect.position.y, rect.width, rect.height, radius, fillValue); }
+
+void Graphics::strokeRect(int x, int y, int w, int h) const { context->strokeRect(x, y, w, h, strokeValue, thickness); }
+
+void Graphics::strokeRect(const Rect<int> &rectangle) const { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+
+void Graphics::strokeRoundedRect(int x, int y, int w, int h, float radius) const { context->strokeRoundRect(x, y, w, h, radius, strokeValue, thickness); }
+
+void Graphics::strokeRoundedRect(const Rect<int> &rect, float radius) const { context->strokeRoundRect(rect.position.x, rect.position.y, rect.width, rect.height, radius, strokeValue, thickness); }
+
+//----------[ ELLIPSE ]----------//
+
+void Graphics::fillEllipse(int cx, int cy, int rx, int ry) const { context->fillEllipse(cx, cy, rx, ry, fillValue); }
+
+void Graphics::fillEllipse(const Point<int> &center, int rx, int ry) const { context->fillEllipse(center.x, center.y, rx, ry, fillValue); }
+
+void Graphics::fillEllipseInRect(int x, int y, int w, int h) const { fillEllipseInRect(Rect<int>(x, y, w, h)); }
+
+void Graphics::fillEllipseInRect(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->fillEllipse(center.x, center.y, area.width / 2, area.height / 2, fillValue);
+}
+
+void Graphics::strokeEllipse(int cx, int cy, int rx, int ry) const { context->strokeEllipse(cx, cy, rx, ry, strokeValue, 1); }
+
+void Graphics::strokeEllipse(const Point<int> &center, int rx, int ry) const { context->strokeEllipse(center.x, center.y, rx, ry, fillValue, thickness); }
+
+void Graphics::strokeEllipseInRect(int x, int y, int w, int h) const { strokeEllipseInRect(Rect<int>(x, y, w, h)); }
+
+void Graphics::strokeEllipseInRect(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->strokeEllipse(center.x, center.y, area.width / 2, area.height / 2, strokeValue, thickness);
+}
+
+//----------[ CIRCLE ]----------//
+
+void Graphics::fillCircle(int cx, int cy, int radius) const { context->fillCircle(cx, cy, radius, fillValue); }
+
+void Graphics::fillCircle(const Point<int> &center, int radius) const { context->fillCircle(center.x, center.y, radius, fillValue); }
+
+void Graphics::fillCircleInRect(int x, int y, int w, int h) const { fillCircleInRect(Rect<int>(x, y, w, h)); }
+
+void Graphics::fillCircleInRect(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->fillCircle(center.x, center.y, min(area.width / 2, area.height / 2), fillValue);
+}
+
+void Graphics::strokeCircle(int cx, int cy, int radius) const { context->strokeCircle(cx, cy, radius, strokeValue, 1); }
+
+void Graphics::strokeCircle(const Point<int> &center, int radius) const { context->strokeCircle(center.x, center.y, radius, strokeValue, thickness); }
+
+void Graphics::strokeCircleInRect(int x, int y, int w, int h) const { strokeCircleInRect(Rect<int>(x, y, w, h));  }
+
+void Graphics::strokeCircleInRect(const Rect<int> &area) const {
+    const auto center = area.getCenter();
+    context->strokeCircle(center.x, center.y, min(area.width / 2, area.height / 2), strokeValue, thickness);
+}
+
+//----------[ ARC ]----------//
+
+void Graphics::fillArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle) const { context->fillArc(cx, cy, r1, r2, startAngle, endAngle, fillValue); }
+
+void Graphics::fillArc(const Point<int> &center, int r1, int r2, float startAngle, float endAngle) const { context->fillArc(center.x, center.y, r1, r2, startAngle, endAngle, fillValue); }
+
+void Graphics::strokeArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle) const { context->strokeArc(cx, cy, r1, r2, startAngle, endAngle, strokeValue, thickness); }
+
+void Graphics::strokeArc(const Point<int> &center, int r1, int r2, float startAngle, float endAngle) const { context->strokeArc(center.x, center.y, r1, r2, startAngle, endAngle, strokeValue, thickness); }
+
+//----------[ TRIANGLE ]----------//
+
+void Graphics::fillTri(int x0, int y0, int x1, int y1, int x2, int y2) const { context->fillTriangle(x0, y0, x1, y1, x2, y2, fillValue); }
+
+void Graphics::fillTri(const Point<int> &p1, const Point<int> &p2, const Point<int> &p3) const { context->fillTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, fillValue); }
+
+void Graphics::strokeTri(int x0, int y0, int x1, int y1, int x2, int y2) const { context->strokeTriangle(x0, y0, x1, y1, x2, y2, strokeValue, thickness); }
+
+void Graphics::strokeTri(const Point<int> &p1, const Point<int> &p2, const Point<int> &p3) const { context->strokeTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, strokeValue, thickness); }
+
+//----------[ TEXT ]----------//
 
 void Graphics::setTextPoint(float point) { textPoint = point; }
 
@@ -338,23 +430,12 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
     }
 }
 
-
 void Graphics::drawTextArea(const std::string &text, Rect<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
 
-void Graphics::fillEllipse(int x, int y, int width, int height) const {
-    fillEllipse(Rect<int>(x, y, width, height));
-}
+void Graphics::setClipRect(int x, int y, int w, int h) { context->setClipRect(x, y, w, h); }
 
-void Graphics::fillEllipse(const Rect<int> &area) const {
-    const auto center = area.getCenter();
-    context->fillEllipse(center.x, center.y, area.width / 2, area.height / 2, fillValue);
-}
+void Graphics::setClipRect(const Rect<int> &rect) { context->setClipRect(rect.position.x, rect.position.y, rect.width, rect.height); }
 
-void Graphics::strokeEllipse(int x, int y, int width, int height) const {
-    strokeEllipse(Rect<int>(x, y, width, height));
-}
+void Graphics::clearClipRect() { context->clearClipRect(); }
 
-void Graphics::strokeEllipse(const Rect<int> &area) const {
-    const auto center = area.getCenter();
-    context->strokeEllipse(center.x, center.y, area.width / 2, area.height / 2, strokeValue, 1);
-}
+//----------[ CLIP ]----------//

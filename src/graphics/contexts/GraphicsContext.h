@@ -3,6 +3,8 @@
 #include "graphics/colors/Color.h"
 #include "graphics/geometry/alignment.h"
 
+#include "graphics/Image.h"
+
 class GraphicsContext {
     protected:
         int width;
@@ -23,29 +25,57 @@ class GraphicsContext {
         int getScreenWidth() const;
         int getScreenHeight() const;
         
+        //----------[ FILL ]----------//
+        virtual void fillAll(uint16_t color) = 0;
+
+        //----------[ PIXEL ]----------//
+        virtual void drawPixel(int x, int y, uint16_t color) = 0;
+
+        //----------[ LINE ]----------//
         virtual void strokeLine(int x0, int y0, int x1, int y1, uint16_t color) = 0;
-        virtual void fillWideLine(int x0, int y0, int x1, int y1, uint16_t color, float thickness = 1) = 0;
+        virtual void fillWideLine(int x0, int y0, int x1, int y1, uint16_t color, float thickness) = 0;
 
-        virtual void strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
-        virtual void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
-
+        //----------[ RECTANGLE ]----------//
         virtual void fillRect(int x, int y, int w, int h, uint16_t color) = 0;
         virtual void strokeRect(int x, int y, int w, int h, uint16_t color, float thickness) = 0;
 
+        virtual void fillRoundRect(int x, int y, int w, int h, float radius, uint16_t color) = 0;
+        virtual void fillRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color) = 0;
+
+        virtual void strokeRoundRect(int x, int y, int w, int h, float radius, uint16_t color, float thickness) = 0;
+        virtual void strokeRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color, float thickness) = 0;
+
+        //----------[ CIRCLE ]----------//
         virtual void fillCircle(int cx, int cy, int r, uint16_t color) = 0;
         virtual void strokeCircle(int cx, int cy, int r, uint16_t color, float thickness) = 0;
 
+        //----------[ ELLIPSE ]----------//
+        virtual void fillEllipse(int cx, int cy, int rx, int ry, uint16_t color) = 0;
+        virtual void strokeEllipse(int cx, int cy, int rx, int ry, uint16_t color, float thickness) = 0;
+
+        //----------[ RING ]----------//
         virtual void fillRing(int cx, int cy, int r, uint16_t color) = 0;
         virtual void strokeRing(int cx, int cy, int r, uint16_t color, float thickness) = 0;
 
-        virtual void fillEllipse(int cx, int cy, int rx, int ry, uint16_t color) = 0;
-        virtual void strokeEllipse(int cx, int cy, int rx, int ry, uint16_t color, float thickness) = 0;
-        virtual void fillAll(uint16_t color) = 0;
+        //----------[ ARC ]----------//
+        virtual void fillArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color) = 0;
+        virtual void strokeArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color, float thickness) = 0;
 
-        // Text
+        //----------[ TRIANGLE ]----------//
+        virtual void strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color, float thickness) = 0;
+        virtual void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
 
+        //----------[ TEXT ]----------//
         virtual float getTextWidth(const char* text, float point) = 0;
         float getTextWidth(std::string_view text, float point);
 
         virtual void drawText(const char* text, int x, int y, uint16_t color, float point, Anchor anchor = Anchor::TopLeft) = 0;
+
+        //----------[ IMAGE ]----------//
+        virtual void drawImage(const Image& img, int x, int y, Anchor anchor = Anchor::TopLeft) = 0;
+        virtual void drawImage(const Image& img, int x, int y, int width, int height) = 0;
+
+        //----------[ CLIP ]----------//
+        virtual void setClipRect(int x, int y, int width, int height) = 0;
+        virtual void clearClipRect() = 0;
 };

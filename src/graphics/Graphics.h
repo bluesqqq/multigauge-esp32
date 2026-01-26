@@ -8,6 +8,7 @@
 #include "geometry/path.h"
 
 #include "contexts/GraphicsContext.h"
+#include "Image.h"
 
 #define MIN_HYPHEN_PREFIX 3 // Prefix must be this number of chars or higher to be hyphenated in text wrap
 
@@ -22,6 +23,8 @@ class Graphics final {
 
         Color* stroke;
         uint16_t strokeValue;
+
+        float thickness = 0.0f;
 
         /// @brief Cache that stores a color's value for quick lookup
         std::unordered_map<Color*, uint16_t> colorCache;
@@ -38,7 +41,6 @@ class Graphics final {
     public:
         Graphics(GraphicsContext* context);
 
-
         Rect<int> getScreenBounds();
         
         //----------[ COLOR ]----------//
@@ -51,60 +53,99 @@ class Graphics final {
         void setStroke(uint16_t color);
         void setStroke(Color* color);
 
-        //----------[ PRIMITIVES ]----------//
+        void setStrokeThickness(float thickness);
 
+        //----------[ FILL ]----------//
         void fillAll() const;
         void fillAll(Color* color);
         void fillAll(uint16_t color) const;
 
-        void fillRect(int x, int y, int width, int height);
-        void fillRect(const Rect<int>& rectangle);
+        //----------[ PIXEL ]----------//
+        void fillPixel(int x, int y) const;
+        void fillPixel(const Point<int>& pos) const;
 
-        void strokeRect(int x, int y, int width, int height);
-        void strokeRect(const Rect<int>& rectangle);
+        //----------[ LINE ]----------//
+        void strokeLine(int x0, int y0, int x1, int y1) const;
+        void strokeLine(const Point<int>& p1, const Point<int>& p2) const;
+        void strokeLine(const Line<int>& line) const;
 
-        void fillRoundedRect(int x, int y, int width, int height, int cornerSize = 0);
-        void fillRoundedRect(const Rect<int>&, int cornerSize = 0);
+        void fillWideLine(int x0, int y0, int x1, int y1, float thickness) const;
+        void fillWideLine(const Point<int>& p1, const Point<int>& p2, float thickness) const;
+        void fillWideLine(const Line<int>& line) const;
 
-        void strokeRoundedRect(int x, int y, int width, int height, int cornerSize = 0);
-        void strokeRoundedRect(const Rect<int>&, int cornerSize = 0);
+        void strokeWideLine(int x0, int y0, int x1, int y1, float thickness) const;
+        void strokeWideLine(const Point<int>& p1, const Point<int>& p2, float thickness) const;
+        void strokeWideLine(const Line<int>& line) const;
 
-        void fillEllipse(int x, int y, int width, int height) const;
-        void fillEllipse(const Rect<int>& area) const;
+        //----------[ RECTANGLE ]----------//
+        void fillRect(int x, int y, int width, int height) const;
+        void fillRect(const Rect<int>& rect) const;
 
-        void strokeEllipse(int x, int y, int width, int height) const;
-        void strokeEllipse(const Rect<int>& area) const;
+        void strokeRect(int x, int y, int width, int height) const;
+        void strokeRect(const Rect<int>& rect) const;
 
+        void fillRoundedRect(int x, int y, int width, int height, float radius) const;
+        void fillRoundedRect(const Rect<int>& rect, float radius) const;
+        void fillRoundedRect(int x, int y, int width, int height, int topLeft, int topRight, int bottomRight, int bottomLeft) const;
+        void fillRoundedRect(const Rect<int>& rect, int topLeft, int topRight, int bottomRight, int bottomLeft) const;
+
+        void strokeRoundedRect(int x, int y, int width, int height, float radius) const;
+        void strokeRoundedRect(const Rect<int>& rect, float radius) const;
+        void strokeRoundedRect(int x, int y, int width, int height, int topLeft, int topRight, int bottomRight, int bottomLeft) const;
+        void strokeRoundedRect(const Rect<int>& rect, int topLeft, int topRight, int bottomRight, int bottomLeft) const;
+
+        //----------[ ELLIPSE ]----------//
+        void fillEllipse(int cx, int cy, int rx, int ry) const;
+        void fillEllipse(const Point<int>& center, int rx, int ry) const;
+
+        void fillEllipseInRect(int x, int y, int width, int height) const;
+        void fillEllipseInRect(const Rect<int>& area) const;
+
+        void strokeEllipse(int cx, int cy, int rx, int ry) const;
+        void strokeEllipse(const Point<int>& center, int rx, int ry) const;
+
+        void strokeEllipseInRect(int x, int y, int width, int height) const;
+        void strokeEllipseInRect(const Rect<int>& area) const;
+
+        //----------[ CIRCLE ]----------//
         void fillCircle(int cx, int cy, int radius) const;
         void fillCircle(const Point<int>& center, int radius) const;
+
+        void fillCircleInRect(int x, int y, int width, int height) const;
+        void fillCircleInRect(const Rect<int>& area) const;
 
         void strokeCircle(int cx, int cy, int radius) const;
         void strokeCircle(const Point<int>& center, int radius) const;
 
+        void strokeCircleInRect(int x, int y, int width, int height) const;
+        void strokeCircleInRect(const Rect<int>& area) const;
+
+        //----------[ RING ]----------//
         void fillRing(int cx, int cy, int r1, int r2) const;
         void fillRing(const Point<int>& center, int r1, int r2) const;
 
         void strokeRing(int cx, int cy, int r1, int r2) const;
         void strokeRing(const Point<int>& center, int r1, int r2) const;
 
-        void strokeLine(int x0, int y0, int x1, int y1) const;
-        void strokeLine(const Point<int>& p1, const Point<int>& p2) const;
-        void strokeLine(const Line<int>& line) const;
+        //----------[ ARC ]----------//
+        void fillArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle) const;
+        void fillArc(const Point<int>& center, int r1, int r2, float startAngle, float endAngle) const;
 
-        void fillArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle);
-        void fillArc(Point<int> center, int r1, int r2, float startAngle, float endAngle);
+        void strokeArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle) const;
+        void strokeArc(const Point<int>& center, int r1, int r2, float startAngle, float endAngle) const;
 
-        void strokeArc(int cx, int cy, int r1, int r2, float startAngle, float endAngle);
-        void strokeArc(Point<int> center, int r1, int r2, float startAngle, float endAngle);
+        //----------[ TRIANGLE ]----------//
+        void fillTri(int x0, int y0, int x1, int y1, int x2, int y2) const;
+        void fillTri(const Point<int>& p1, const Point<int>& p2, const Point<int>& p3) const;
 
-        void fillPath(const Path<int>& path);
-        void strokePath(const Path<int>& path);
+        void strokeTri(int x0, int y0, int x1, int y1, int x2, int y2) const;
+        void strokeTri(const Point<int>& p1, const Point<int>& p2, const Point<int>& p3) const;
 
-        void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
-        void strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2);
+        //----------[ PATH ]----------//
+        void fillPath(const Path<int>& path) const;
+        void strokePath(const Path<int>& path) const;
 
         //----------[ TEXT ]----------//
-
         void setTextPoint(float point);
 
         void drawText(const std::string& text, int x, int y, Anchor anchor);
@@ -116,5 +157,8 @@ class Graphics final {
 
         //----------[ IMAGES ]----------//
 
-        void drawImage(const Rect<int>& area);
+        //----------[ CLIP ]----------//
+        void setClipRect(int x, int y, int width, int height);
+        void setClipRect(const Rect<int>& rect);
+        void clearClipRect();
 };
