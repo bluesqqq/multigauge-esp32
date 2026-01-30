@@ -1,17 +1,18 @@
 #pragma once
 
 #include "graphics/gauge/Element.h"
+#include "graphics/colors/Color.h"
 
 class RectangleElement : public Element {
-public:
-    explicit RectangleElement(YGConfigRef config) : Element(config) {}
+    private:
+        FillStroke color;
 
-    void draw(Graphics& g) const override {
-        const auto& b = getBounds();
+        float radius = 0.0f;
 
-        g.setFill(0xf800);
-        g.fillRect(b.toInt());
+    public:
+        explicit RectangleElement(YGConfigRef config);
 
-        Element::draw(g);
-    }
+        RectangleElement(YGConfigRef config, const rapidjson::Value::ConstObject json);
+
+        void draw(Graphics& g) const override;
 };

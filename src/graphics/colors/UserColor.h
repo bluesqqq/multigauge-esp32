@@ -18,9 +18,7 @@ class UserColor : public Color {
     public:
         UserColor(Slot slot = Slot::Primary);
 
-        /// @brief Constructs a UserColor from JSON.
-        /// @param userColorJson The JSON object containing color data
-        UserColor(JsonObject userColorJson);
+        UserColor(const rapidjson::Value::ConstObject json);
 
         std::unique_ptr<Color> clone() const override;
         

@@ -3,9 +3,9 @@
 
 UserColor::UserColor(Slot slot) : slot(slot) { }
 
-UserColor::UserColor(JsonObject userColorJson) {
-    if (userColorJson["slot"].is<const char*>()) {
-        std::string slotStr(userColorJson["slot"].as<const char*>());
+UserColor::UserColor(const rapidjson::Value::ConstObject json) {
+    if (json.HasMember("Slot") && json["slot"].IsString()) {
+        const char* slotStr = json["slot"].GetString();
 
         if (slotStr == "primary")       slot = Slot::Primary;
         else if (slotStr == "secondary") slot = Slot::Secondary;

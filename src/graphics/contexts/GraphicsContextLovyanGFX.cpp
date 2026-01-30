@@ -66,6 +66,24 @@ void GraphicsContextLovyanGFX::strokeRect(int x, int y, int w, int h, uint16_t c
     buffer.drawRect(x, y, w + 1, h + 1, color);
 }
 
+void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float radius, uint16_t color) {
+    buffer.fillRoundRect(x, y, w, h, radius, color);
+}
+
+void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color) {
+    // TODO: CHANGE IMPL
+    buffer.fillRoundRect(x, y, w, h, r1, color);
+}
+
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float radius, uint16_t color, float thickness) {
+    buffer.drawRoundRect(x, y, w, h, radius, color);
+}
+
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color, float thickness) {
+    // TODO: CHANGE IMPL
+    buffer.drawRoundRect(x, y, w, h, r1, color);
+}
+
 void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, uint16_t color) { buffer.fillCircle(cx, cy, r, color); }
 
 void GraphicsContextLovyanGFX::strokeCircle(int cx, int cy, int r, uint16_t color, float thickness) {
@@ -107,6 +125,10 @@ void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor 
             spr->pushSprite(&buffer, x, y);
         }
     }
+}
+
+void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, int width, int height) {
+    // TODO: implement ts
 }
 
 //----------[ CLIP ]----------//

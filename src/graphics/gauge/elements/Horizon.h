@@ -14,12 +14,14 @@ class Horizon : public Element {
         float zPosition = 0;
         float xPosition = 0;
 
-        Color* horizonColor;
+        Color* horizonColor = new StaticColor(0xf800);
 
         
     public:
-        Horizon(YGConfigRef config) : Element(config) {
-            horizonColor = new StaticColor(0xf800);
+        Horizon(YGConfigRef config) : Element(config) {}
+
+        Horizon(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config) {
+            loadLayout(getNode(), json);
         }
 
         void draw(Graphics& g) const override {
@@ -32,11 +34,11 @@ class Horizon : public Element {
 
             const int halfY = b.getCenterY();
 
-            auto background = Rectangle<int>(b);
+            auto background = Rect<int>(b);
             background.setTop(halfY);
             background.reduce(1);
 
-            auto background2 = Rectangle<int>(b);
+            auto background2 = Rect<int>(b);
             background2.setBottom(halfY);
             background2.reduce(1);
 
@@ -46,7 +48,7 @@ class Horizon : public Element {
             g.setFill(0x3004);
             g.fillRect(background2);
 
-            g.setStroke(horizonColor->getColor());
+            g.setStroke(*horizonColor);
 
             // Horizon line (middle)
             g.strokeLine(left, halfY, right, halfY);

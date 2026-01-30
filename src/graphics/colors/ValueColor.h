@@ -13,9 +13,7 @@ class ValueColor : public Color {
 
         ValueColor(Value* value, ColorTimeline timeline);
 
-        /// @brief Constructs a ValueColor from JSON
-        /// @param valueColorJson The JSON object containing color data
-        ValueColor(JsonObject valueColorJson);
+        ValueColor(const rapidjson::Value::ConstObject json);
 
         ValueColor(const ValueColor& other);
         

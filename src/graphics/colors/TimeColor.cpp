@@ -8,18 +8,18 @@ float TimeColor::getTime() const {
     float t = static_cast<float>(millis());
 
     switch (loopType) {
-    case LoopType::Forward:
-        t = std::fmod(t, duration);
-        break;
-    
-    case LoopType::Reverse:
-        t = duration - std::fmod(t, duration);
-        break;
+        case LoopType::Forward:
+            t = std::fmod(t, duration);
+            break;
+        
+        case LoopType::Reverse:
+            t = duration - std::fmod(t, duration);
+            break;
 
-    case LoopType::PingPong:
-        t = std::fmod(t, 2.0f * duration);
-        if (t > duration) t = 2.0f * duration - t;
-        break;
+        case LoopType::PingPong:
+            t = std::fmod(t, 2.0f * duration);
+            if (t > duration) t = 2.0f * duration - t;
+            break;
     }
 
     return t;
@@ -31,10 +31,10 @@ TimeColor::TimeColor() : timeline(ColorTimeline()), loopType(LoopType::Forward) 
 
 TimeColor::TimeColor(ColorTimeline timeline, LoopType loopType) : timeline(std::move(timeline)), loopType(loopType) {}
 
-TimeColor::TimeColor(JsonObject timeColorJson) {
-    timeline = timeColorJson["timeline"].is<JsonObject>() ? ColorTimeline(timeColorJson["timeline"].as<JsonObject>()) : ColorTimeline();
-    if (timeColorJson["loopType"].is<const char*>()) {
-        const char* loopStr = timeColorJson["loopType"].as<const char*>();
+TimeColor::TimeColor(const rapidjson::Value::ConstObject json) 
+    : timeline((json.HasMember("timeline") && json["timeline"].IsObject()) ? ColorTimeline(json["timeline"].GetObject()) : ColorTimeline()) {
+    if (json.HasMember("loopType") && json["loopType"].IsString()) {
+        const char* loopStr = json["loopType"].GetString();
         if (strcmp(loopStr, "forward") == 0) loopType = LoopType::Forward;
         else if (strcmp(loopStr, "reverse") == 0) loopType = LoopType::Reverse;
         else if (strcmp(loopStr, "pingpong") == 0) loopType = LoopType::PingPong;

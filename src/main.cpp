@@ -23,11 +23,15 @@
 #include "io/logging/Logger.h"
 #include "io/logging/SerialLogger.h"
 
+#include "AssetManager.h"
+
 #ifndef PIO_UNIT_TESTING
 
 SerialLogger logger = SerialLogger();
 
-FileSystem* fileSystem = new LittleFsFileSystem();
+LittleFsFileSystem fileSystem = LittleFsFileSystem();
+
+AssetManager assetManager = AssetManager(fileSystem, logger);
 
 GraphicsContext* context = new GraphicsContextLovyanGFX();
 
@@ -37,33 +41,25 @@ static std::unique_ptr<GaugeFace> face;
 void setup() { 
     logger.init();
 
-    if (!fileSystem->init()) LOG_ERROR(logger, "file", "FileSystem failed to mount.");
+    if (!fileSystem.init()) LOG_ERROR(logger, "file", "FileSystem failed to mount.");
     else LOG_INFO(logger, "file", "FileSystem successfully mounted.");
+
+    std::vector<std::string> dirs;
+    fileSystem.listDirectories("/", dirs);
 
     context->init();
 
     YGConfigRef config = YGConfigNew();
     YGConfigSetUseWebDefaults(config, false);
 
-    face = std::make_unique<GaugeFace>(config);
-
-    // Root fills the screen and centers its only child
-    YGNodeStyleSetWidthPercent(face->getNode(), 100);
-    YGNodeStyleSetHeightPercent(face->getNode(), 100);
-    YGNodeStyleSetFlexDirection(face->getNode(), YGFlexDirectionRow);
-    YGNodeStyleSetJustifyContent(face->getNode(), YGJustifyCenter);
-    YGNodeStyleSetAlignItems(face->getNode(), YGAlignCenter);
-
-    // One element
-    auto graphElement = std::make_unique<ShiftLightElement>(
-        config, engineRPM, new StaticColor(0xFFFF)
-    );
-
-    // Half width + half height, centered by parent settings above
-    YGNodeStyleSetWidthPercent(graphElement->getNode(), 50);
-    YGNodeStyleSetHeightPercent(graphElement->getNode(), 50);
-
-    face->addChild(std::move(graphElement));
+    rapidjson::Document doc;
+    if (assetManager.loadJson("/gauge.json", doc)) {
+        face = std::make_unique<GaugeFace>(config, doc);
+        LOG_INFO(logger, "gauge", "Successfully loaded test gaugeface file.");
+    } else {
+        face = std::make_unique<GaugeFace>(config);
+        LOG_INFO(logger, "gauge", "Failed to load test gaugeface file.");
+    }
 }
 
 

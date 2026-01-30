@@ -2,6 +2,7 @@
 
 #include "color.h"
 #include "ColorTimeline.h"
+#include "Arduino.h" // TODO: REMOVE THIS AND CHANGE TO ABSTRACT TIME CLASS
 
 class TimeColor : public Color {
     public:
@@ -34,7 +35,7 @@ class TimeColor : public Color {
 
         /// @brief Constructs a TimeColor from JSON
         /// @param timeColorJson The JSON object containing color data
-        TimeColor(JsonObject timeColorJson);
+        TimeColor(const rapidjson::Value::ConstObject json);
 
         TimeColor(const TimeColor& other);
         

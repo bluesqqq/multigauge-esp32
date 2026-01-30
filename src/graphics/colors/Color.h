@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ArduinoJson.h>
+#include "rapidjson/document.h"
 #include <memory>
 #include "values/value.h"
 
@@ -14,17 +14,10 @@ class Color {
         /// @return A unique pointer to the created Color object
         virtual std::unique_ptr<Color> clone() const = 0;
 
-        /// @brief Blends two 16-bit (RGB565) color values together.
-        /// @param base The base color value
-        /// @param blend The color value to blend with
-        /// @param alpha The blend amount (0.0 = base, 1.0 = blend)
-        /// @return The blended 16-bit color value
-        static uint16_t blend(const uint16_t& base, const uint16_t& blend, float alpha);
-
         /// @brief Creates a Color object from JSON.
         /// @param colorJson The JSON object containing Color data
         /// @return A unique pointer to the created Color object (defaults to StaticColor if type is missing or invalid)
-        static std::unique_ptr<Color> loadFromJson(JsonObject colorJson);
+        static std::unique_ptr<Color> fromJson(const rapidjson::Value::ConstObject json);
 
         /// @brief Gets the current color value.
         /// @return The 16-bit color value
@@ -41,6 +34,15 @@ class Color {
         /// @return The Type enum value
         virtual Type getType() const = 0;
 
+        //----------[ BLENDING ]----------//
+
+        /// @brief Blends two 16-bit (RGB565) color values together.
+        /// @param base The base color value
+        /// @param blend The color value to blend with
+        /// @param alpha The blend amount (0.0 = base, 1.0 = blend)
+        /// @return The blended 16-bit color value
+        static uint16_t blend(const uint16_t& base, const uint16_t& blend, float alpha);
+        
         /// @brief Blends this color with a static color value.
         /// @param color The 16-bit color value to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
@@ -52,4 +54,20 @@ class Color {
         /// @param alpha The blend amount (0.0 = this color, 1.0 = other color)
         /// @return A new Color object with the blended result
         virtual std::unique_ptr<Color> blended(const Color& color, float alpha) const = 0;
+};
+
+//----------[ FILL STROKE ]----------//
+
+struct FillStroke {
+    std::unique_ptr<Color> fill;
+    std::unique_ptr<Color> stroke;
+    float thickness = 1.0f;
+
+    FillStroke();
+
+    FillStroke(std::unique_ptr<Color> fill, std::unique_ptr<Color> stroke, float thickness = 1.0f);
+    FillStroke(const rapidjson::Value::ConstObject json);
+
+    FillStroke blended(uint16_t color, float alpha) const;
+    FillStroke blended(const Color& color, float alpha) const;
 };

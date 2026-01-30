@@ -1,50 +1,30 @@
 #include "Graphics.h"
 
-uint16_t Graphics::getCachedColor(Color *color) {
-    auto it = colorCache.find(color);
+uint16_t Graphics::getCachedColor(const Color& color) {
+    auto it = colorCache.find(&color);
     if (it != colorCache.end())
         return it->second;
 
-    uint16_t c = color->getColor();
-    colorCache[color] = c;
+    uint16_t c = color.getColor();
+    colorCache[&color] = c;
     return c;
 }
 
 Graphics::Graphics(GraphicsContext *context) : context(context) { }
 
-Rect<int> Graphics::getScreenBounds() {
-    return Rect<int>(0, 0, context->getScreenWidth(), context->getScreenHeight());
-}
+Rect<int> Graphics::getScreenBounds() { return Rect<int>(0, 0, context->getScreenWidth(), context->getScreenHeight()); }
 
 //----------[ COLOR ]----------//
 
-void Graphics::clearColorCache() {
-    colorCache.clear();
-    if (fill != nullptr) fillValue = getCachedColor(fill);
-    if (stroke != nullptr) strokeValue = getCachedColor(stroke);
-}
+void Graphics::clearColorCache() { colorCache.clear(); }
 
-void Graphics::setFill(uint16_t color) {
-    fill = nullptr;
-    fillValue = color;
-}
+void Graphics::setFill(uint16_t color) { fillValue = color; }
 
-void Graphics::setFill(Color *color) {
-    if (!color) return;
-    fill = color;
-    fillValue = getCachedColor(color);
-}
+void Graphics::setFill(const Color& color) { fillValue = getCachedColor(color); }
 
-void Graphics::setStroke(uint16_t color) {
-    stroke = nullptr;
-    strokeValue = color;
-}
+void Graphics::setStroke(uint16_t color) { strokeValue = color; }
 
-void Graphics::setStroke(Color *color) {
-    if (!color) return;
-    stroke = color; 
-    strokeValue = getCachedColor(color);
-}
+void Graphics::setStroke(const Color& color) { strokeValue = getCachedColor(color); }
 
 void Graphics::setStrokeThickness(float t) { thickness = t; }
 
@@ -52,7 +32,7 @@ void Graphics::setStrokeThickness(float t) { thickness = t; }
 
 void Graphics::fillAll() const { fillAll(fillValue); }
 
-void Graphics::fillAll(Color *color) { context->fillAll(getCachedColor(color)); }
+void Graphics::fillAll(const Color& color) { context->fillAll(getCachedColor(color)); }
 
 void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
 
@@ -225,7 +205,7 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
     const int maxLines = rect.height / lineHeight;
     if (maxLines <= 0) return;
 
-    uint16_t textColor = fill ? getCachedColor(fill) : fillValue;
+    uint16_t textColor = fillValue;
 
     std::string scratch;
     scratch.reserve(128);

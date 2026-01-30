@@ -18,21 +18,18 @@ class Graphics final {
 
         //----------[ COLORS ]----------//
 
-        Color* fill;
         uint16_t fillValue;
-
-        Color* stroke;
         uint16_t strokeValue;
 
         float thickness = 0.0f;
 
         /// @brief Cache that stores a color's value for quick lookup
-        std::unordered_map<Color*, uint16_t> colorCache;
+        std::unordered_map<const Color*, uint16_t> colorCache;
 
         /// @brief Gets a color's value from the cache.
         /// @param color The Color object to get the color value of
         /// @return The current Color object's 16-bit color value
-        uint16_t getCachedColor(Color* color);
+        uint16_t getCachedColor(const Color& color);
 
         //----------[ TEXT ]----------//
 
@@ -48,16 +45,15 @@ class Graphics final {
         void clearColorCache();
 
         void setFill(uint16_t color);
-        void setFill(Color* color);
+        void setFill(const Color& color);
 
         void setStroke(uint16_t color);
-        void setStroke(Color* color);
-
+        void setStroke(const Color& color);
         void setStrokeThickness(float thickness);
 
         //----------[ FILL ]----------//
         void fillAll() const;
-        void fillAll(Color* color);
+        void fillAll(const Color& color);
         void fillAll(uint16_t color) const;
 
         //----------[ PIXEL ]----------//

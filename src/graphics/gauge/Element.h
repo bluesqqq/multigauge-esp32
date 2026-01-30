@@ -8,6 +8,10 @@
 #include <yoga/Yoga.h>
 #include "layout.h"
 
+#include <rapidjson/document.h>
+
+#include "AssetManager.h"
+
 class Element {
     private:
         /// @brief Parent element in the hierarchy, or nullptr if root
@@ -59,32 +63,21 @@ class Element {
         bool needsLayout() const { return needsLayout_; }
 
     public:
-        explicit Element(YGConfigRef config) : config(config) {
-            initializeNode(config);
-        }
+        explicit Element(YGConfigRef config);
 
-        virtual ~Element() {
-            if (parent && parent->node) YGNodeRemoveChild(parent->node, node);
+        explicit Element(YGConfigRef config, const rapidjson::Value::ConstObject json);
 
-            YGNodeRemoveAllChildren(node);
-            YGNodeFree(node);
-            node = nullptr;
-        }
+        virtual ~Element();
+
+        static std::unique_ptr<Element> fromJson(YGConfigRef config, const rapidjson::Value::ConstObject json);
 
         // Tree
 
         YGNodeRef getNode() const { return node; }
 
-        void addChild(std::unique_ptr<Element> child) {
-            child->parent = this;
+        void addChild(std::unique_ptr<Element> child);
 
-            const uint32_t index = (uint32_t)children.size();
-            YGNodeInsertChild(this->node, child->node, index);
-
-            children.push_back(std::move(child));
-        }
-
-        void addChild(JsonObject json);
+        void addChild(const rapidjson::Value::ConstObject json);
 
         bool removeChild(Element* child) {
             if (!child) return false;
@@ -113,7 +106,7 @@ class Element {
 
         // Update + draw
 
-        virtual bool init();
+        virtual bool init(AssetManager& assetManager);
 
         virtual void draw(Graphics& g) const;
 

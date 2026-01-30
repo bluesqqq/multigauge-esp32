@@ -15,9 +15,7 @@ class StaticColor : public Color {
         /// @param color The 16-bit color value
         StaticColor(uint32_t color);
 
-        /// @brief Constructs a StaticColor from JSON.
-        /// @param staticColorJson The JSON object containing color data
-        StaticColor(JsonObject staticColorJson);
+        StaticColor(const rapidjson::Value::ConstObject json);
 
         std::unique_ptr<Color> clone() const override;
 

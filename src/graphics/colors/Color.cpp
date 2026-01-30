@@ -22,15 +22,34 @@ uint16_t Color::blend(const uint16_t &base, const uint16_t &blend, float alpha) 
     return (r << 11) | (g << 5) | b;
 }
 
-std::unique_ptr<Color> Color::loadFromJson(JsonObject colorJson) {
-    if (!colorJson["type"].is<const char*>()) return std::make_unique<StaticColor>();
-    
-    std::string type = std::string(colorJson["type"].as<const char*>());
+std::unique_ptr<Color> Color::fromJson(const rapidjson::Value::ConstObject json) {
+    Serial.println("ATTEMPTING TO CREATE COLOR");
+    if (!json.HasMember("type") || !json["type"].IsString())
+        return std::make_unique<StaticColor>();
 
-    if (type == "static")     return std::make_unique<StaticColor>(colorJson);
-    else if (type == "value") return std::make_unique<ValueColor>(colorJson);
-    else if (type == "time")  return std::make_unique<TimeColor>(colorJson);
-    else if (type == "user")  return std::make_unique<StaticColor>(colorJson);
+    const char* type = json["type"].GetString();
+
+    if (strcmp(type, "static") == 0)     return std::make_unique<StaticColor>(json);
+    if (strcmp(type, "value") == 0)      return std::make_unique<ValueColor>(json);
+    if (strcmp(type, "time") == 0)       return std::make_unique<TimeColor>(json);
+    if (strcmp(type, "user") == 0)       return std::make_unique<StaticColor>(json);
 
     return std::make_unique<StaticColor>();
 }
+
+//----------[ FILL STROKE ]----------//
+
+FillStroke::FillStroke() : fill(nullptr), stroke(nullptr) {}
+
+FillStroke::FillStroke(std::unique_ptr<Color> fill, std::unique_ptr<Color> stroke, float thickness) : fill(std::move(fill)), stroke(std::move(stroke)), thickness(thickness) {}
+
+FillStroke::FillStroke(const rapidjson::Value::ConstObject json)
+    : fill((json.HasMember("fill") && json["fill"].IsObject() ? Color::fromJson(json["fill"].GetObject()) : nullptr)),
+      stroke((json.HasMember("stroke") && json["stroke"].IsObject() ? Color::fromJson(json["stroke"].GetObject()) : nullptr)),
+      thickness((json.HasMember("thickness") && json["thickness"].IsNumber()) ? json["thickness"].GetFloat() :  1.0f) {
+        Serial.println("CREATING FILL STROKE");
+      }
+
+FillStroke FillStroke::blended(uint16_t c, float alpha) const { return FillStroke((fill) ? fill->blended(c, alpha) : nullptr, (stroke) ? stroke->blended(c, alpha) : nullptr, thickness); }
+
+FillStroke FillStroke::blended(const Color &c, float alpha) const { return FillStroke((fill) ? fill->blended(c, alpha) : nullptr, (stroke) ? stroke->blended(c, alpha) : nullptr, thickness); }

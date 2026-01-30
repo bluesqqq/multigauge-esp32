@@ -2,14 +2,12 @@
 
 char SerialLogger::levelToChar(LogLevel level) {
     switch (level) {
-        switch (level) {
-            case LogLevel::Debug: return 'D';
-            case LogLevel::Info:  return 'I';
-            case LogLevel::Warn:  return 'W';
-            case LogLevel::Error: return 'E';
-        }
-        return '?';
+        case LogLevel::Debug: return 'D';
+        case LogLevel::Info:  return 'I';
+        case LogLevel::Warn:  return 'W';
+        case LogLevel::Error: return 'E';
     }
+    return '?';
 }
 
 void SerialLogger::_log(LogLevel level, const char *tag, const char *fmt, va_list args) {
