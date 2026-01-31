@@ -3,7 +3,7 @@
 #include "graphics/colors/Color.h"
 #include "graphics/geometry/alignment.h"
 
-#include "graphics/Image.h"
+#include "images/Image.h"
 
 class GraphicsContext {
     protected:
@@ -72,6 +72,8 @@ class GraphicsContext {
         virtual void drawText(const char* text, int x, int y, uint16_t color, float point, Anchor anchor = Anchor::TopLeft) = 0;
 
         //----------[ IMAGE ]----------//
+        virtual Image createNativeImage(const uint16_t* pixels, int w, int h) = 0;
+
         virtual void drawImage(const Image& img, int x, int y, Anchor anchor = Anchor::TopLeft) = 0;
         virtual void drawImage(const Image& img, int x, int y, int width, int height) = 0;
 

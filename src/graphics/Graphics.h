@@ -8,7 +8,7 @@
 #include "geometry/path.h"
 
 #include "contexts/GraphicsContext.h"
-#include "Image.h"
+#include "images/Image.h"
 
 #define MIN_HYPHEN_PREFIX 3 // Prefix must be this number of chars or higher to be hyphenated in text wrap
 
@@ -152,7 +152,9 @@ class Graphics final {
         void drawTextArea(const std::string& text, Rect<int> rectangle, Anchor anchor, bool useEllipses = true, bool useHyphens = false);
 
         //----------[ IMAGES ]----------//
-
+        void drawImage(const Image& image, int x, int y, Anchor anchor) const;
+        void drawImage(const Image& image, Rect<int> rectangle) const;
+        
         //----------[ CLIP ]----------//
         void setClipRect(int x, int y, int width, int height);
         void setClipRect(const Rect<int>& rect);

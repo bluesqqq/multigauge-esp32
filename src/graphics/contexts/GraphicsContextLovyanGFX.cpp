@@ -118,17 +118,85 @@ void GraphicsContextLovyanGFX::drawText(const char *text, int x, int y, uint16_t
     buffer.drawString(text, x, y);
 }
 
-void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor anchor) {
-    switch (img.type) {
-        case Image::Type::LGFX: {
-            auto* spr = static_cast<LGFX_Sprite*>(img.native);
-            spr->pushSprite(&buffer, x, y);
-        }
+Image GraphicsContextLovyanGFX::createNativeImage(const uint16_t* pixels, int w, int h) {
+    auto* spr = new lgfx::LGFX_Sprite(&buffer);
+    spr->setColorDepth(16);
+    spr->setPsram(true);
+
+    if (!spr->createSprite(w, h)) {
+        delete spr;
+        return Image(0, 0, nullptr, nullptr);
     }
+
+    spr->setSwapBytes(true);
+    spr->pushImage(0, 0, w, h, pixels);
+    spr->setSwapBytes(false);
+
+    return Image(w, h, spr, [](void* ptr) { delete static_cast<lgfx::LGFX_Sprite*>(ptr); });
+}
+
+void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor anchor) {
+    if (!img.native) return;
+    auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
+    if (!spr) return;
+
+    int drawX = x;
+    int drawY = y;
+
+    switch (anchor) {
+        case Anchor::TopLeft:
+            break;
+
+        case Anchor::TopCenter:
+            drawX -= img.width / 2;
+            break;
+
+        case Anchor::TopRight:
+            drawX -= img.width;
+            break;
+
+        case Anchor::CenterLeft:
+            drawY -= img.height / 2;
+            break;
+
+        case Anchor::Center:
+            drawX -= img.width / 2;
+            drawY -= img.height / 2;
+            break;
+
+        case Anchor::CenterRight:
+            drawX -= img.width;
+            drawY -= img.height / 2;
+            break;
+
+        case Anchor::BottomLeft:
+            drawY -= img.height;
+            break;
+
+        case Anchor::BottomCenter:
+            drawX -= img.width / 2;
+            drawY -= img.height;
+            break;
+
+        case Anchor::BottomRight:
+            drawX -= img.width;
+            drawY -= img.height;
+            break;
+    }
+
+    spr->pushSprite(drawX, drawY);
 }
 
 void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, int width, int height) {
-    // TODO: implement ts
+    if (!img.native || width <= 0 || height <= 0 || img.width <= 0 || img.height <= 0) return;
+
+    auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
+    if (!spr) return;
+
+    const float zx = (float)width  / (float)img.width;
+    const float zy = (float)height / (float)img.height;
+
+    spr->pushRotateZoom(x + width / 2, y + height / 2, 0.0f, zx, zy);
 }
 
 //----------[ CLIP ]----------//

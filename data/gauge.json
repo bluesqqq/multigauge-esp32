@@ -129,10 +129,23 @@
           },
           "children": [
             {
-              "type": "horizon",
+              "type": "image",
               "style": {
                 "width": "100%",
                 "height": "50%"
+              },
+              "props": {
+                "path": "/test.bmp"
+              }
+            },
+            {
+              "type": "image",
+              "style": {
+                "width": "100%",
+                "height": "50%"
+              },
+              "props": {
+                "path": "/test.bmp"
               }
             }
           ]

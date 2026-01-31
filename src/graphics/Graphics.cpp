@@ -412,6 +412,10 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
 
 void Graphics::drawTextArea(const std::string &text, Rect<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
 
+void Graphics::drawImage(const Image &image, int x, int y, Anchor anchor) const { context->drawImage(image, x, y, anchor); }
+
+void Graphics::drawImage(const Image &image, Rect<int> rect) const { context->drawImage(image, rect.position.x, rect.position.y, rect.width, rect.height); }
+
 void Graphics::setClipRect(int x, int y, int w, int h) { context->setClipRect(x, y, w, h); }
 
 void Graphics::setClipRect(const Rect<int> &rect) { context->setClipRect(rect.position.x, rect.position.y, rect.width, rect.height); }

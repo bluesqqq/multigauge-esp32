@@ -23,6 +23,8 @@
 #include "io/logging/Logger.h"
 #include "io/logging/SerialLogger.h"
 
+#include "io/time/TimeArduino.h"
+
 #include "AssetManager.h"
 
 #ifndef PIO_UNIT_TESTING
@@ -31,11 +33,15 @@ SerialLogger logger = SerialLogger();
 
 LittleFsFileSystem fileSystem = LittleFsFileSystem();
 
-AssetManager assetManager = AssetManager(fileSystem, logger);
+namespace mg {
+    TimeArduino clock;
+}
 
-GraphicsContext* context = new GraphicsContextLovyanGFX();
+GraphicsContextLovyanGFX context = GraphicsContextLovyanGFX();
+Graphics g(&context);
 
-Graphics g(context);
+AssetManager assetManager = AssetManager(fileSystem, context, logger);
+
 static std::unique_ptr<GaugeFace> face;
 
 void setup() { 
@@ -47,7 +53,7 @@ void setup() {
     std::vector<std::string> dirs;
     fileSystem.listDirectories("/", dirs);
 
-    context->init();
+    context.init();
 
     YGConfigRef config = YGConfigNew();
     YGConfigSetUseWebDefaults(config, false);
@@ -60,8 +66,9 @@ void setup() {
         face = std::make_unique<GaugeFace>(config);
         LOG_INFO(logger, "gauge", "Failed to load test gaugeface file.");
     }
-}
 
+    face->init(assetManager);
+}
 
 int t = 0;
 
@@ -70,7 +77,7 @@ uint32_t lastTime = 0;
 void draw() {
     auto screen = g.getScreenBounds().toFloat();
 
-    context->beginFrame();
+    context.beginFrame();
 
     g.fillAll(TFT_BLACK);
 
@@ -78,11 +85,11 @@ void draw() {
     face->update(1);
     face->draw(g);
 
-    context->endFrame();
+    context.endFrame();
 }
 
 void loop() {
-    uint32_t currentTime = micros();
+    uint32_t currentTime = mg::clock.getMicros();
     uint32_t lastFrameTime = currentTime - lastTime;          // microseconds
     float lastFPS = 1000000.0f / (float)lastFrameTime;        // FPS from us
 

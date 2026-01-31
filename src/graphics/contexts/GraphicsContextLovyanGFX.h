@@ -60,6 +60,8 @@ class GraphicsContextLovyanGFX : public GraphicsContext {
         void drawText(const char* text, int x, int y, uint16_t color, float point, Anchor anchor = Anchor::TopLeft) override;
 
         //----------[ IMAGE ]----------//
+        Image createNativeImage(const uint16_t* pixels, int w, int h) override;
+
         void drawImage(const Image& img, int x, int y, Anchor anchor = Anchor::TopLeft) override;
         void drawImage(const Image& img, int x, int y, int width, int height) override;
 
