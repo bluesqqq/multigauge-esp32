@@ -26,26 +26,12 @@ struct ImageInfo {
     std::vector<uint16_t> pixels;
 };
 
-//----------[ SIGNATURES ]----------//
+//----------[ BMP ]----------//
 
 static inline bool canDecodeBMP(const uint8_t* data, size_t size) {
     if (!data || size < 2) return false;
     return data[0] == 'B' && data[1] == 'M';
 }
-
-static inline bool canDecodePNG(const uint8_t* data, size_t size) {
-    if (!data || size < 8) return false;
-    // 89 50 4E 47 0D 0A 1A 0A
-    return data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47 &&
-           data[4] == 0x0D && data[5] == 0x0A && data[6] == 0x1A && data[7] == 0x0A;
-}
-
-static inline bool canDecodeJPG(const uint8_t* data, size_t size) {
-    if (!data || size < 3) return false;
-    // FF D8 FF
-    return data[0] == 0xFF && data[1] == 0xD8 && data[2] == 0xFF;
-}
-
 
 static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
     out = ImageInfo{};
@@ -310,6 +296,15 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
     return true;
 }
 
+//----------[ PNG ]----------//
+
+static inline bool canDecodePNG(const uint8_t* data, size_t size) {
+    if (!data || size < 8) return false;
+    // 89 50 4E 47 0D 0A 1A 0A
+    return data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47 &&
+           data[4] == 0x0D && data[5] == 0x0A && data[6] == 0x1A && data[7] == 0x0A;
+}
+
 static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
     out = ImageInfo{};
 
@@ -351,6 +346,164 @@ static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, L
         const uint8_t g = rgba[i * 4 + 1];
         const uint8_t b = rgba[i * 4 + 2];
         out.pixels[i] = rgb888_to_565(r, g, b);
+    }
+
+    return true;
+}
+
+//----------[ JPG ]----------//
+
+#include "tjpgd/tjpgd.h"
+
+static inline bool canDecodeJPG(const uint8_t* data, size_t size) {
+    if (!data || size < 3) return false;
+    // FF D8 FF
+    return data[0] == 0xFF && data[1] == 0xD8 && data[2] == 0xFF;
+}
+
+struct TjpgdMemSrc {
+    const uint8_t* data = nullptr;
+    size_t size = 0;
+    size_t pos  = 0;
+
+    ImageInfo* out = nullptr;
+};
+
+// Input callback: read "nbyte" bytes into "buf". If buf==nullptr, skip bytes.
+static size_t tjpgd_in_cb(JDEC* jd, uint8_t* buf, size_t nbyte) {
+    auto* src = static_cast<TjpgdMemSrc*>(jd->device);
+    if (!src || !src->data) return 0;
+
+    const size_t remain = (src->pos < src->size) ? (src->size - src->pos) : 0;
+    if (nbyte > remain) nbyte = remain;
+
+    if (buf) {
+        std::copy(src->data + src->pos, src->data + src->pos + nbyte, buf);
+    }
+    src->pos += nbyte;
+    return nbyte;
+}
+
+// Output callback: receive a rectangle and its pixel data, then write to out->pixels.
+// Pixel format depends on JD_FORMAT in tjpgd config.
+// Most common: JD_FORMAT==0 => RGB888 (3 bytes per pixel).
+static int tjpgd_out_cb(JDEC* jd, void* bitmap, JRECT* rect) {
+    auto* src = static_cast<TjpgdMemSrc*>(jd->device);
+    if (!src || !src->out || !bitmap || !rect) return 0;
+
+    ImageInfo& out = *src->out;
+    const int outW = out.width;
+    const int outH = out.height;
+
+    int left   = rect->left;
+    int right  = rect->right;
+    int top    = rect->top;
+    int bottom = rect->bottom;
+
+    // Clip to output (safety)
+    if (left < 0) left = 0;
+    if (top < 0) top = 0;
+    if (right >= outW) right = outW - 1;
+    if (bottom >= outH) bottom = outH - 1;
+
+    const int rw = (right - left + 1);
+    const int rh = (bottom - top + 1);
+
+#if JD_FORMAT == 0
+    // RGB888: bitmap is uint8_t*, 3 bytes per pixel, row-major for the rect size
+    const uint8_t* srcPx = static_cast<const uint8_t*>(bitmap);
+
+    // Note: the provided bitmap corresponds to the original rect width/height,
+    // not the clipped rw/rh, so compute using rect->left/top etc carefully.
+    const int rectW = (rect->right - rect->left + 1);
+
+    for (int y = 0; y < rh; ++y) {
+        const int dstY = top + y;
+
+        // Starting pixel index in the provided block for this row, adjusted for clipping
+        const int blockRow = (dstY - rect->top);
+        const int blockColStart = (left - rect->left);
+
+        const uint8_t* row = srcPx + (size_t)(blockRow * rectW + blockColStart) * 3;
+
+        uint16_t* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
+
+        for (int x = 0; x < rw; ++x) {
+            const uint8_t r = row[x * 3 + 0];
+            const uint8_t g = row[x * 3 + 1];
+            const uint8_t b = row[x * 3 + 2];
+            dst[x] = rgb888_to_565(r, g, b);
+        }
+    }
+
+#elif JD_FORMAT == 1
+    // RGB565: bitmap is uint16_t* (already 565). Just copy into out.
+    const uint16_t* src565 = static_cast<const uint16_t*>(bitmap);
+    const int rectW = (rect->right - rect->left + 1);
+
+    for (int y = 0; y < rh; ++y) {
+        const int dstY = top + y;
+        const int blockRow = (dstY - rect->top);
+        const int blockColStart = (left - rect->left);
+
+        const uint16_t* row = src565 + (size_t)(blockRow * rectW + blockColStart);
+        uint16_t* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
+
+        std::copy(row, row + rw, dst);
+    }
+
+#else
+    // Other formats exist (grayscale etc). Add if you enable them.
+    (void)rw; (void)rh;
+    return 0;
+#endif
+
+    return 1; // non-zero tells tjpgd to continue
+}
+
+static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
+    out = ImageInfo{};
+
+    if (!canDecodeJPG(data, size)) {
+        LOG_ERROR(log, "JPG", "Data is not a JPG.");
+        return false;
+    }
+
+    // Work buffer: tjpgd needs a scratch buffer.
+    // Bigger generally improves reliability for larger images.
+    // 4096 is a decent starting point; if jd_prepare fails on some images, try 8192 or 16384.
+    static uint8_t work[8192];
+
+    TjpgdMemSrc src;
+    src.data = data;
+    src.size = size;
+    src.pos  = 0;
+    src.out  = &out;
+
+    JDEC jd;
+    JRESULT res = jd_prepare(&jd, tjpgd_in_cb, work, sizeof(work), &src);
+    if (res != JDR_OK) {
+        LOG_ERROR(log, "JPG", "jd_prepare failed (%d).", (int)res);
+        return false;
+    }
+
+    // Dimensions are available after prepare
+    if (jd.width == 0 || jd.height == 0) {
+        LOG_ERROR(log, "JPG", "Invalid dimensions (W=%u H=%u).", (unsigned)jd.width, (unsigned)jd.height);
+        return false;
+    }
+
+    out.width  = (int)jd.width;
+    out.height = (int)jd.height;
+    out.pixels.assign((size_t)out.width * (size_t)out.height, 0);
+
+    // scale: 0=full, 1=1/2, 2=1/4, 3=1/8
+    const uint8_t scale = 0;
+
+    res = jd_decomp(&jd, tjpgd_out_cb, scale);
+    if (res != JDR_OK) {
+        LOG_ERROR(log, "JPG", "jd_decomp failed (%d).", (int)res);
+        return false;
     }
 
     return true;

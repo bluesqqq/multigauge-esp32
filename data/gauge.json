@@ -135,7 +135,7 @@
                 "height": "50%"
               },
               "props": {
-                "path": "/test.png"
+                "path": "/test.jpg"
               }
             },
             {
@@ -145,7 +145,7 @@
                 "height": "50%"
               },
               "props": {
-                "path": "/test.png"
+                "path": "/test.jpg"
               }
             }
           ]

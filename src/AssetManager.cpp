@@ -64,8 +64,9 @@ bool AssetManager::loadImage(const std::string &path, Image &out) {
             break;
 
         case ImageType::JPG:
-            LOG_WARN(log, "asset", "JPG not implemented yet.");
-            return false;
+            LOG_DEBUG(log, "asset", "decoding JPG: %s", path.c_str());
+            if (!decodeJPG(data.data(), data.size(), info, log)) return false;
+            break;
 
         default:
             LOG_DEBUG(log, "asset", "Unsupported image format: %s", path.c_str());
