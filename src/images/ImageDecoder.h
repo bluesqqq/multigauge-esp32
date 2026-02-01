@@ -8,6 +8,8 @@
 #include "io/logging/Logger.h"
 #include "utils.h"
 
+#include "lodepng/lodepng.h"
+
 // BMP compression types (from BMP spec)
 constexpr uint32_t BI_RGB            = 0; // no compression
 constexpr uint32_t BI_RLE8           = 1;
@@ -17,17 +19,33 @@ constexpr uint32_t BI_JPEG           = 4;
 constexpr uint32_t BI_PNG            = 5;
 constexpr uint32_t BI_ALPHABITFIELDS = 6; // adds alpha mask
 
-static inline bool canDecodeBMP(const uint8_t* data, size_t size) {
-    if (!data || size < 2) return false;
-    return data[0] == 'B' && data[1] == 'M';
-}
-
 struct ImageInfo {
     int width = 0;
     int height = 0;
     // RGB565 pixels, row-major, owns its memory
     std::vector<uint16_t> pixels;
 };
+
+//----------[ SIGNATURES ]----------//
+
+static inline bool canDecodeBMP(const uint8_t* data, size_t size) {
+    if (!data || size < 2) return false;
+    return data[0] == 'B' && data[1] == 'M';
+}
+
+static inline bool canDecodePNG(const uint8_t* data, size_t size) {
+    if (!data || size < 8) return false;
+    // 89 50 4E 47 0D 0A 1A 0A
+    return data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47 &&
+           data[4] == 0x0D && data[5] == 0x0A && data[6] == 0x1A && data[7] == 0x0A;
+}
+
+static inline bool canDecodeJPG(const uint8_t* data, size_t size) {
+    if (!data || size < 3) return false;
+    // FF D8 FF
+    return data[0] == 0xFF && data[1] == 0xD8 && data[2] == 0xFF;
+}
+
 
 static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
     out = ImageInfo{};
@@ -287,6 +305,52 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
             LOG_ERROR(log, "BMP", "Unsupported bpp: %u", (unsigned)bpp);
             return false;
         }
+    }
+
+    return true;
+}
+
+static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
+    out = ImageInfo{};
+
+    if (!canDecodePNG(data, size)) {
+        LOG_ERROR(log, "PNG", "Data is not a PNG.");
+        return false;
+    }
+
+    std::vector<unsigned char> rgba;
+    unsigned w = 0, h = 0;
+
+    const unsigned err = lodepng::decode(rgba, w, h, data, size);
+    if (err != 0) {
+        LOG_ERROR(log, "PNG", "Decode failed: %s", lodepng_error_text(err));
+        return false;
+    }
+
+    if (w == 0 || h == 0) {
+        LOG_ERROR(log, "PNG", "Invalid dimensions (W=%u, H=%u).", w, h);
+        return false;
+    }
+
+    const size_t pxCount = (size_t)w * (size_t)h;
+    const size_t needBytes = pxCount * 4;
+
+    if (rgba.size() < needBytes) {
+        LOG_ERROR(log, "PNG", "Truncated RGBA buffer (have=%u need=%u).",
+                  (unsigned)rgba.size(), (unsigned)needBytes);
+        return false;
+    }
+
+    out.width  = (int)w;
+    out.height = (int)h;
+    out.pixels.assign(pxCount, 0);
+
+    // Convert RGBA8888 -> RGB565 (alpha ignored here)
+    for (size_t i = 0; i < pxCount; ++i) {
+        const uint8_t r = rgba[i * 4 + 0];
+        const uint8_t g = rgba[i * 4 + 1];
+        const uint8_t b = rgba[i * 4 + 2];
+        out.pixels[i] = rgb888_to_565(r, g, b);
     }
 
     return true;

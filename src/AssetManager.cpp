@@ -32,18 +32,18 @@ bool AssetManager::loadJson(const std::string &path, rapidjson::Document &out) {
 
 bool AssetManager::loadImage(const std::string &path, Image &out) {
     if (!fs.exists(path)) {
-        LOG_ERROR(log, "asset", "Image does not exist: %s", path);
+        LOG_ERROR(log, "asset", "Image does not exist: %s", path.c_str());
         return false;
     }
 
     std::vector<uint8_t> data;
     if (!fs.readAll(path, data)) {
-        LOG_ERROR(log, "asset", "Failed to read image: %s", path);
+        LOG_ERROR(log, "asset", "Failed to read image: %s", path.c_str());
         return false;
     }
 
     if (data.empty()) {
-        LOG_ERROR(log, "asset", "Image is empty: %s", path);
+        LOG_ERROR(log, "asset", "Image is empty: %s", path.c_str());
         return false;
     }
 
@@ -53,21 +53,22 @@ bool AssetManager::loadImage(const std::string &path, Image &out) {
 
     switch (type) {
         case ImageType::BMP: {
-            LOG_DEBUG(log, "asset", "decoding BMP: %s", path);
+            LOG_DEBUG(log, "asset", "decoding BMP: %s", path.c_str());
             if (!decodeBMP(data.data(), data.size(), info, log)) return false;
             break;
         }
 
         case ImageType::PNG:
-            LOG_WARN(log, "asset", "PNG not implemented yet.");
-            return false;
+            LOG_DEBUG(log, "asset", "decoding PNG: %s", path.c_str());
+            if (!decodePNG(data.data(), data.size(), info, log)) return false;
+            break;
 
         case ImageType::JPG:
             LOG_WARN(log, "asset", "JPG not implemented yet.");
             return false;
 
         default:
-            LOG_DEBUG(log, "asset", "Unsupported image format: %s", path);
+            LOG_DEBUG(log, "asset", "Unsupported image format: %s", path.c_str());
             return false;
     }
     
