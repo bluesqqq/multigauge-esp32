@@ -37,7 +37,7 @@ struct TextStyle {
             else if (strcmp(s, "normal") == 0) slant = FontSlant::Normal;
         }
 
-        if (json.HasMember("color") && json["color"].IsObject())
-            color = Color::fromJson(json["color"].GetObject());
+        if (json.HasMember("color"))
+            color = Color::fromJson(json["color"]);
     }
 };

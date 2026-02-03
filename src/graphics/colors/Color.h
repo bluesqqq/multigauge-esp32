@@ -17,7 +17,7 @@ class Color {
         /// @brief Creates a Color object from JSON.
         /// @param colorJson The JSON object containing Color data
         /// @return A unique pointer to the created Color object (defaults to StaticColor if type is missing or invalid)
-        static std::unique_ptr<Color> fromJson(const rapidjson::Value::ConstObject json);
+        static std::unique_ptr<Color> fromJson(const rapidjson::Value& json);
 
         /// @brief Gets the current color value.
         /// @return The 16-bit color value

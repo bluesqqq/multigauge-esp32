@@ -21,4 +21,6 @@ class GaugeFace : public Element {
         explicit GaugeFace(YGConfigRef config);
 
         GaugeFace(YGConfigRef config, const rapidjson::Document& json);
+
+        void draw(Graphics& g) const override;
 };

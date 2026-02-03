@@ -8,12 +8,19 @@ GaugeFace::GaugeFace(YGConfigRef config, const rapidjson::Document& json) : Elem
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("backgroundColor") && props["backgroundColor"].IsObject())
-        backgroundColor = Color::fromJson(props["backgroundColor"].GetObject());
+    if (props.HasMember("backgroundColor"))
+        backgroundColor = Color::fromJson(props["backgroundColor"]);
 
     if (props.HasMember("title") && props["title"].IsString())
         title = props["title"].GetString();
 
     if (props.HasMember("description") && props["description"].IsString())
         description = props["description"].GetString();
+}
+
+void GaugeFace::draw(Graphics &g) const {
+    if (backgroundColor) g.fillAll(*backgroundColor);
+    else g.fillAll(0xF800);
+
+    Element::draw(g);
 }

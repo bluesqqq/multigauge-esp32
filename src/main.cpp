@@ -77,9 +77,8 @@ uint32_t lastTime = 0;
 void draw(uint32_t deltaUs) {
     auto screen = g.getScreenBounds().toFloat();
 
+    g.clearColorCache();
     context.beginFrame();
-
-    g.fillAll(TFT_BLACK);
 
     face->calculateLayout(screen.width, screen.height);
     face->update(deltaUs);

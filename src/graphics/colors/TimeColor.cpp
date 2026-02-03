@@ -5,7 +5,7 @@ float TimeColor::getTime() const {
 
     if (timeline.size() == 0 || duration <= 0.0f) return 0.0f;
 
-    float t = static_cast<float>(millis());
+    float t = static_cast<float>(millis()) / 1000.0f;
 
     switch (loopType) {
         case LoopType::Forward:

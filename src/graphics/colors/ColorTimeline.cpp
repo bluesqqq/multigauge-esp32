@@ -1,14 +1,17 @@
 #include "ColorTimeline.h"
 #include "StaticColor.h"
+#include "TimeColor.h"
+#include "ValueColor.h"
 #include "utils.h"
 #include <set>
 #include <algorithm>
+#include <Arduino.h>
 
 ColorKeyframe::ColorKeyframe(std::unique_ptr<Color> color, float position) : color(std::move(color)), position(position) { }
 
 ColorKeyframe::ColorKeyframe(const rapidjson::Value::ConstObject json)
-    : position(json.HasMember("position") && json["position"].IsFloat() ? json["position"].GetFloat() : 0.0f),
-      color((json.HasMember("color") && json["color"].IsObject()) ? Color::fromJson(json["color"].GetObject()) : std::make_unique<StaticColor>()) {}
+    : position(json.HasMember("position") && json["position"].IsNumber() ? json["position"].GetFloat() : 0.0f),
+      color((json.HasMember("color")) ? Color::fromJson(json["color"]) : std::make_unique<StaticColor>()) {}
 
 ColorKeyframe::ColorKeyframe(const ColorKeyframe &other) : position(other.position), color(other.color ? other.color->clone() : nullptr) {}
 
@@ -44,8 +47,6 @@ ColorTimeline::ColorTimeline(uint16_t color) { addKeyframe(color, 0.0f); }
 
 ColorTimeline::ColorTimeline(const rapidjson::Value::ConstObject json) {
     if (!(json.HasMember("keyframes") && json["keyframes"].IsArray())) return;
-
-    json["keyframes"].GetArray();
 
     for (const auto& keyframe : json["keyframes"].GetArray())
         if (keyframe.IsObject()) keyframes.emplace_back(ColorKeyframe(keyframe.GetObject()));
