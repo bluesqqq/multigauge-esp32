@@ -11,8 +11,8 @@
       "grow": 0,
       "shrink": 1
     },
-    "padding": { "all": 12 },
-    "gap": { "row": 12, "column": 12 }
+    "padding": { "all": 6 },
+    "gap": { "row": 6, "column": 6 }
   },
   "props": {
     "backgroundColor": { "type": "static", "value": 2146 },
@@ -24,16 +24,16 @@
       "type": "rectangle",
       "style": {
         "width": "100%",
-        "height": 44,
+        "height": 28,
         "flex": { "direction": "row", "justify": "space-between", "align": "center" },
-        "padding": { "left": 12, "right": 12, "top": 6, "bottom": 6 }
+        "padding": { "left": 8, "right": 8, "top": 4, "bottom": 4 }
       },
       "props": {
-        "radius": 10,
+        "radius": 8,
         "color": {
           "fill": { "type": "static", "color": 4357 },
           "stroke": { "type": "static", "color": 20062 },
-          "thickness": 2
+          "thickness": 1
         }
       },
       "children": [
@@ -49,7 +49,7 @@
               "family": "orbitron",
               "weight": "normal",
               "slant": "normal",
-              "pt": 24,
+              "pt": 14,
               "color": { "type": "static", "color": 65535 }
             },
             "ellipses": true,
@@ -69,7 +69,7 @@
               "family": "dejavu",
               "weight": "bold",
               "slant": "normal",
-              "pt": 20,
+              "pt": 12,
               "color": { "type": "static", "color": 65535 }
             },
             "ellipses": true,
@@ -93,7 +93,7 @@
           "grow": 1,
           "shrink": 1
         },
-        "gap": { "row": 0, "column": 12 }
+        "gap": { "row": 0, "column": 6 }
       },
       "props": {
         "radius": 0,
@@ -109,15 +109,15 @@
           "style": {
             "height": "100%",
             "flex": { "direction": "column", "justify": "center", "align": "stretch", "grow": 2, "shrink": 1 },
-            "padding": { "all": 12 },
-            "gap": { "row": 10, "column": 0 }
+            "padding": { "all": 8 },
+            "gap": { "row": 6, "column": 0 }
           },
           "props": {
-            "radius": 12,
+            "radius": 10,
             "color": {
               "fill": { "type": "static", "color": 6470 },
               "stroke": { "type": "static", "color": 9771 },
-              "thickness": 2
+              "thickness": 1
             }
           },
           "children": [
@@ -125,15 +125,16 @@
               "type": "text",
               "style": {
                 "width": "100%",
+                "height": 14,
                 "flex": { "justify": "flex-start", "align": "center" }
               },
               "props": {
-                "text": "MAIN DIAL",
+                "text": "MAIN",
                 "textStyle": {
                   "family": "sans",
                   "weight": "bold",
                   "slant": "normal",
-                  "pt": 18,
+                  "pt": 12,
                   "color": { "type": "static", "color": 65535 }
                 },
                 "ellipses": true,
@@ -142,43 +143,13 @@
               "children": []
             },
             {
-              "type": "circle",
+              "type": "horizon",
               "style": {
                 "width": "100%",
                 "height": "100%",
                 "flex": { "justify": "center", "align": "center", "grow": 1, "shrink": 1 }
               },
-              "props": {
-                "radius": 90,
-                "color": {
-                  "fill": { "type": "static", "color": 2146 },
-                  "stroke": { "type": "static", "color": 20062 },
-                  "thickness": 4
-                }
-              },
-              "children": [
-                {
-                  "type": "text",
-                  "style": {
-                    "width": "100%",
-                    "height": "100%",
-                    "flex": { "justify": "center", "align": "center" }
-                  },
-                  "props": {
-                    "text": "72%",
-                    "textStyle": {
-                      "family": "dejavu",
-                      "weight": "bold",
-                      "slant": "normal",
-                      "pt": 40,
-                      "color": { "type": "static", "color": 65535 }
-                    },
-                    "ellipses": false,
-                    "hyphens": false
-                  },
-                  "children": []
-                }
-              ]
+              "children": []
             }
           ]
         },
@@ -188,7 +159,7 @@
           "style": {
             "height": "100%",
             "flex": { "direction": "column", "justify": "space-between", "align": "stretch", "grow": 1, "shrink": 1 },
-            "gap": { "row": 12, "column": 0 }
+            "gap": { "row": 6, "column": 0 }
           },
           "props": {
             "radius": 0,
@@ -205,15 +176,15 @@
                 "width": "100%",
                 "height": "50%",
                 "flex": { "direction": "column", "justify": "center", "align": "stretch" },
-                "padding": { "all": 12 },
-                "gap": { "row": 6, "column": 0 }
+                "padding": { "all": 8 },
+                "gap": { "row": 4, "column": 0 }
               },
               "props": {
-                "radius": 12,
+                "radius": 10,
                 "color": {
                   "fill": { "type": "static", "color": 4357 },
                   "stroke": { "type": "static", "color": 20062 },
-                  "thickness": 2
+                  "thickness": 1
                 }
               },
               "children": [
@@ -221,12 +192,12 @@
                   "type": "text",
                   "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
                   "props": {
-                    "text": "OIL TEMP",
+                    "text": "OIL",
                     "textStyle": {
                       "family": "sans",
                       "weight": "bold",
                       "slant": "normal",
-                      "pt": 16,
+                      "pt": 11,
                       "color": { "type": "static", "color": 65535 }
                     },
                     "ellipses": true,
@@ -238,12 +209,12 @@
                   "type": "text",
                   "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
                   "props": {
-                    "text": "196 °F",
+                    "text": "196F",
                     "textStyle": {
                       "family": "dejavu",
                       "weight": "normal",
                       "slant": "normal",
-                      "pt": 28,
+                      "pt": 18,
                       "color": { "type": "static", "color": 65535 }
                     },
                     "ellipses": true,
@@ -259,15 +230,15 @@
                 "width": "100%",
                 "height": "50%",
                 "flex": { "direction": "column", "justify": "center", "align": "stretch" },
-                "padding": { "all": 12 },
-                "gap": { "row": 6, "column": 0 }
+                "padding": { "all": 8 },
+                "gap": { "row": 4, "column": 0 }
               },
               "props": {
-                "radius": 12,
+                "radius": 10,
                 "color": {
                   "fill": { "type": "static", "color": 4357 },
                   "stroke": { "type": "static", "color": 20062 },
-                  "thickness": 2
+                  "thickness": 1
                 }
               },
               "children": [
@@ -280,7 +251,7 @@
                       "family": "sans",
                       "weight": "bold",
                       "slant": "normal",
-                      "pt": 16,
+                      "pt": 11,
                       "color": { "type": "static", "color": 65535 }
                     },
                     "ellipses": true,
@@ -292,12 +263,12 @@
                   "type": "text",
                   "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
                   "props": {
-                    "text": "11.2 PSI",
+                    "text": "11.2",
                     "textStyle": {
                       "family": "dejavu",
                       "weight": "normal",
                       "slant": "normal",
-                      "pt": 28,
+                      "pt": 18,
                       "color": { "type": "static", "color": 65535 }
                     },
                     "ellipses": true,
@@ -316,9 +287,9 @@
       "type": "rectangle",
       "style": {
         "width": "100%",
-        "height": 84,
+        "height": 56,
         "flex": { "direction": "row", "justify": "space-between", "align": "stretch" },
-        "gap": { "row": 0, "column": 12 }
+        "gap": { "row": 0, "column": 6 }
       },
       "props": {
         "radius": 0,
@@ -333,121 +304,15 @@
           "type": "rectangle",
           "style": {
             "height": "100%",
-            "flex": { "direction": "column", "justify": "center", "align": "stretch", "grow": 1, "shrink": 1 },
-            "padding": { "all": 10 }
-          },
-          "props": {
-            "radius": 12,
-            "color": {
-              "fill": { "type": "static", "color": 6470 },
-              "stroke": { "type": "static", "color": 9771 },
-              "thickness": 2
-            }
-          },
-          "children": [
-            {
-              "type": "text",
-              "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
-              "props": {
-                "text": "STATUS",
-                "textStyle": {
-                  "family": "sans",
-                  "weight": "bold",
-                  "slant": "normal",
-                  "pt": 14,
-                  "color": { "type": "static", "color": 65535 }
-                },
-                "ellipses": true,
-                "hyphens": false
-              },
-              "children": []
-            },
-            {
-              "type": "text",
-              "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
-              "props": {
-                "text": "All systems OK",
-                "textStyle": {
-                  "family": "dejavu",
-                  "weight": "normal",
-                  "slant": "normal",
-                  "pt": 18,
-                  "color": { "type": "static", "color": 65535 }
-                },
-                "ellipses": true,
-                "hyphens": false
-              },
-              "children": []
-            }
-          ]
-        },
-
-        {
-          "type": "rectangle",
-          "style": {
-            "height": "100%",
-            "flex": { "direction": "column", "justify": "center", "align": "stretch", "grow": 1, "shrink": 1 },
-            "padding": { "all": 10 }
-          },
-          "props": {
-            "radius": 12,
-            "color": {
-              "fill": { "type": "static", "color": 4357 },
-              "stroke": { "type": "static", "color": 20062 },
-              "thickness": 2
-            }
-          },
-          "children": [
-            {
-              "type": "text",
-              "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
-              "props": {
-                "text": "NOTES",
-                "textStyle": {
-                  "family": "sans",
-                  "weight": "bold",
-                  "slant": "normal",
-                  "pt": 14,
-                  "color": { "type": "static", "color": 65535 }
-                },
-                "ellipses": true,
-                "hyphens": false
-              },
-              "children": []
-            },
-            {
-              "type": "text",
-              "style": { "width": "100%", "height": "100%", "flex": { "justify": "flex-start", "align": "flex-start" } },
-              "props": {
-                "text": "Tap to open logs. Long press for debug overlay.",
-                "textStyle": {
-                  "family": "dejavu",
-                  "weight": "normal",
-                  "slant": "normal",
-                  "pt": 16,
-                  "color": { "type": "static", "color": 65535 }
-                },
-                "ellipses": true,
-                "hyphens": true
-              },
-              "children": []
-            }
-          ]
-        },
-
-        {
-          "type": "rectangle",
-          "style": {
-            "height": "100%",
             "flex": { "direction": "column", "justify": "center", "align": "center", "grow": 1, "shrink": 1 },
-            "padding": { "all": 10 }
+            "padding": { "all": 8 }
           },
           "props": {
-            "radius": 12,
+            "radius": 10,
             "color": {
               "fill": { "type": "static", "color": 6470 },
               "stroke": { "type": "static", "color": 9771 },
-              "thickness": 2
+              "thickness": 1
             }
           },
           "children": [
@@ -455,6 +320,41 @@
               "type": "image",
               "style": { "width": "100%", "height": "100%" },
               "props": { "path": "/test.jpg" }
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "style": {
+            "height": "100%",
+            "flex": { "direction": "column", "justify": "center", "align": "stretch", "grow": 1, "shrink": 1 },
+            "padding": { "all": 8 }
+          },
+          "props": {
+            "radius": 10,
+            "color": {
+              "fill": { "type": "static", "color": 4357 },
+              "stroke": { "type": "static", "color": 20062 },
+              "thickness": 1
+            }
+          },
+          "children": [
+            {
+              "type": "text",
+              "style": { "width": "100%", "height": "100%", "flex": { "justify": "flex-start", "align": "flex-start" } },
+              "props": {
+                "text": "Long press debug {engineRPM=0.0} | Coolant {engineCoolantTemp=0.0} | Boost {boostPressure=0.0} | Throttle {throttlePosition|pct}",
+                "textStyle": {
+                  "family": "sans",
+                  "weight": "normal",
+                  "slant": "normal",
+                  "pt": 12,
+                  "color": { "type": "static", "color": 65535 }
+                },
+                "ellipses": true,
+                "hyphens": false
+              },
+              "children": []
             }
           ]
         }

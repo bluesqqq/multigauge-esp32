@@ -9,6 +9,7 @@ class Value {
     private:
         static std::unordered_map<std::string, Value*> registry;
 
+        const char* id;
         const char* name;
 
         float value;
@@ -18,9 +19,9 @@ class Value {
         const UnitType& unitType;
 
     public:
-        Value(const char* name, const UnitType& unitType, float minimumValue, float maximumValue);
+        Value(const char* id, const char* name, const UnitType& unitType, float minimumValue, float maximumValue);
         
-        static Value* find(std::string name);
+        static Value* find(const std::string& id);
 
         std::function<void(float)> onChange;
 
@@ -52,6 +53,7 @@ class Value {
         /// @return The maximum value converted to the specified unit.
         float getMaximum(int index = DEFAULT_UNIT) const;
 
+        const char* getId() const;
         const char* getName() const;
 
         const UnitType& getUnitType() const;

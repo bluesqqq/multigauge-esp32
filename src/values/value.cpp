@@ -3,13 +3,13 @@
 
 std::unordered_map<std::string, Value*> Value::registry;
 
-Value::Value(const char* name, const UnitType& unitType, float minimumValue, float maximumValue) 
-    : name(name), unitType(unitType), value(minimumValue), minimumValue(minimumValue), maximumValue(maximumValue) { 
-    registry[name] = this;
+Value::Value(const char* id, const char* name, const UnitType& unitType, float minimumValue, float maximumValue) 
+    : id(id), name(name), unitType(unitType), value(minimumValue), minimumValue(minimumValue), maximumValue(maximumValue) { 
+    registry[id] = this;
 }
 
-Value *Value::find(std::string name) {
-    auto it = registry.find(name);
+Value *Value::find(const std::string& id) {
+    auto it = registry.find(id);
     return (it != registry.end()) ? it->second : nullptr;
 }
 
@@ -42,7 +42,9 @@ float Value::getMinimum(int index) const { return unitType.convertFromBase(minim
 
 float Value::getMaximum(int index) const { return unitType.convertFromBase(maximumValue, index); }
 
-const char* Value::getName() const { return name; }
+const char *Value::getId() const { return id; }
+
+const char *Value::getName() const { return name; }
 
 const UnitType& Value::getUnitType() const { return unitType; }
 
@@ -56,21 +58,22 @@ std::string Value::getLongestValueString(int index, bool abbreviation) {
     return (maximumString.length() > minimumString.length()) ? maximumString : minimumString;
 }
 
-Value engineRPM("RPM", revolutions, 0.0f, 8000.0f);
-Value engineCoolantTemp("Coolant Temp", temperature, -40.0f, 120.0f);
-Value engineOilTemp("Oil Temp", temperature, -40.0f, 120.0f);
-Value transmissionTemp("Transmission Temp", temperature, -40.0f, 120.0f);
-Value engineOilPressure("Oil Pressure", pressure, 0.0f, 100.0f);
-Value transmissionFluidPressure("Transmission Fluid Pressure", pressure, 0.0f, 100.0f);
-Value fuelPressure("Fuel Pressure", pressure, 0.0f, 100.0f);
-Value boostPressure("Boost Pressure", pressure, 0.0f, 100.0f);
-Value fuelLevel("Fuel Level", volume, 0.0f, 12.0f);
-Value distanceDriven("Distance Driven", distance, 0.0f, 999999.0f);
-Value speed("Speed", velocity, 0.0f, 160.0f);
-Value verticalAcceleration("Vertical Accel", acceleration, -4.0f, 4.0f);
-Value longitudinalAcceleration("Longitudinal Accel", acceleration, -4.0f, 4.0f);
-Value lateralAcceleration("Lateral Accel", acceleration, -4.0f, 4.0f);
-Value calculatedEngineLoad("Engine Load", percentage, 0.0f, 100.0f);
-Value throttlePosition("Throttle Position", percentage, 0.0f, 100.0f);
-Value engineFuelRate("Engine Fuel Rate", volumePerTime, 0.0f, 3212.75f);
+Value engineRPM("engineRPM", "RPM", revolutions, 0.0f, 8000.0f);
+Value engineCoolantTemp("engineCoolantTemp", "Coolant Temp", temperature, -40.0f, 120.0f);
+Value engineOilTemp("engineOilTemp", "Oil Temp", temperature, -40.0f, 120.0f);
+Value transmissionTemp("transmissionTemp", "Transmission Temp", temperature, -40.0f, 120.0f);
+Value engineOilPressure("engineOilPressure", "Oil Pressure", pressure, 0.0f, 100.0f);
+Value transmissionFluidPressure("transmissionFluidPressure", "Transmission Fluid Pressure", pressure, 0.0f, 100.0f);
+Value fuelPressure("fuelPressure", "Fuel Pressure", pressure, 0.0f, 100.0f);
+Value boostPressure("boostPressure", "Boost Pressure", pressure, 0.0f, 100.0f);
+Value fuelLevel("fuelLevel", "Fuel Level", volume, 0.0f, 12.0f);
+Value distanceDriven("distanceDriven", "Distance Driven", distance, 0.0f, 999999.0f);
+Value speed("speed", "Speed", velocity, 0.0f, 160.0f);
+Value verticalAcceleration("verticalAcceleration", "Vertical Accel", acceleration, -4.0f, 4.0f);
+Value longitudinalAcceleration("longitudinalAcceleration", "Longitudinal Accel", acceleration, -4.0f, 4.0f);
+Value lateralAcceleration("lateralAcceleration", "Lateral Accel", acceleration, -4.0f, 4.0f);
+Value calculatedEngineLoad("calculatedEngineLoad", "Engine Load", percentage, 0.0f, 100.0f);
+Value throttlePosition("throttlePosition", "Throttle Position", percentage, 0.0f, 100.0f);
+Value engineFuelRate("engineFuelRate", "Engine Fuel Rate", volumePerTime, 0.0f, 3212.75f);
+
 //Value engineRunTimeSinceStart("Run Time Since Start", time, 0.0f, 65535.0f); // 65535 is max defined by OBD2 protocol

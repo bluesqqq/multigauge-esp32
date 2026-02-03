@@ -2,6 +2,7 @@
 
 #include "graphics/gauge/Element.h"
 #include "graphics/colors/Color.h"
+#include "values/ValueEmbed.h"
 
 class TextElement : public Element {
     private:

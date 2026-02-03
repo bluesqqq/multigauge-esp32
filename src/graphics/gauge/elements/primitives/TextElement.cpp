@@ -30,7 +30,13 @@ void TextElement::draw(Graphics &g) const {
 
     if (textStyle.color) { 
         g.setTextStyle(textStyle);
-        g.drawTextArea(text, b.toInt(), anchor, useEllipses, useHyphens);
+
+        if (text.find('{') != std::string::npos) {
+            const std::string expanded = embed_render::replaceEmbeds(text);
+            g.drawTextArea(expanded, b.toInt(), anchor, useEllipses, useHyphens);
+        } else {
+            g.drawTextArea(text, b.toInt(), anchor, useEllipses, useHyphens);
+        }
     }
 
     Element::draw(g);
