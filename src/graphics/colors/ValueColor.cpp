@@ -7,7 +7,7 @@ ValueColor::ValueColor(Value *value) : timeline(ColorTimeline()), value(value) {
 ValueColor::ValueColor(Value *value, ColorTimeline timeline) : timeline(std::move(timeline)), value(value) { }
 
 ValueColor::ValueColor(const rapidjson::Value::ConstObject json)
-    : timeline((json.HasMember("timeline") && json["timeline"].IsObject()) ? ColorTimeline(json["timeline"].GetObject()) : ColorTimeline()),
+    : timeline((json.HasMember("timeline") && json["timeline"].IsArray()) ? ColorTimeline(json["timeline"].GetArray()) : ColorTimeline()),
       value((json.HasMember("value") && json["value"].IsString()) ? Value::find(json["value"].GetString()) : nullptr) {}
 
 ValueColor::ValueColor(const ValueColor &other) : timeline(other.timeline), value(other.value) {}

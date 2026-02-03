@@ -23,6 +23,7 @@ Element::~Element() {
 #include "elements/primitives/CircleElement.h"
 #include "elements/Horizon.h"
 #include "elements/ImageElement.h"
+#include "elements/Graph.h"
 
 std::unique_ptr<Element> Element::fromJson(YGConfigRef config, const rapidjson::Value::ConstObject json) {
     if (!json.HasMember("type") || !json["type"].IsString()) return nullptr; // typeless elements are undefined behavior
@@ -44,7 +45,9 @@ std::unique_ptr<Element> Element::fromJson(YGConfigRef config, const rapidjson::
     if (strcmp(type, "horizon") == 0) {
         return std::make_unique<Horizon>(config, json);
     }   
-
+    if (strcmp(type, "graph") == 0) {
+        return std::make_unique<Graph>(config, json);
+    }   
 }
 
 void Element::addChild(std::unique_ptr<Element> child) {

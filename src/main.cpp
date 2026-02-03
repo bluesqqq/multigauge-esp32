@@ -103,6 +103,7 @@ uint32_t currentTime = mg::clock.getMicros();
     lastTime = currentTime;
 
     engineRPM.setValueBase(sin((float)currentTime / 1000000.0f) * 3000 + 4000);
+    engineCoolantTemp.setValueBase(sin((float)currentTime / 5000000.0f) * 10 + 0);
 
 }
 

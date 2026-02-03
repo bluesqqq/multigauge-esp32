@@ -15,17 +15,7 @@
     "gap": { "row": 6, "column": 6 }
   },
   "props": {
-    "backgroundColor": {
-      "type": "time",
-      "loopType": "forward",
-      "timeline": {
-        "keyframes": [
-          { "position": 0.0, "color": 65535 },
-          { "position": 1.0, "color": 0 },
-          { "position": 2.0, "color": 65535 }
-        ]
-      }
-    },
+    "backgroundColor": 0,
     "title": "Dashboard: Dial + Stats + Tiles",
     "description": "Header with title + number, center dial card with stacked info cards, bottom tiles row."
   },
@@ -59,11 +49,10 @@
               "family": "orbitron",
               "weight": "normal",
               "slant": "normal",
-              "pt": 14,
+              "pt": 9,
               "color": 65535
             },
-            "ellipses": true,
-            "hyphens": false
+            "ellipses": true
           },
           "children": []
         },
@@ -82,8 +71,7 @@
               "pt": 12,
               "color": 65535
             },
-            "ellipses": true,
-            "hyphens": false
+            "ellipses": true
           },
           "children": []
         }
@@ -147,8 +135,7 @@
                   "pt": 12,
                   "color": 65535
                 },
-                "ellipses": true,
-                "hyphens": false
+                "ellipses": true
               },
               "children": []
             },
@@ -181,7 +168,7 @@
           },
           "children": [
             {
-              "type": "rectangle",
+              "type": "graph",
               "style": {
                 "width": "100%",
                 "height": "50%",
@@ -190,52 +177,19 @@
                 "gap": { "row": 4, "column": 0 }
               },
               "props": {
-                "radius": 10,
-                "color": {
+                "value": "engineRPM",
+                "backgroundColor": {
                   "fill": 4357,
                   "stroke": 20062,
                   "thickness": 1
-                }
-              },
-              "children": [
-                {
-                  "type": "text",
-                  "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
-                  "props": {
-                    "text": "OIL",
-                    "textStyle": {
-                      "family": "sans",
-                      "weight": "bold",
-                      "slant": "normal",
-                      "pt": 11,
-                      "color": 65535
-                    },
-                    "ellipses": true,
-                    "hyphens": false
-                  },
-                  "children": []
                 },
-                {
-                  "type": "text",
-                  "style": { "width": "100%", "flex": { "justify": "flex-start", "align": "center" } },
-                  "props": {
-                    "text": "196F",
-                    "textStyle": {
-                      "family": "dejavu",
-                      "weight": "normal",
-                      "slant": "normal",
-                      "pt": 18,
-                      "color": 65535
-                    },
-                    "ellipses": true,
-                    "hyphens": false
-                  },
-                  "children": []
-                }
-              ]
+                "secondsColor": 20062,
+                "graphColor": 20062
+              },
+              "children": []
             },
             {
-              "type": "rectangle",
+              "type": "graph",
               "style": {
                 "width": "100%",
                 "height": "50%",
@@ -244,12 +198,14 @@
                 "gap": { "row": 4, "column": 0 }
               },
               "props": {
-                "radius": 10,
-                "color": {
+                "value": "engineCoolantTemp",
+                "backgroundColor": {
                   "fill": 4357,
                   "stroke": 20062,
                   "thickness": 1
-                }
+                },
+                "secondsColor": 20062,
+                "graphColor": 20062
               },
               "children": [
                 {
@@ -264,8 +220,7 @@
                       "pt": 11,
                       "color": 65535
                     },
-                    "ellipses": true,
-                    "hyphens": false
+                    "ellipses": true
                   },
                   "children": []
                 },
@@ -281,8 +236,7 @@
                       "pt": 18,
                       "color": 65535
                     },
-                    "ellipses": true,
-                    "hyphens": false
+                    "ellipses": true
                   },
                   "children": []
                 }
@@ -314,29 +268,6 @@
           "type": "rectangle",
           "style": {
             "height": "100%",
-            "flex": { "direction": "column", "justify": "center", "align": "center", "grow": 1, "shrink": 1 },
-            "padding": { "all": 8 }
-          },
-          "props": {
-            "radius": 10,
-            "color": {
-              "fill": 6470,
-              "stroke": 9771,
-              "thickness": 1
-            }
-          },
-          "children": [
-            {
-              "type": "image",
-              "style": { "width": "100%", "height": "100%" },
-              "props": { "path": "/test.jpg" }
-            }
-          ]
-        },
-        {
-          "type": "rectangle",
-          "style": {
-            "height": "100%",
             "flex": { "direction": "column", "justify": "center", "align": "stretch", "grow": 1, "shrink": 1 },
             "padding": { "all": 8 }
           },
@@ -353,7 +284,7 @@
               "type": "text",
               "style": { "width": "100%", "height": "100%", "flex": { "justify": "flex-start", "align": "flex-start" } },
               "props": {
-                "text": "Long press debug {engineRPM=0.0} | Coolant {engineCoolantTemp=0.0} | Boost {boostPressure=0.0} | Throttle {throttlePosition|pct}",
+                "text": "Long press debug {engineRPM=0.0} | Coolant {engineCoolantTemp=1.0} | Boost {boostPressure=0.0} | Throttle {throttlePosition|pct}",
                 "textStyle": {
                   "family": "sans",
                   "weight": "normal",
@@ -361,8 +292,7 @@
                   "pt": 12,
                   "color": 65535
                 },
-                "ellipses": true,
-                "hyphens": false
+                "ellipses": true
               },
               "children": []
             }

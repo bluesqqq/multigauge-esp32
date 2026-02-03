@@ -61,12 +61,6 @@ static inline bool tokEq(std::string_view s, size_t start, size_t end, const cha
 
 // --------------------[ Flag parsing (tight) ]--------------------
 
-/// @brief Adds a recognized flag token to flags (tight mode).
-/// @note Tokens must be exact, lowercase, and separated by commas only. No whitespace allowed.
-/// @param flags In/out bitmask.
-/// @param rhs Full rhs string (only used for indexing).
-/// @param start Start index (inclusive).
-/// @param end End index (exclusive).
 static inline void addFlagToken(uint8_t& flags, std::string_view rhs, size_t start, size_t end) {
     if (end <= start) return;
 
@@ -78,12 +72,6 @@ static inline void addFlagToken(uint8_t& flags, std::string_view rhs, size_t sta
     // Unknown tokens are ignored by design.
 }
 
-/// @brief Parses flags in tight mode.
-/// @note RHS may be empty. If present, it must contain NO whitespace.
-///       Tokens are separated by commas only, like "pct,na".
-/// @param flags In/out bitmask.
-/// @param rhs Flags substring (after '|').
-/// @param err Output error set to BadFlags if whitespace is detected.
 static inline void parseFlagsTight(uint8_t& flags, std::string_view rhs, ParseError& err) {
     if (rhs.empty()) return;
 
@@ -109,31 +97,20 @@ static inline void parseFlagsTight(uint8_t& flags, std::string_view rhs, ParseEr
 }
 
 // --------------------[ Main parse (tight) ]--------------------
-/// @brief Parses ONLY the content inside '{' and '}' using a tight grammar.
-/// @details Grammar (no whitespace anywhere):
-///   valueName[=unitIndex][.decimals][|flags]
-/// - valueName: identifier [A-Za-z_][A-Za-z0-9_]*
-/// - unitIndex: digits after '='
-/// - decimals : digits after '.'
-/// - flags   : comma-separated tokens after '|', no whitespace, e.g. "pct,na"
-/// @param s Inner text view.
-/// @return EmbedSpec with error set on failure.
+
 static inline EmbedSpec parseEmbedInnerTight(std::string_view s) {
     EmbedSpec spec;
 
     if (s.empty()) { spec.error = ParseError::Empty; return spec; }
 
-    // Reject any whitespace anywhere in the inner string.
     for (char c : s) {
         if (isSpace(c)) { spec.error = ParseError::TrailingJunk; return spec; }
     }
 
-    // Split into lhs and rhs on first '|'
     std::string_view lhs, rhs;
     bool hasBar = false;
     splitOnce(s, '|', lhs, rhs, hasBar);
 
-    // lhs: valueName [=unitIndex] [.decimals]
     size_t i = 0;
 
     if (lhs.empty()) { spec.error = ParseError::MissingName; return spec; }
@@ -175,22 +152,16 @@ namespace embed_render {
 
 // --------------------[ render helpers ]--------------------
 
-/// @brief Appends the character range [begin,end) to out.
 static inline void appendRange(std::string& out, const char* begin, const char* end) {
     out.append(begin, static_cast<size_t>(end - begin));
 }
 
 static inline void appendFloat(std::string& out, float v, uint8_t decimals) {
-    // 1 sign + ~10 int digits + 1 dot + up to 9 frac + '\0' => fits comfortably
     char buf[32];
     size_t len = fastFloatToString(v, decimals, buf, sizeof(buf));
     if (len) out.append(buf, len);
 }
 
-/// @brief Returns the unit name or abbreviation as a string.
-/// @param ut UnitType to read from.
-/// @param unitIndex Unit index (or DEFAULT_UNIT).
-/// @param abbreviation True to use abbreviation, false to use full name.
 static inline std::string getUnitString(const UnitType& ut, int unitIndex, bool abbreviation) {
     const Unit& u = ut.getUnit(unitIndex);
     const char* s = abbreviation ? u.abbreviation : u.name;
@@ -269,14 +240,6 @@ static inline bool renderOne(std::string_view inner, std::string& out) {
 
 // --------------------[ replace across full string ]--------------------
 
-/// @brief Scans input for "{...}" blocks and replaces successful embeds with rendered output.
-/// @details Behavior:
-/// - Finds '{' then the next '}' (no nesting support).
-/// - Calls renderOne() on the inner.
-/// - If renderOne() succeeds, replaces "{inner}" with rendered text.
-/// - If renderOne() fails, leaves "{inner}" intact.
-/// @param input Full text that may contain embeds.
-/// @return A new string with embeds replaced where possible.
 static inline std::string replaceEmbeds(const std::string& input) {
     if (input.find('{') == std::string::npos) return input;
 

@@ -21,7 +21,7 @@ class RollOdometer : public Element {
         void draw(Graphics& g) const override {
             float val = value.getValue(DEFAULT);
 
-            Rectangle marginless = getBounds().reduced(margin);
+            Rect marginless = getBounds().reduced(margin);
 
             int totalGap = gap * (segments - 1);
             int segmentWidth = (marginless.width - totalGap) / segments;
@@ -34,7 +34,7 @@ class RollOdometer : public Element {
             g.strokeRect(getBounds().toInt());
 
             for (int i = 0; i < segments; ++i) {
-                Rectangle<float> segment = Rectangle<float>(marginless.position.x + (segmentWidth + gap) * i, marginless.position.y, segmentWidth, segmentHeight);
+                Rect<float> segment = Rect<float>(marginless.position.x + (segmentWidth + gap) * i, marginless.position.y, segmentWidth, segmentHeight);
 
                 g.setFill(0xFFFF);
                 g.fillRect(segment.toInt());

@@ -32,7 +32,7 @@ TimeColor::TimeColor() : timeline(ColorTimeline()), loopType(LoopType::Forward) 
 TimeColor::TimeColor(ColorTimeline timeline, LoopType loopType) : timeline(std::move(timeline)), loopType(loopType) {}
 
 TimeColor::TimeColor(const rapidjson::Value::ConstObject json) 
-    : timeline((json.HasMember("timeline") && json["timeline"].IsObject()) ? ColorTimeline(json["timeline"].GetObject()) : ColorTimeline()) {
+    : timeline((json.HasMember("timeline") && json["timeline"].IsArray()) ? ColorTimeline(json["timeline"].GetArray()) : ColorTimeline()) {
     if (json.HasMember("loopType") && json["loopType"].IsString()) {
         const char* loopStr = json["loopType"].GetString();
         if (strcmp(loopStr, "forward") == 0) loopType = LoopType::Forward;

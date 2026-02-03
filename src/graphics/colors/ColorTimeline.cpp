@@ -45,10 +45,8 @@ ColorTimeline::ColorTimeline() {}
 
 ColorTimeline::ColorTimeline(uint16_t color) { addKeyframe(color, 0.0f); }
 
-ColorTimeline::ColorTimeline(const rapidjson::Value::ConstObject json) {
-    if (!(json.HasMember("keyframes") && json["keyframes"].IsArray())) return;
-
-    for (const auto& keyframe : json["keyframes"].GetArray())
+ColorTimeline::ColorTimeline(const rapidjson::Value::ConstArray json) {
+    for (const auto& keyframe : json)
         if (keyframe.IsObject()) keyframes.emplace_back(ColorKeyframe(keyframe.GetObject()));
 }
 

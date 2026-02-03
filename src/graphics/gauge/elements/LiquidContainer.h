@@ -70,6 +70,8 @@ class LiquidContainer : public Element {
             outlineColor    = new StaticColor(0xFFFF);
         }
 
+        
+
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();
 
@@ -100,12 +102,12 @@ class LiquidContainer : public Element {
 
                 if (points[i].y > points[i + 1].y) {
                     // sloping upwards left
-                    g.fillTriangle(x1, y1, x2, y2, x2, y1);
+                    g.fillTri(x1, y1, x2, y2, x2, y1);
 
                     const float h = std::min(forwardAmount, float((top + height) - y1 - 1));
                     g.fillRect(x1, y1, spacing + 1, h);
                 } else {
-                    g.fillTriangle(x1, y1, x2, y2, x1, y2);
+                    g.fillTri(x1, y1, x2, y2, x1, y2);
 
                     const float h = std::min(forwardAmount, float((top + height) - y2 - 1));
                     g.fillRect(x1, y2, spacing + 1, h);
@@ -127,12 +129,12 @@ class LiquidContainer : public Element {
                 g.setFill(liquidColor->getColor());
 
                 if (points[i].y > points[i + 1].y) {
-                    g.fillTriangle(x1, y1w, x2, y2w, x2, y1w);
+                    g.fillTri(x1, y1w, x2, y2w, x2, y1w);
 
                     const float h = std::min(height - points[i].y, float((top + height) - y1w - 1));
                     g.fillRect(x1, y1w, spacing + 1, h);
                 } else {
-                    g.fillTriangle(x1, y1w, x2, y2w, x1, y2w);
+                    g.fillTri(x1, y1w, x2, y2w, x1, y2w);
 
                     const float h = std::min(height - points[i].y, float((top + height) - y2w - 1));
                     g.fillRect(x1, y2w, spacing + 1, h);
