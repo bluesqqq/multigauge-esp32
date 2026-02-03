@@ -20,9 +20,7 @@ class Horizon : public Element {
     public:
         Horizon(YGConfigRef config) : Element(config) {}
 
-        Horizon(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config) {
-            loadLayout(getNode(), json);
-        }
+        Horizon(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {}
 
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();

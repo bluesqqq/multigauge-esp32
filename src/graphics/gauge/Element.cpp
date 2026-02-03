@@ -3,7 +3,9 @@
 Element::Element(YGConfigRef config) : config(config) { initializeNode(config); }
 
 Element::Element(YGConfigRef config, const rapidjson::Value::ConstObject json) : config(config) {
-    initializeNode(config); 
+    initializeNode(config);
+
+    loadLayout(getNode(), json);
 
     if (!json.HasMember("children") || !json["children"].IsArray()) return;
     for (const auto& child : json["children"].GetArray())
@@ -26,28 +28,18 @@ Element::~Element() {
 #include "elements/Graph.h"
 
 std::unique_ptr<Element> Element::fromJson(YGConfigRef config, const rapidjson::Value::ConstObject json) {
-    if (!json.HasMember("type") || !json["type"].IsString()) return nullptr; // typeless elements are undefined behavior
+    if (!json.HasMember("type") || !json["type"].IsString()) return std::make_unique<Element>(config, json);
 
     const char* type = json["type"].GetString();
 
-    if (strcmp(type, "text") == 0) {
-        return std::make_unique<TextElement>(config, json);
-    }
-    if (strcmp(type, "rectangle") == 0) {
-        return std::make_unique<RectangleElement>(config, json);
-    }
-    if (strcmp(type, "circle") == 0) {
-        return std::make_unique<CircleElement>(config, json);
-    }
-    if (strcmp(type, "image") == 0) {
-        return std::make_unique<ImageElement>(config, json);
-    }
-    if (strcmp(type, "horizon") == 0) {
-        return std::make_unique<Horizon>(config, json);
-    }   
-    if (strcmp(type, "graph") == 0) {
-        return std::make_unique<Graph>(config, json);
-    }   
+    if (strcmp(type, "text") == 0)      return std::make_unique<TextElement>(config, json);
+    if (strcmp(type, "rectangle") == 0) return std::make_unique<RectangleElement>(config, json);
+    if (strcmp(type, "circle") == 0)    return std::make_unique<CircleElement>(config, json);
+    if (strcmp(type, "image") == 0)     return std::make_unique<ImageElement>(config, json);
+    if (strcmp(type, "horizon") == 0)   return std::make_unique<Horizon>(config, json);
+    if (strcmp(type, "graph") == 0)     return std::make_unique<Graph>(config, json);
+
+    return std::make_unique<Element>(config, json);
 }
 
 void Element::addChild(std::unique_ptr<Element> child) {

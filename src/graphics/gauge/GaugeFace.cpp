@@ -3,8 +3,6 @@
 GaugeFace::GaugeFace(YGConfigRef config) : Element(config) {}
 
 GaugeFace::GaugeFace(YGConfigRef config, const rapidjson::Document& json) : Element(config, json.GetObject()) {
-    loadLayout(getNode(), json.GetObject());
-
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

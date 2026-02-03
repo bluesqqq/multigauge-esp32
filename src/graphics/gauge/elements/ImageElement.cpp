@@ -2,9 +2,7 @@
 
 ImageElement::ImageElement(YGConfigRef config) : Element(config), path("/placeholder.bmp") { }
 
-ImageElement::ImageElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config) {
-    loadLayout(getNode(), json);
-
+ImageElement::ImageElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

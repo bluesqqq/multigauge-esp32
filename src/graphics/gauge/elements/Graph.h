@@ -29,9 +29,7 @@ class Graph : public Element {
             valueMemory.insert(valueMemory.begin(), {4000, 0});
         }
 
-        Graph(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config) {
-            loadLayout(getNode(), json);
-
+        Graph(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
             if (!json.HasMember("props") || !json["props"].IsObject()) return;
             const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
