@@ -9,6 +9,7 @@
 
 #include "contexts/GraphicsContext.h"
 #include "images/Image.h"
+#include "TextStyle.h"
 
 #define MIN_HYPHEN_PREFIX 3 // Prefix must be this number of chars or higher to be hyphenated in text wrap
 
@@ -20,8 +21,8 @@ class Graphics final {
 
         uint16_t fillValue;
         uint16_t strokeValue;
-
-        float thickness = 0.0f;
+        uint16_t textValue;
+        float thickness = 0.0f; // for stroke
 
         /// @brief Cache that stores a color's value for quick lookup
         std::unordered_map<const Color*, uint16_t> colorCache;
@@ -31,9 +32,11 @@ class Graphics final {
         /// @return The current Color object's 16-bit color value
         uint16_t getCachedColor(const Color& color);
 
-        //----------[ TEXT ]----------//
-
-        float textPoint = 10.0f;
+        //----------[ Font ]----------//
+        std::string family = "default";
+        FontWeight weight = FontWeight::Normal;
+        FontSlant slant = FontSlant::Normal;
+        float pt = 16.0f;
 
     public:
         Graphics(GraphicsContext* context);
@@ -141,9 +144,18 @@ class Graphics final {
         void fillPath(const Path<int>& path) const;
         void strokePath(const Path<int>& path) const;
 
-        //----------[ TEXT ]----------//
-        void setTextPoint(float point);
+        //----------[ FONT ]----------//
+        void setFontFamily(const std::string& family);
+        void setFontWeight(FontWeight weight);
+        void setFontSlant(FontSlant slant);
+        void setFontPoint(float pt);
 
+        void setTextColor(uint16_t color);
+        void setTextColor(const Color& color);
+
+        void setTextStyle(const TextStyle& style);
+
+        //----------[ TEXT ]----------//
         void drawText(const std::string& text, int x, int y, Anchor anchor);
         void drawText(const std::string& text, Point<int> pos, Anchor anchor);
         void drawTextVertical(const std::string& text, int x, int y, Anchor anchor);

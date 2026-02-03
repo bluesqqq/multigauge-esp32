@@ -5,12 +5,12 @@
 
 #include "images/Image.h"
 
+#include "graphics/TextStyle.h"
+
 class GraphicsContext {
     protected:
         int width;
         int height;
-
-        float getFontScaleFactor(float point);
 
     public:
         /// @brief Called once during initialization
@@ -66,10 +66,10 @@ class GraphicsContext {
         virtual void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) = 0;
 
         //----------[ TEXT ]----------//
-        virtual float getTextWidth(const char* text, float point) = 0;
-        float getTextWidth(std::string_view text, float point);
+        virtual float getTextWidth(const char* text, std::string family, float pt, FontWeight weight, FontSlant slant) = 0;
+        float getTextWidth(std::string_view text, std::string family, float pt, FontWeight weight, FontSlant slant);
 
-        virtual void drawText(const char* text, int x, int y, uint16_t color, float point, Anchor anchor = Anchor::TopLeft) = 0;
+        virtual void drawText(const char* text, int x, int y, std::string family, float pt, FontWeight weight, FontSlant slant, uint16_t color, Anchor anchor = Anchor::TopLeft) = 0;
 
         //----------[ IMAGE ]----------//
         virtual Image createNativeImage(const uint16_t* pixels, int w, int h) = 0;

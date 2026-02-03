@@ -1,6 +1,8 @@
 #include "TextElement.h"
 
-TextElement::TextElement(YGConfigRef config, std::string text, float point, std::unique_ptr<Color> color) : Element(config), text(text), point(point), color(std::move(color)) {}
+TextElement::TextElement(YGConfigRef config, std::string text) : Element(config), text(text) {
+    
+}
 
 TextElement::TextElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
     loadLayout(getNode(), json);
@@ -11,11 +13,8 @@ TextElement::TextElement(YGConfigRef config, const rapidjson::Value::ConstObject
     if (props.HasMember("text") && props["text"].IsString())
         text = props["text"].GetString();
 
-    if (props.HasMember("point") && props["point"].IsNumber())
-        point = props["point"].GetFloat();
-
-    if (props.HasMember("color") && props["color"].IsObject())
-        color = Color::fromJson(props["color"].GetObject());
+    if (props.HasMember("textStyle") && props["textStyle"].IsObject())
+        textStyle =TextStyle(props["textStyle"].GetObject());
 
     // TODO: Add anchor parsing
 
@@ -29,8 +28,8 @@ TextElement::TextElement(YGConfigRef config, const rapidjson::Value::ConstObject
 void TextElement::draw(Graphics &g) const {
     const auto& b = getBounds();
 
-    if (color) { 
-        g.setFill(*color);
+    if (textStyle.color) { 
+        g.setTextStyle(textStyle);
         g.drawTextArea(text, b.toInt(), anchor, useEllipses, useHyphens);
     }
 

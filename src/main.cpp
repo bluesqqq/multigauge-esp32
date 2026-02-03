@@ -74,7 +74,7 @@ int t = 0;
 
 uint32_t lastTime = 0;
 
-void draw() {
+void draw(uint32_t deltaUs) {
     auto screen = g.getScreenBounds().toFloat();
 
     context.beginFrame();
@@ -82,26 +82,29 @@ void draw() {
     g.fillAll(TFT_BLACK);
 
     face->calculateLayout(screen.width, screen.height);
-    face->update(1);
+    face->update(deltaUs);
     face->draw(g);
 
     context.endFrame();
 }
 
 void loop() {
-    uint32_t currentTime = mg::clock.getMicros();
-    uint32_t lastFrameTime = currentTime - lastTime;          // microseconds
-    float lastFPS = 1000000.0f / (float)lastFrameTime;        // FPS from us
+uint32_t currentTime = mg::clock.getMicros();
+    uint32_t deltaUs = currentTime - lastTime;
 
-    if (t % 60 == 0) LOG_INFO(logger, "perf", "fps=%.2f dt_us=%u", lastFPS, (unsigned)lastFrameTime);
-    
+    if (t % 60 == 0) {
+        float fps = 1000000.0f / (float)deltaUs;
+        LOG_INFO(logger, "perf", "fps=%.2f dt_us=%u", fps, (unsigned)deltaUs);
+    }
+
     t++;
 
-    draw();
+    draw(deltaUs);
 
     lastTime = currentTime;
 
     engineRPM.setValueBase(sin((float)currentTime / 1000000.0f) * 3000 + 4000);
+
 }
 
 #endif

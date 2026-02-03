@@ -142,18 +142,39 @@ void Graphics::strokeTri(int x0, int y0, int x1, int y1, int x2, int y2) const {
 
 void Graphics::strokeTri(const Point<int> &p1, const Point<int> &p2, const Point<int> &p3) const { context->strokeTriangle(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, strokeValue, thickness); }
 
+//----------[ FONT ]----------//
+
+void Graphics::setFontFamily(const std::string &family) { this->family = family; }
+
+void Graphics::setFontWeight(FontWeight weight) { weight = weight; }
+
+void Graphics::setFontSlant(FontSlant slant) { slant = slant; }
+
+void Graphics::setFontPoint(float pt) { this->pt = pt; }
+
+void Graphics::setTextColor(uint16_t color) { textValue = color; }
+
+void Graphics::setTextColor(const Color &color) { textValue = getCachedColor(color); }
+
+void Graphics::setTextStyle(const TextStyle &style) {
+    setFontFamily(style.family);
+    setFontPoint(style.pt);
+    setFontWeight(style.weight);
+    setFontSlant(style.slant);
+
+    if (style.color) setTextColor(*style.color);
+}
+
 //----------[ TEXT ]----------//
 
-void Graphics::setTextPoint(float point) { textPoint = point; }
-
-void Graphics::drawText(const std::string &text, int x, int y, Anchor anchor) { context->drawText(text.c_str(), x, y, fillValue, textPoint, anchor); }
+void Graphics::drawText(const std::string &text, int x, int y, Anchor anchor) { context->drawText(text.c_str(), x, y, family, pt, weight, slant, textValue, anchor); }
 
 void Graphics::drawText(const std::string &text, Point<int> pos, Anchor anchor) { drawText(text, pos.x, pos.y, anchor); }
 
 void Graphics::drawTextVertical(const std::string& text, int x, int y, Anchor anchor) {
     if (text.empty()) return;
 
-    const int step = textPoint;
+    const int step = pt;
     if (step <= 0) return;
 
     int glyphCount = 0;
@@ -188,7 +209,7 @@ void Graphics::drawTextVertical(const std::string& text, int x, int y, Anchor an
         if (c == '\n') continue;
 
         buf[0] = c;
-        context->drawText(buf, drawX, drawY, fillValue, textPoint, Anchor::TopLeft);
+        context->drawText(buf, drawX, drawY, family, pt, weight, slant, textValue, Anchor::TopLeft);
 
         drawY += dir * step;
     }
@@ -199,7 +220,7 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
 
     Rect<int> rect(x, y, width, height);
 
-    const int lineHeight = textPoint;
+    const int lineHeight = pt;
     if (lineHeight <= 0) return;
 
     const int maxLines = rect.height / lineHeight;
@@ -210,17 +231,17 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
     std::string scratch;
     scratch.reserve(128);
 
-    auto measureString = [&](const std::string& s) -> int { return s.empty() ? 0 : context->getTextWidth(s.c_str(), textPoint); };
+    auto measureString = [&](const std::string& s) -> int { return s.empty() ? 0 : context->getTextWidth(s.c_str(), family, pt, weight, slant); };
 
     auto measureRange = [&](int start, int len) -> int {
         if (len <= 0) return 0;
         scratch.assign(text.data() + start, (size_t)len);
-        return context->getTextWidth(scratch.c_str(), textPoint);
+        return context->getTextWidth(scratch.c_str(), family, pt, weight, slant);
     };
 
     const int n = (int)text.size();
-    const int ellW = context->getTextWidth("...", textPoint);
-    const int hyW  = context->getTextWidth("-", textPoint);
+    const int ellW = context->getTextWidth("...", family, pt, weight, slant);
+    const int hyW  = context->getTextWidth("-", family, pt, weight, slant);
 
     std::vector<std::string> lines;
     lines.reserve(maxLines);
@@ -400,13 +421,13 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
         const std::string& line = lines[i];
         if (line.empty()) continue;
 
-        int lineW = context->getTextWidth(line.c_str(), textPoint);
+        int lineW = context->getTextWidth(line.c_str(), family, pt, weight, slant);
 
         int drawX = rect.position.x;
         if (hAlign == HAlign::Center) drawX = rect.position.x + (rect.width - lineW) / 2;
         if (hAlign == HAlign::Right)  drawX = rect.position.x + rect.width - lineW;
 
-        context->drawText(line.c_str(), drawX, drawY, textColor, textPoint);
+        context->drawText(line.c_str(), drawX, drawY, family, pt, weight, slant, textValue, anchor);
     }
 }
 

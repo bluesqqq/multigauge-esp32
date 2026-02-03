@@ -6,15 +6,14 @@
 class TextElement : public Element {
     private:
         std::string text;
-        float point;
-        std::unique_ptr<Color> color;
+        TextStyle textStyle;
 
         Anchor anchor = Anchor::TopLeft;
         bool useEllipses = false;
         bool useHyphens = false;
 
     public:
-        explicit TextElement(YGConfigRef config, std::string text, float point, std::unique_ptr<Color> color);
+        explicit TextElement(YGConfigRef config, std::string text);
 
         TextElement(YGConfigRef config, const rapidjson::Value::ConstObject json);
         
