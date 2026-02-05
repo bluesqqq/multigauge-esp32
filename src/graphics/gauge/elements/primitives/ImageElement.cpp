@@ -18,6 +18,4 @@ void ImageElement::draw(Graphics &g) const {
     const auto& b = getBounds().toInt();
 
     g.drawImage(image, b);
-
-    Element::draw(g);
 }

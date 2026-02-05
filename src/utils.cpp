@@ -76,7 +76,12 @@ float mapf(float x, float inMin, float inMax, float outMin, float outMax) {
 
 // ----------[ BINARY READERS ]---------- //
 
-bool read_u16(const uint8_t* data, size_t size, size_t off, uint16_t& out) {
+float floorDivisible(float n, float factor, float offset) { return floor((n - offset) / factor) * factor + offset; }
+
+float ceilDivisible(float n, float factor, float offset) { return ceil((n - offset) / factor * factor + offset); }
+
+bool read_u16(const uint8_t *data, size_t size, size_t off, uint16_t &out)
+{
     if (!data) return false;
     if (off + 2 > size) return false;
 

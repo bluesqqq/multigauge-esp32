@@ -106,6 +106,7 @@
             {
               "type": "rectangle",
               "style": {
+                "height": "100%",
                 "flex": { "justify": "center", "grow": 1, "shrink": 1 },
                 "padding": { "all": 8 },
                 "gap": { "row": 4 }
@@ -118,6 +119,7 @@
             {
               "type": "rectangle",
               "style": {
+                "height": "100%",
                 "flex": { "justify": "center", "grow": 1, "shrink": 1 },
                 "padding": { "all": 8 },
                 "gap": { "row": 4 }
@@ -128,21 +130,22 @@
               },
               "children": [
                 {
-                  "type": "text",
-                  "style": { "flex": { "align": "center" } },
+                  "type": "gauge",
+                  "style": { "flex": { "align": "center" }, "height": "100%" },
                   "props": {
-                    "text": "BOOST",
-                    "textStyle": { "family": "sans", "weight": "bold", "slant": "normal", "pt": 11, "color": 65535 },
-                    "ellipses": true
-                  }
-                },
-                {
-                  "type": "text",
-                  "style": { "flex": { "align": "center" } },
-                  "props": {
-                    "text": "11.2",
-                    "textStyle": { "family": "dejavu", "weight": "normal", "slant": "normal", "pt": 18, "color": 65535 },
-                    "ellipses": true
+                    "value": "engineRPM",
+
+                    "backgroundColor": {
+                      "fill": 2146,
+                      "stroke": 9771,
+                      "thickness": 1
+                    },
+
+                    "secondsColor": 65535,
+                    "graphColor": {
+                      "type": "static",
+                      "value": 9771
+                    }
                   }
                 }
               ]

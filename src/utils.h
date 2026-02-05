@@ -4,6 +4,8 @@
 #include <cstddef>     // size_t
 #include <string>      // std::string
 #include <algorithm>   // std::min
+#include <rapidjson/document.h>
+
 
 // ----------[ FLOAT / MATH ]---------- //
 
@@ -17,6 +19,12 @@ template <typename T>
 static inline T lerp(T a, T b, float t) {
     return a + (b - a) * t;
 }
+
+float floorDivisible(float n, float factor, float offset = 0);
+
+float ceilDivisible(float n, float factor, float offset = 0);
+
+bool inRange(float n, float min, float max) { return (n >= min && n <= max); }
 
 // ----------[ BINARY READERS ]---------- //
 
@@ -114,4 +122,84 @@ static inline void splitOnce(std::string_view s, char delim,
     left = s.substr(0, p);
     right = s.substr(p + 1);
     hasDelim = true;
+}
+
+// ----------[ JSON ]---------- //
+
+inline bool setInt(const rapidjson::Value::ConstObject& o, const char* k, int& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd() || !it->value.IsNumber()) return false;
+    out = it->value.GetInt();
+    return true;
+}
+
+inline bool setFloat(const rapidjson::Value::ConstObject& o, const char* k, float& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd() || !it->value.IsNumber()) return false;
+    out = it->value.GetFloat();
+    return true;
+}
+
+inline bool setBool(const rapidjson::Value::ConstObject& o, const char* k, bool& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd() || !it->value.IsBool()) return false;
+    out = it->value.GetBool();
+    return true;
+}
+
+template <class T>
+inline bool setObj(const rapidjson::Value::ConstObject& o, const char* k, T& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd() || !it->value.IsObject()) return false;
+    out = T(it->value.GetObject());
+    return true;
+}
+
+template <class T>
+inline bool setObjVector(const rapidjson::Value::ConstObject& o, const char* k, std::vector<T>& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsArray()) return false;
+    
+    out.clear();
+    out.reserve(out.size() + it->value.Size());
+
+    for (const auto& v : it->value.GetArray()) {
+        if (!v.IsObject()) continue;               // or return false / log
+        out.emplace_back(v.GetObject());
+    }
+    return true;
+}
+
+template <class T>
+inline bool setOptObj(const rapidjson::Value::ConstObject& o, const char* k, std::optional<T>& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsObject()) return false;
+    out = T(it->value.GetObject());
+    return true;
+}
+
+inline bool setOptFloat(const rapidjson::Value::ConstObject& o, const char* k, std::optional<float>& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd()) return false;
+
+    const auto& v = it->value;
+    if (v.IsNull()) { out.reset(); return true; }
+
+    if (!v.IsNumber()) return false;
+    out = v.GetFloat();
+    return true;
+}
+
+inline bool setOptInt(const rapidjson::Value::ConstObject& o, const char* k, std::optional<int>& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd()) return false;
+
+    const auto& v = it->value;
+    if (v.IsNull()) { out.reset(); return true; }
+
+    if (!v.IsInt()) return false;          // strict int
+    out = v.GetInt();
+    return true;
 }

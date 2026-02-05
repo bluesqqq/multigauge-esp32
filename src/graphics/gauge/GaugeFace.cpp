@@ -19,6 +19,4 @@ GaugeFace::GaugeFace(YGConfigRef config, const rapidjson::Document& json) : Elem
 void GaugeFace::draw(Graphics &g) const {
     if (backgroundColor) g.fillAll(*backgroundColor);
     else g.fillAll(0xF800);
-
-    Element::draw(g);
 }

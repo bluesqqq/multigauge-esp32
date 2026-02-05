@@ -76,6 +76,14 @@ ColorTimeline ColorTimeline::blended(uint16_t color, float alpha) const {
     return newTimeline;
 }
 
+ColorTimeline ColorTimeline::blended(const Color &other, float alpha) const {
+    const ColorTimeline* tl = other.getTimeline();
+
+    if (const ColorTimeline* tl = other.getTimeline()) return blended(*tl, alpha);
+
+    return blended(other.getColor(), alpha);
+}
+
 ColorTimeline ColorTimeline::blended(const ColorTimeline &other, float alpha) const {
     ColorTimeline newTimeline;
 
@@ -180,4 +188,28 @@ std::vector<uint16_t> ColorTimeline::sample(float startPosition, float endPositi
     }
 
     return result;
+}
+
+FillStrokeTimeline::FillStrokeTimeline(ColorTimeline f, ColorTimeline s, float t) : fill(f), stroke(s), thickness(t) {}
+
+FillStrokeTimeline::FillStrokeTimeline(const rapidjson::Value::ConstObject json) {
+    if (json.HasMember("fill") && json["fill"].IsArray())     fill = ColorTimeline(json["style"].GetArray());
+    if (json.HasMember("stroke") && json["stroke"].IsArray()) stroke = ColorTimeline(json["stroke"].GetArray());
+    if (json.HasMember("thickness") && json["thickness"].IsNumber()) thickness = json["thickness"].GetFloat();
+}
+
+FillStrokeTimeline FillStrokeTimeline::blended(uint16_t color, float alpha) const {
+    return FillStrokeTimeline(fill.blended(color, alpha), stroke.blended(color, alpha), thickness);
+}
+
+FillStrokeTimeline FillStrokeTimeline::blended(const Color &color, float alpha) const {
+    return FillStrokeTimeline(fill.blended(color, alpha), stroke.blended(color, alpha), thickness);
+}
+
+FillStrokeTimeline FillStrokeTimeline::blended(const ColorTimeline &color, float alpha) const {
+    return FillStrokeTimeline(fill.blended(color, alpha), stroke.blended(color, alpha), thickness);
+}
+
+FillStrokeTimeline FillStrokeTimeline::blended(const FillStrokeTimeline &other, float alpha) const {
+    return FillStrokeTimeline(fill.blended(other.fill, alpha), stroke.blended(other.stroke, alpha), (thickness + other.thickness) / 2.0f);
 }

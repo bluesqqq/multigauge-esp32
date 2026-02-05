@@ -6,6 +6,8 @@ class CircleElement : public Element {
     private:
         FillStroke color;
 
+        Type type = Type::Circle;
+        
     public:
         explicit CircleElement(YGConfigRef config);
 

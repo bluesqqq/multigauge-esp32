@@ -34,6 +34,4 @@ void TextElement::draw(Graphics &g) const {
             g.drawTextArea(text, b.toInt(), anchor, useEllipses, useHyphens);
         }
     }
-
-    Element::draw(g);
 }

@@ -42,7 +42,5 @@ public:
             g.setFill(c);
             g.drawText("label", b.getCenter().toInt(), Anchor::Center);
         }
-
-        Element::draw(g);
     }
 };

@@ -70,4 +70,5 @@ struct FillStroke {
 
     FillStroke blended(uint16_t color, float alpha) const;
     FillStroke blended(const Color& color, float alpha) const;
+    FillStroke blended(const FillStroke& other, float alpha) const;
 };

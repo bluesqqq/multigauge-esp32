@@ -1,22 +1,24 @@
-#include "CircleElement.h"
+#include "CircularNeedle.h"
+#include "CircularGroup.h"
 
-CircleElement::CircleElement(YGConfigRef config) : Element(config) {}
+CircularNeedle::CircularNeedle(YGConfigRef config) : Element(config) {}
 
-CircleElement::CircleElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+CircularNeedle::CircularNeedle(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("color") && props["color"].IsObject())
-        color = FillStroke(props["color"].GetObject());
+    setFloat(json, "radius", radius);
+
+    setObj(json, "color", color);
 }
 
-void CircleElement::draw(Graphics &g) const {
+void CircularNeedle::draw(Graphics &g) const {
     const auto& b = getBounds();
 
     const float w = b.width;
     const float h = b.height;
     const float diameter = std::min(w, h);
-    const float radius   = diameter * 0.5f;
+    const float radius   = diameter * 0.5f * this->radius;
 
     const float cx = b.position.x + w * 0.5f;
     const float cy = b.position.y + h * 0.5f;

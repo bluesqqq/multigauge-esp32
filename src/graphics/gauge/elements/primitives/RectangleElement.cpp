@@ -28,6 +28,4 @@ void RectangleElement::draw(Graphics &g) const {
         if (radius > 0.0f) g.strokeRoundedRect(b, radius);
         else g.strokeRect(b);
     }
-
-    Element::draw(g);
 }

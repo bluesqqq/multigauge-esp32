@@ -15,7 +15,6 @@ class Horizon : public Element {
         float xPosition = 0;
 
         Color* horizonColor = new StaticColor(0xf800);
-
         
     public:
         Horizon(YGConfigRef config) : Element(config) {}

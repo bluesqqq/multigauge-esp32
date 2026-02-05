@@ -106,6 +106,12 @@ class ColorTimeline {
         /// @return A new ColorTimeline object with the blended result
         ColorTimeline blended(uint16_t color, float alpha) const;
 
+        /// @brief Blends this timeline with another Color object.
+        /// @param other The Color object to blend with
+        /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
+        /// @return A new ColorTimeline object with the blended result
+        ColorTimeline blended(const Color& other, float alpha) const;
+
         /// @brief Blends this timeline with another ColorTImeline object.
         /// @param other The ColorTImeline object to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
@@ -127,10 +133,21 @@ class ColorTimeline {
 
 //----------[ FILL STROKE TIMELINE ]----------//
 
-struct StrokeTimeline {
-
-};
-
 struct FillStrokeTimeline {
+    ColorTimeline fill;
+    ColorTimeline stroke;
+    float thickness = 1.0f;
 
+    FillStrokeTimeline() = default;
+
+    FillStrokeTimeline(ColorTimeline fill, ColorTimeline stroke, float thickness);
+
+    FillStrokeTimeline(const rapidjson::Value::ConstObject json);
+
+    //----------[ BLENDING ]----------//
+
+    FillStrokeTimeline blended(uint16_t color, float alpha) const;
+    FillStrokeTimeline blended(const Color& color, float alpha) const;
+    FillStrokeTimeline blended(const ColorTimeline& color, float alpha) const;
+    FillStrokeTimeline blended(const FillStrokeTimeline& other, float alpha) const;
 };

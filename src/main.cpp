@@ -67,7 +67,7 @@ void setup() {
         LOG_INFO(logger, "gauge", "Failed to load test gaugeface file.");
     }
 
-    face->init(assetManager);
+    face->initRecursive(assetManager);
 }
 
 int t = 0;
@@ -80,9 +80,9 @@ void draw(uint32_t deltaUs) {
     g.clearColorCache();
     context.beginFrame();
 
-    face->calculateLayout(screen.width, screen.height);
-    face->update(deltaUs);
-    face->draw(g);
+    face->layoutRecursive(screen.width, screen.height);
+    face->updateRecursive(deltaUs);
+    face->drawRecursive(g);
 
     context.endFrame();
 }

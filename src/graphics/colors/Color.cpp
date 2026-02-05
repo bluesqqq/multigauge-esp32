@@ -64,3 +64,18 @@ FillStroke::FillStroke(const rapidjson::Value::ConstObject json)
 FillStroke FillStroke::blended(uint16_t c, float alpha) const { return FillStroke((fill) ? fill->blended(c, alpha) : nullptr, (stroke) ? stroke->blended(c, alpha) : nullptr, thickness); }
 
 FillStroke FillStroke::blended(const Color &c, float alpha) const { return FillStroke((fill) ? fill->blended(c, alpha) : nullptr, (stroke) ? stroke->blended(c, alpha) : nullptr, thickness); }
+
+FillStroke FillStroke::blended(const FillStroke &other, float alpha) const {
+    std::unique_ptr<Color> outFill;
+    std::unique_ptr<Color> outStroke;
+
+    if (fill && other.fill) outFill = fill->blended(*other.fill, alpha);
+    else if (fill) outFill = fill->clone();
+    else if (other.fill) outFill = other.fill->clone();
+
+    if (stroke && other.stroke) outStroke = stroke->blended(*other.stroke, alpha);
+    else if (stroke) outStroke = stroke->clone();
+    else if (other.stroke) outStroke = other.stroke->clone();
+
+    return FillStroke(std::move(outFill), std::move(outStroke), thickness);
+}
