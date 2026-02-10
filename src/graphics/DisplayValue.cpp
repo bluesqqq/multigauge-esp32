@@ -2,6 +2,8 @@
 
 int DisplayValue::getUnitIndex() const { return unitIndex.has_value() ? unitIndex.value() : DEFAULT_UNIT; }
 
+DisplayValue::DisplayValue() {}
+
 DisplayValue::DisplayValue(Value *value, std::optional<int> unitIndex, std::optional<float> minimum, std::optional<float> maximum)
     : value(value), unitIndex(unitIndex), minimum(minimum), maximum(maximum) {}
 
@@ -28,6 +30,7 @@ float DisplayValue::getValue() const {
 }
 
 float DisplayValue::getInterpolationValue() const {
+    if (!value) return 0.5f;
     float minimum = getMinimumBase();
     float maximum = getMaximumBase();
 
@@ -65,6 +68,6 @@ const Unit *DisplayValue::getUnit() const {
     return unitIndex.has_value() ? &unitType.getUnit(unitIndex.value()) : &unitType.getDefaultUnit();
 }
 
-std::string DisplayValue::getValueString(bool abbreviation) {
+std::string DisplayValue::getValueString(bool abbreviation) const {
     return value ? value->getValueString(getUnitIndex(), abbreviation) : "n/a";
 }

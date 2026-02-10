@@ -3,10 +3,11 @@
 #include "graphics/gauge/Element.h"
 #include "graphics/DisplayValue.h"
 #include "graphics/ticks/TickList.h"
+#include "CircularElement.h"
 
-class CircularScale : public Element {
+class CircularScale : public CircularElement {
     private:
-        //TickList ticks;
+        TickList ticks;
 
         float radius = 1.0f;
 

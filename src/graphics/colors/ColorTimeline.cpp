@@ -193,7 +193,7 @@ std::vector<uint16_t> ColorTimeline::sample(float startPosition, float endPositi
 FillStrokeTimeline::FillStrokeTimeline(ColorTimeline f, ColorTimeline s, float t) : fill(f), stroke(s), thickness(t) {}
 
 FillStrokeTimeline::FillStrokeTimeline(const rapidjson::Value::ConstObject json) {
-    if (json.HasMember("fill") && json["fill"].IsArray())     fill = ColorTimeline(json["style"].GetArray());
+    if (json.HasMember("fill") && json["fill"].IsArray())     fill = ColorTimeline(json["fill"].GetArray());
     if (json.HasMember("stroke") && json["stroke"].IsArray()) stroke = ColorTimeline(json["stroke"].GetArray());
     if (json.HasMember("thickness") && json["thickness"].IsNumber()) thickness = json["thickness"].GetFloat();
 }
@@ -212,4 +212,14 @@ FillStrokeTimeline FillStrokeTimeline::blended(const ColorTimeline &color, float
 
 FillStrokeTimeline FillStrokeTimeline::blended(const FillStrokeTimeline &other, float alpha) const {
     return FillStrokeTimeline(fill.blended(other.fill, alpha), stroke.blended(other.stroke, alpha), (thickness + other.thickness) / 2.0f);
+}
+
+#include "StaticColor.h"
+
+FillStroke FillStrokeTimeline::getFillStrokeAtPosition(float position) const {
+    return FillStroke(
+        fill.empty() ? nullptr : std::make_unique<StaticColor>(fill.getColor(position)),
+        stroke.empty() ? nullptr : std::make_unique<StaticColor>(stroke.getColor(position)),
+        thickness
+    );
 }

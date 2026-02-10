@@ -28,6 +28,8 @@ class DisplayValue {
         int getUnitIndex() const;
 
     public: 
+        DisplayValue();
+        
         DisplayValue(Value* value, std::optional<int> unitIndex = std::nullopt, std::optional<float> minimum = std::nullopt, std::optional<float> maximum = std::nullopt);
 
         DisplayValue(const rapidjson::Value::ConstObject json);
@@ -49,5 +51,5 @@ class DisplayValue {
 
         const Unit* getUnit() const;
 
-        std::string getValueString(bool abbreviation = false);
+        std::string getValueString(bool abbreviation = false) const;
 };

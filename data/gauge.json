@@ -3,181 +3,70 @@
   "style": {
     "width": "100%",
     "height": "100%",
-    "flex": {
-      "shrink": 1
-    },
-    "padding": { "all": 6 },
-    "gap": { "row": 6, "column": 6 }
+    "padding": { "all": 6 }
   },
   "props": {
     "backgroundColor": 0,
-    "title": "Dashboard: Dial + Stats + Tiles",
-    "description": "Header with title + number, center dial card with stacked info cards, bottom tiles row."
+    "title": "Scale Only"
   },
   "children": [
     {
       "type": "rectangle",
       "style": {
         "width": "100%",
-        "height": 28,
-        "flex": { "direction": "row", "justify": "space-between", "align": "center" },
-        "padding": { "left": 8, "right": 8, "top": 4, "bottom": 4 }
+        "height": "100%",
+        "padding": { "all": 8 },
+        "flex": { "justify": "center", "align": "center" }
       },
       "props": {
-        "radius": 8,
-        "color": { "fill": 4357, "stroke": 20062, "thickness": 1 }
+        "radius": 10,
+        "color": { "fill": 6470, "stroke": 9771, "thickness": 1 }
       },
       "children": [
         {
-          "type": "text",
-          "style": {
-            "height": "100%",
-            "flex": { "align": "center" }
-          },
+          "type": "circular-scale",
+          "style": "inherit",
           "props": {
-            "text": "MULTIGAUGE",
-            "textStyle": { "family": "orbitron", "weight": "normal", "slant": "normal", "pt": 9, "color": 65535 },
-            "ellipses": true
-          }
-        },
-        {
-          "type": "text",
-          "style": {
-            "height": "100%",
-            "flex": { "justify": "flex-end", "align": "center" }
-          },
-          "props": {
-            "text": "RPM 4280",
-            "textStyle": { "family": "dejavu", "weight": "bold", "slant": "normal", "pt": 12, "color": 65535 },
-            "ellipses": true
-          }
-        }
-      ]
-    },
+            "radius": 0.8,
 
-    {
-      "style": {
-        "width": "100%",
-        "height": "100%",
-        "flex": { "direction": "row", "justify": "space-between", "grow": 1, "shrink": 1 },
-        "gap": { "column": 6 }
-      },
-      "children": [
-        {
-          "type": "rectangle",
-          "style": {
-            "height": "100%",
-            "flex": { "justify": "center", "grow": 2, "shrink": 1 },
-            "padding": { "all": 8 },
-            "gap": { "row": 6 }
-          },
-          "props": {
-            "radius": 10,
-            "color": { "fill": 6470, "stroke": 9771, "thickness": 1 }
-          },
-          "children": [
-            {
-              "type": "horizon",
-              "style": "inherit"
+            "startAngle": -135,
+            "endAngle": 135,
+            "value": {
+              "id": "engineRPM",
+              "min": 0,
+              "max": 8000,
+              "unitIndex": 0
             },
-            {
-              "type": "text",
-              "style": { "height": 14, "flex": { "align": "center" } },
-              "props": {
-                "text": "MAIN",
-                "textStyle": { "family": "sans", "weight": "bold", "slant": "normal", "pt": 12, "color": 65535 },
-                "ellipses": true
-              }
-            }
-          ]
-        },
 
-        {
-          "style": {
-            "height": "100%",
-            "flex": { "grow": 1, "shrink": 1 },
-            "gap": { "row": 6 }
-          },
-          "children": [
-            {
-              "type": "rectangle",
-              "style": {
-                "height": "100%",
-                "flex": { "justify": "center", "grow": 1, "shrink": 1 },
-                "padding": { "all": 8 },
-                "gap": { "row": 4 }
-              },
-              "props": {
-                "radius": 10,
-                "color": { "fill": 6470, "stroke": 9771, "thickness": 0 }
-              }
-            },
-            {
-              "type": "rectangle",
-              "style": {
-                "height": "100%",
-                "flex": { "justify": "center", "grow": 1, "shrink": 1 },
-                "padding": { "all": 8 },
-                "gap": { "row": 4 }
-              },
-              "props": {
-                "radius": 10,
-                "color": { "fill": 6470, "stroke": 9771, "thickness": 0 }
-              },
-              "children": [
-                {
-                  "type": "gauge",
-                  "style": { "flex": { "align": "center" }, "height": "100%" },
-                  "props": {
-                    "value": "engineRPM",
-
-                    "backgroundColor": {
-                      "fill": 2146,
-                      "stroke": 9771,
-                      "thickness": 1
-                    },
-
-                    "secondsColor": 65535,
-                    "graphColor": {
-                      "type": "static",
-                      "value": 9771
-                    }
-                  }
+            "ticks": {
+              "offset": 0,
+              "root": {
+                "useDivisions": true,
+                "divisions": 8,
+                "length": 18,
+                "thickness": 3,
+                "color": {
+                  "fill": [
+                    { "position": 0.0, "color": 65535 }
+                  ],
+                  "stroke": [
+                    { "position": 0.0, "color": 0 }
+                  ],
+                  "thickness": 1
                 }
-              ]
+              },
+              "subs": []
             }
-          ]
-        }
-      ]
-    },
-
-    {
-      "style": {
-        "width": "100%",
-        "height": 56,
-        "flex": { "direction": "row", "justify": "space-between" },
-        "gap": { "column": 6 }
-      },
-      "children": [
-        {
-          "type": "rectangle",
-          "style": {
-            "height": "100%",
-            "flex": { "justify": "center", "grow": 1, "shrink": 1 },
-            "padding": { "all": 8 }
-          },
-          "props": {
-            "radius": 10,
-            "color": { "fill": 4357, "stroke": 20062, "thickness": 1 }
           },
           "children": [
             {
-              "type": "text",
-              "style": { "width": "100%", "height": "100%" },
+              "type": "circular-needle",
+              "style": "inherit",
               "props": {
-                "text": "Long press debug {engineRPM=0.0} | Coolant {engineCoolantTemp=1.0} | Boost {boostPressure=0.0} | Throttle {throttlePosition|pct}",
-                "textStyle": { "family": "sans", "weight": "normal", "slant": "normal", "pt": 12, "color": 65535 },
-                "ellipses": true
+                "radius": 1.0,
+                "color": {
+                  "fill": 65535
+                }
               }
             }
           ]

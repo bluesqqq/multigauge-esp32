@@ -41,7 +41,7 @@ class TickList {
         const FillStrokeTimeline& getColor(uint8_t index) const;
         const std::optional<TickValueStyle>& getValueStyle(uint8_t index) const;
 
-        std::vector<std::vector<float>> getTickPositions(float startValue, float endValue) {
+        std::vector<std::vector<float>> getTickPositions(float startValue, float endValue) const {
             auto allPositions = std::vector<std::vector<float>>(subs.size() + 1);
 
             std::vector<float> positions = root.getPositions(startValue, endValue, 0);
@@ -56,10 +56,10 @@ class TickList {
             return allPositions;
         }
 
-        void getSeqTickPositions(float startTickPosition, float endTickPosition, uint8_t index, std::vector<std::vector<float>>& out) {
+        void getSeqTickPositions(float startTickPosition, float endTickPosition, uint8_t index, std::vector<std::vector<float>>& out) const {
             if (index >= subs.size()) return;
 
-            SubTick& tick = subs[index];
+            const SubTick& tick = subs[index];
 
             std::vector<float> positions = tick.getPositions(startTickPosition, endTickPosition);
             const float interval = tick.getInterval(startTickPosition, endTickPosition);
@@ -73,7 +73,8 @@ class TickList {
         }
 
         void drawLineTick(Graphics& g, Line<float> line, float thickness, FillStroke& fillStroke) const {
-            
+            g.setFill(*fillStroke.fill);
+            g.fillWideLine(line.toInt(), thickness);
         }
 
         void drawCircleTick(Graphics& g, Line<float> line, float thickness, FillStroke& fillStroke) const {
@@ -103,17 +104,19 @@ class TickList {
         }
 
     public:
+        TickList() {}
+        
         TickList(const rapidjson::Value::ConstObject& json) {
             setObj(json, "root", root);
             setObjVector(json, "subs", subs);
             setFloat(json, "offset", offset);
         }
 
-        void drawCircular(Graphics& g, Point<float> pos, float radius, float startAngle, float endAngle, float startValue, float endValue) {
+        void drawCircular(Graphics& g, Point<float> pos, float radius, float startAngle, float endAngle, float startValue, float endValue) const {
             auto tickPositions = getTickPositions(startValue, endValue);
 
-            float rStartAngle = startAngle; 
-            float rEndAngle = endAngle;
+            float rStartAngle = startAngle * DEG_TO_RAD; 
+            float rEndAngle = endAngle * DEG_TO_RAD;
 
             for (int i = tickPositions.size() - 1; i >= 0; --i) {
                 for (float& position : tickPositions[i]) {

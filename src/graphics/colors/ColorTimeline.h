@@ -150,4 +150,6 @@ struct FillStrokeTimeline {
     FillStrokeTimeline blended(const Color& color, float alpha) const;
     FillStrokeTimeline blended(const ColorTimeline& color, float alpha) const;
     FillStrokeTimeline blended(const FillStrokeTimeline& other, float alpha) const;
+
+    FillStroke getFillStrokeAtPosition(float position) const;
 };

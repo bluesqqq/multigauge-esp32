@@ -66,7 +66,7 @@ class Element {
         virtual void update(int deltaTime) {}
 
     public:
-        enum Type { Base, CircularGroup };
+        enum Type { Base, Circular };
 
         explicit Element(Element* parent, bool inherit = false);
         explicit Element(Element* parent, const rapidjson::Value::ConstObject json);

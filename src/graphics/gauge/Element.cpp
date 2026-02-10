@@ -55,6 +55,8 @@ Element::~Element() {
 #include "elements/Horizon.h"
 #include "elements/primitives/ImageElement.h"
 #include "elements/Graph.h"
+#include "elements/circular/CircularNeedle.h"
+#include "elements/circular/CircularScale.h"
 
 std::unique_ptr<Element> Element::fromJson(Element* parent, const rapidjson::Value::ConstObject json) {
     if (!json.HasMember("type") || !json["type"].IsString()) return std::make_unique<Element>(parent, json);
@@ -68,6 +70,9 @@ std::unique_ptr<Element> Element::fromJson(Element* parent, const rapidjson::Val
     if (strcmp(type, "horizon") == 0)   return std::make_unique<Horizon>(parent, json);
     if (strcmp(type, "graph") == 0)     return std::make_unique<Graph>(parent, json);
 
+    if (strcmp(type, "circular-needle") == 0) return std::make_unique<CircularNeedle>(parent, json);
+    if (strcmp(type, "circular-scale") == 0) return std::make_unique<CircularScale>(parent, json);
+    
     return std::make_unique<Element>(parent, json);
 }
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 
 enum class Direction {
     Right,
@@ -18,3 +19,11 @@ enum class Anchor {
     BottomCenter,
     BottomRight
 };
+
+enum LengthAlignment {
+    LENGTH_OUTER = -1,
+    LENGTH_CENTER = 0,
+    LENGTH_INNER = 1
+};
+
+std::pair<float, float> alignLength(float start, float length, LengthAlignment alignment);

@@ -54,7 +54,7 @@ void Graphics::fillWideLine(int x0, int y0, int x1, int y1, float t) const { con
 
 void Graphics::fillWideLine(const Point<int> &p1, const Point<int> &p2, float t) const { context->fillWideLine(p1.x, p1.y, p2.x, p2.y, strokeValue, t); }
 
-void Graphics::fillWideLine(const Line<int> &line) const { context->fillWideLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y, strokeValue, thickness); }
+void Graphics::fillWideLine(const Line<int> &line, float t) const { context->fillWideLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y, strokeValue, t); }
 
 //----------[ RECTANGLE ]----------//
 

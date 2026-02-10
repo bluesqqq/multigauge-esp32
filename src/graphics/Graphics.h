@@ -70,11 +70,11 @@ class Graphics final {
 
         void fillWideLine(int x0, int y0, int x1, int y1, float thickness) const;
         void fillWideLine(const Point<int>& p1, const Point<int>& p2, float thickness) const;
-        void fillWideLine(const Line<int>& line) const;
+        void fillWideLine(const Line<int>& line, float thickness) const;
 
         void strokeWideLine(int x0, int y0, int x1, int y1, float thickness) const;
         void strokeWideLine(const Point<int>& p1, const Point<int>& p2, float thickness) const;
-        void strokeWideLine(const Line<int>& line) const;
+        void strokeWideLine(const Line<int>& line, float thickness) const;
 
         //----------[ RECTANGLE ]----------//
         void fillRect(int x, int y, int width, int height) const;

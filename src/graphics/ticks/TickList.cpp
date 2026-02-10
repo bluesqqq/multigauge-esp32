@@ -51,50 +51,49 @@ void TickList::drawCircularTick(Graphics &g, uint8_t index, Point<float> pos, fl
         length    *= 1.0f + (lengthFactor * highlightFactor);
         thickness *= 1.0f + (thicknessFactor * highlightFactor);
     }
-
-    /*
-    std::pair<float, float> tickRadii = alignLength(radius, length, alignment);
+    
+    std::pair<float, float> tickRadii = alignLength(radius, length, LENGTH_CENTER);
 
     Point<float> unitVector = Point<float>::getPointOnUnitCircle(angle);
     Line<float> line = Line<float>(pos + unitVector * tickRadii.first, pos + unitVector * tickRadii.second);
 
     // Get the color at the current position  
-    FillStroke temporaryFS = color.getFillStroke(value);
+    FillStroke temporaryFS = color.getFillStrokeAtPosition(value);
 
-    if (fillStrokeModifier.fill != nullptr) temporaryFS.blendFill(fillStrokeModifier.fill->getColor(), highlightFactor);
-    if (fillStrokeModifier.stroke != nullptr) temporaryFS.blendStroke(fillStrokeModifier.stroke->getColor(), fillStrokeModifier.stroke->thickness, highlightFactor);
+    //if (fillStrokeModifier.fill != nullptr) temporaryFS.blendFill(fillStrokeModifier.fill->getColor(), highlightFactor);
+    //if (fillStrokeModifier.stroke != nullptr) temporaryFS.blendStroke(fillStrokeModifier.stroke->getColor(), fillStrokeModifier.stroke->thickness, highlightFactor);
 
+    /*
     if (fade != nullptr) { // Apply fade
         uint8_t alpha = fade->getAlpha(position);
         temporaryFS = temporaryFS.getBlendFillStroke(fade->color->getColor(), alpha);
     }
+    */
 
     switch(style) {
         case LINE:
-            drawLineTick(canvas, line, thickness, temporaryFS);
+            drawLineTick(g, line, thickness, temporaryFS);
             break;
 
         case TRIANGLE:
-            switch(alignment) {
+            switch(LENGTH_CENTER) {
                 case LENGTH_INNER: // Triangle points outwards
-                    drawTriangleTick(canvas, line, thickness, temporaryFS);
+                    drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
                 case LENGTH_CENTER: // Triangles points both ways
-                    drawTriangleTick(canvas, line, thickness, temporaryFS, true);
+                    drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
 
                 case LENGTH_OUTER: // Triangle points inwards
-                    drawTriangleTick(canvas, line, thickness, temporaryFS);
+                    drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
             }
             break;
 
         case CIRCLE:
-            drawCircleTick(canvas, line, thickness, temporaryFS);
+            drawCircleTick(g, line, thickness, temporaryFS);
             break;
     }
-
-    */
    
     /*
     // Draw the value if needed

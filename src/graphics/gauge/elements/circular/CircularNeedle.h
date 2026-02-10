@@ -1,13 +1,10 @@
 #pragma once
 
 #include "graphics/gauge/Element.h"
-#include "CircularGroup.h"
+#include "CircularElement.h"
 
-class CircularNeedle : public Element {
+class CircularNeedle : public CircularElement {
     private:
-        CircularContext elementContext;
-        bool inherit = true;
-
         FillStroke color;
         float radius = 1.0f;
 
