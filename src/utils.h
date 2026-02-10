@@ -5,6 +5,8 @@
 #include <string>      // std::string
 #include <algorithm>   // std::min
 #include <rapidjson/document.h>
+#include <optional>
+#include <vector>
 
 
 // ----------[ FLOAT / MATH ]---------- //
@@ -24,7 +26,7 @@ float floorDivisible(float n, float factor, float offset = 0);
 
 float ceilDivisible(float n, float factor, float offset = 0);
 
-bool inRange(float n, float min, float max) { return (n >= min && n <= max); }
+inline bool inRange(float v, float lo, float hi) { return (v >= lo) && (v <= hi); }
 
 // ----------[ BINARY READERS ]---------- //
 

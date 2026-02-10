@@ -15,7 +15,7 @@ private:
     Point<float> gforce = Point<float>(0.0f, 0.0f);
 
 public:
-    GForceElement(YGConfigRef config, int points = 24) : Element(config), numberOfPoints(points) {
+    GForceElement(Element* parent, int points = 24) : Element(parent), numberOfPoints(points) {
         if (numberOfPoints < 3) numberOfPoints = 3;
         maxGForce.resize((size_t)numberOfPoints, 0.3f);
     }

@@ -55,15 +55,12 @@ void setup() {
 
     context.init();
 
-    YGConfigRef config = YGConfigNew();
-    YGConfigSetUseWebDefaults(config, false);
-
     rapidjson::Document doc;
     if (assetManager.loadJson("/gauge.json", doc)) {
-        face = std::make_unique<GaugeFace>(config, doc);
+        face = std::make_unique<GaugeFace>(doc);
         LOG_INFO(logger, "gauge", "Successfully loaded test gaugeface file.");
     } else {
-        face = std::make_unique<GaugeFace>(config);
+        face = std::make_unique<GaugeFace>();
         LOG_INFO(logger, "gauge", "Failed to load test gaugeface file.");
     }
 

@@ -1,8 +1,8 @@
 #include "TextElement.h"
 
-TextElement::TextElement(YGConfigRef config, std::string text) : Element(config), text(text) {}
+TextElement::TextElement(Element* parent, std::string text) : Element(parent), text(text) {}
 
-TextElement::TextElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+TextElement::TextElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

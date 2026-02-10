@@ -1,12 +1,9 @@
 #pragma once
 
-#include "graphics/colors/Color.h"
-#include "graphics/geometry/alignment.h"
 #include "graphics/geometry/Rect.h"
 
 #include "graphics/Graphics.h"
 #include <yoga/Yoga.h>
-#include "layout.h"
 
 #include <rapidjson/document.h>
 
@@ -21,6 +18,9 @@ class Element {
         /// @brief Owned child elements
         std::vector<std::unique_ptr<Element>> children;
 
+        bool inherited = false;
+        Element* layoutOwner = nullptr;
+
         //----------[ LAYOUT ]----------//
 
         /// @brief Absolute bounds computer from Yoga
@@ -32,36 +32,59 @@ class Element {
         /// @brief True when the layout needs to be recalculated at the root
         bool layoutDirty = true;
         
+
+        void refreshInheritanceCacheRecursive() {
+            if (!inherited) layoutOwner = this;
+            else {
+                Element* a = parent;
+                while(a && a->inherited) a = a->parent;
+                layoutOwner = a ? a : this;
+            }
+
+            for (auto& c : children) c->refreshInheritanceCacheRecursive();
+        }
         void clearLayoutDirtyRecursive();
-        void initializeNode(YGConfigRef config);
+
+        YGConfigRef createConfig();
+
+        static bool styleIsInherit(const rapidjson::Value::ConstObject& json) {
+            auto it = json.FindMember("style");
+            if (it == json.MemberEnd()) return false;
+            if (!it->value.IsString()) return false;
+            return std::strcmp(it->value.GetString(), "inherit") == 0;
+        }
         
     protected:
         void markLayoutDirty();
         bool needsLayout() const { return layoutDirty; }
+        bool ownsLayout() const { return !inherited; }
 
         //----------[ HOOKS ]----------//
 
-        virtual bool init(AssetManager& assetManager);
-        virtual void draw(Graphics& g) const;
-        virtual void update(int deltaTime);
+        virtual bool init(AssetManager& assetManager) { return true; }
+        virtual void draw(Graphics& g) const {}
+        virtual void update(int deltaTime) {}
 
     public:
         enum Type { Base, CircularGroup };
 
-        explicit Element(YGConfigRef config);
-        explicit Element(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        explicit Element(Element* parent, bool inherit = false);
+        explicit Element(Element* parent, const rapidjson::Value::ConstObject json);
         virtual ~Element();
-        static std::unique_ptr<Element> fromJson(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        static std::unique_ptr<Element> fromJson(Element* parent, const rapidjson::Value::ConstObject json);
 
         virtual Type getType() const { return Type::Base; }
         
         //----------[ TREE ]----------//
 
+        const Element* getLayoutOwner() const { return layoutOwner ? layoutOwner : this; }
+        Element* getLayoutOwner() { return layoutOwner ? layoutOwner : this; }
+
         Element* getParent() const { return parent; }
         YGNodeRef getNode() const { return node; }
-        const Rect<float>& getBounds() const { return bounds; }
+        YGConfigRef getConfig() const { return config; }
+        const Rect<float>& getBounds() const { return getLayoutOwner()->bounds; }
 
-        void addChild(std::unique_ptr<Element> child);
         void addChild(const rapidjson::Value::ConstObject json);
         bool removeChild(Element* child);
 

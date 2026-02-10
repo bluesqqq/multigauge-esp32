@@ -18,9 +18,9 @@ class GaugeFace : public Element {
         unsigned long lastUpdateTime = 0;
 
     public:
-        explicit GaugeFace(YGConfigRef config);
+        explicit GaugeFace();
 
-        GaugeFace(YGConfigRef config, const rapidjson::Document& json);
+        GaugeFace(const rapidjson::Document& json);
 
         void draw(Graphics& g) const override;
 };

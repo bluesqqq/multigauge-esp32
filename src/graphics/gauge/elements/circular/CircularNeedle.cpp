@@ -1,14 +1,14 @@
 #include "CircularNeedle.h"
 #include "CircularGroup.h"
 
-CircularNeedle::CircularNeedle(YGConfigRef config) : Element(config) {}
+CircularNeedle::CircularNeedle(Element* parent) : Element(parent) {}
 
-CircularNeedle::CircularNeedle(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+CircularNeedle::CircularNeedle(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
     setFloat(json, "radius", radius);
-
+    //setObj(json, "value", value);
     setObj(json, "color", color);
 }
 
@@ -32,5 +32,13 @@ void CircularNeedle::draw(Graphics &g) const {
         g.setStroke(*color.stroke);
         g.setStrokeThickness(color.thickness);
         g.strokeCircle(cx, cy, radius);
+    }
+
+    Element* parent = getParent();
+
+    if (parent) {
+        if (parent->getType() == Element::Type::CircularGroup) {
+            
+        }
     }
 }

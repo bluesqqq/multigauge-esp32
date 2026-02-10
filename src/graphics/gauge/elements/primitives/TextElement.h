@@ -14,9 +14,9 @@ class TextElement : public Element {
         bool useHyphens = false;
 
     public:
-        explicit TextElement(YGConfigRef config, std::string text);
+        explicit TextElement(Element* parent, std::string text);
 
-        TextElement(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        TextElement(Element* parent, const rapidjson::Value::ConstObject json);
         
         void draw(Graphics& g) const override;
 };

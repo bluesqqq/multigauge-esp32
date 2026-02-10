@@ -1,12 +1,12 @@
 #include "CircularGroup.h"
 
-CircularGroup::CircularGroup(YGConfigRef config) : Element(config) {}
+CircularGroup::CircularGroup(Element* parent) : Element(parent) {}
 
-CircularGroup::CircularGroup(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+CircularGroup::CircularGroup(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
-        const rapidjson::Value::ConstObject props = json["props"].GetObject();
+    const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    setObj(json, "value", value);
-    setFloat(json, "startAngle", startAngle);
-    setFloat(json, "endAngle", endAngle);
+    //setObj(json, "value", value);
+    //setFloat(json, "startAngle", startAngle);
+    //setFloat(json, "endAngle", endAngle);
 }

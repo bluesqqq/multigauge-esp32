@@ -1,8 +1,8 @@
 #include "GaugeFace.h"
 
-GaugeFace::GaugeFace(YGConfigRef config) : Element(config) {}
+GaugeFace::GaugeFace() : Element(nullptr) {}
 
-GaugeFace::GaugeFace(YGConfigRef config, const rapidjson::Document& json) : Element(config, json.GetObject()) {
+GaugeFace::GaugeFace(const rapidjson::Document& json) : Element(nullptr, json.GetObject()) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

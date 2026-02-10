@@ -1,13 +1,16 @@
 #include "Element.h"
 
+#include "layout.h"
+
 void Element::clearLayoutDirtyRecursive() {
     layoutDirty = false;
     for (auto& child : children) child->clearLayoutDirtyRecursive();
 }
 
-void Element::initializeNode(YGConfigRef config) {
-    node = YGNodeNewWithConfig(config);
-    YGNodeSetContext(node, this);
+YGConfigRef Element::createConfig() {
+    YGConfigRef config = YGConfigNew();
+    YGConfigSetUseWebDefaults(config, false);
+    return config;
 }
 
 void Element::markLayoutDirty() {
@@ -16,12 +19,21 @@ void Element::markLayoutDirty() {
     n->layoutDirty = true;
 }
 
-Element::Element(YGConfigRef config) : config(config) { initializeNode(config); }
+Element::Element(Element* p, bool inherit) : parent(p), inherited(inherit) {
+    config = parent ? parent->getConfig() : createConfig();
 
-Element::Element(YGConfigRef config, const rapidjson::Value::ConstObject json) : config(config) {
-    initializeNode(config);
+    if (!parent) inherited = false; // root must own layout
 
-    loadLayout(getNode(), json);
+    if (!inherited) {
+        node = YGNodeNewWithConfig(config);
+        YGNodeSetContext(node, this);
+    }
+
+    refreshInheritanceCacheRecursive();
+}
+
+Element::Element(Element* p, const rapidjson::Value::ConstObject json) : Element(p, styleIsInherit(json)) {
+    if (!inherited) loadLayout(getNode(), json);
 
     if (!json.HasMember("children") || !json["children"].IsArray()) return;
     for (const auto& child : json["children"].GetArray())
@@ -29,6 +41,8 @@ Element::Element(YGConfigRef config, const rapidjson::Value::ConstObject json) :
 }
 
 Element::~Element() {
+    children.clear();
+    
     if (node) {
         YGNodeFree(node);
         node = nullptr;
@@ -42,31 +56,37 @@ Element::~Element() {
 #include "elements/primitives/ImageElement.h"
 #include "elements/Graph.h"
 
-std::unique_ptr<Element> Element::fromJson(YGConfigRef config, const rapidjson::Value::ConstObject json) {
-    if (!json.HasMember("type") || !json["type"].IsString()) return std::make_unique<Element>(config, json);
+std::unique_ptr<Element> Element::fromJson(Element* parent, const rapidjson::Value::ConstObject json) {
+    if (!json.HasMember("type") || !json["type"].IsString()) return std::make_unique<Element>(parent, json);
 
     const char* type = json["type"].GetString();
 
-    if (strcmp(type, "text") == 0)      return std::make_unique<TextElement>(config, json);
-    if (strcmp(type, "rectangle") == 0) return std::make_unique<RectangleElement>(config, json);
-    if (strcmp(type, "circle") == 0)    return std::make_unique<CircleElement>(config, json);
-    if (strcmp(type, "image") == 0)     return std::make_unique<ImageElement>(config, json);
-    if (strcmp(type, "horizon") == 0)   return std::make_unique<Horizon>(config, json);
-    if (strcmp(type, "graph") == 0)     return std::make_unique<Graph>(config, json);
+    if (strcmp(type, "text") == 0)      return std::make_unique<TextElement>(parent, json);
+    if (strcmp(type, "rectangle") == 0) return std::make_unique<RectangleElement>(parent, json);
+    if (strcmp(type, "circle") == 0)    return std::make_unique<CircleElement>(parent, json);
+    if (strcmp(type, "image") == 0)     return std::make_unique<ImageElement>(parent, json);
+    if (strcmp(type, "horizon") == 0)   return std::make_unique<Horizon>(parent, json);
+    if (strcmp(type, "graph") == 0)     return std::make_unique<Graph>(parent, json);
 
-    return std::make_unique<Element>(config, json);
-}
-
-void Element::addChild(std::unique_ptr<Element> child) {
-    child->parent = this;
-    YGNodeInsertChild(this->node, child->node, (uint32_t)children.size());
-    children.push_back(std::move(child));
-    markLayoutDirty();
+    return std::make_unique<Element>(parent, json);
 }
 
 void Element::addChild(const rapidjson::Value::ConstObject json) {
-    std::unique_ptr<Element> element = fromJson(config, json);
-    if (element) addChild(std::move(element));
+    std::unique_ptr<Element> child = fromJson(this, json);
+    if (!child) return;
+
+    Element* yogaParent = this->getLayoutOwner();
+    
+    if (child->ownsLayout()) {
+        if (yogaParent && yogaParent->node) {
+            const uint32_t index = (uint32_t)YGNodeGetChildCount(yogaParent->node);
+            YGNodeInsertChild(yogaParent->node, child->node, index);
+        }
+    }
+    
+    children.push_back(std::move(child));
+    refreshInheritanceCacheRecursive();
+    markLayoutDirty();
 }
 
 bool Element::removeChild(Element *child) {
@@ -74,9 +94,17 @@ bool Element::removeChild(Element *child) {
 
     for (size_t i = 0; i < children.size(); ++i) {
         if (children[i].get() == child) {
-            YGNodeRemoveChild(node, child->node);
+            if (child->ownsLayout()) {
+                Element* yogaParent = this->getLayoutOwner();
+                if (yogaParent && yogaParent->node && child->node) {
+                    YGNodeRemoveChild(yogaParent->node, child->node);
+                }
+            }
+
             child->parent = nullptr;
             children.erase(children.begin() + i);
+
+            refreshInheritanceCacheRecursive();
             markLayoutDirty();
             return true;
         }
@@ -102,22 +130,34 @@ void Element::updateRecursive(int deltaTime) {
 
 void Element::layoutRecursive(float width, float height, YGDirection direction) {
     if (!layoutDirty) return;
-    YGNodeCalculateLayout(node, width, height, direction);
+
+    Element* root = this;
+    while (root->parent) root = root->parent;
+
+    Element* layoutRoot = root->getLayoutOwner(); // should always be root
+    if (!layoutRoot->node) return;
+
+    YGNodeCalculateLayout(layoutRoot->node, width, height, direction);
    
     auto walk = [&](auto&& self, Element* e, float parentAbsX, float parentAbsY) -> void {
-        const float left   = YGNodeLayoutGetLeft(e->node);
-        const float top    = YGNodeLayoutGetTop(e->node);
-        const float w      = YGNodeLayoutGetWidth(e->node);
-        const float h      = YGNodeLayoutGetHeight(e->node);
+        if (e->ownsLayout()) {
+            const float left   = YGNodeLayoutGetLeft(e->node);
+            const float top    = YGNodeLayoutGetTop(e->node);
+            const float w      = YGNodeLayoutGetWidth(e->node);
+            const float h      = YGNodeLayoutGetHeight(e->node);
 
-        const float absX = parentAbsX + left;
-        const float absY = parentAbsY + top;
+            const float absX = parentAbsX + left;
+            const float absY = parentAbsY + top;
 
-        e->bounds = Rect<float>(absX, absY, w, h);
+            e->bounds = Rect<float>(absX, absY, w, h);
 
-        for (auto& c : e->children) self(self, c.get(), absX, absY);
+            for (auto& c : e->children) self(self, c.get(), absX, absY);
+        } else {
+            for (auto& c : e->children) self(self, c.get(), parentAbsX, parentAbsY);
+        }
     };
 
-    walk(walk, this, 0, 0);
-    clearLayoutDirtyRecursive();
+    walk(walk, root, 0, 0);
+
+    root->clearLayoutDirtyRecursive();
 }

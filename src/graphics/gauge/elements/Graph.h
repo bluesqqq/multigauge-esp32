@@ -21,7 +21,7 @@ class Graph : public Element {
         std::vector<TimeValue> valueMemory;
 
     public:
-        explicit Graph(YGConfigRef config, Value* val) : Element(config), value(val) {
+        explicit Graph(Element* parent, Value* val) : Element(parent), value(val) {
             if (value) {
                 minimum = value->getMinimumBase();
                 maximum = value->getMaximumBase();
@@ -29,7 +29,7 @@ class Graph : public Element {
             valueMemory.insert(valueMemory.begin(), {4000, 0});
         }
 
-        Graph(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+        Graph(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
             if (!json.HasMember("props") || !json["props"].IsObject()) return;
             const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

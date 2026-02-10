@@ -17,9 +17,9 @@ class Horizon : public Element {
         Color* horizonColor = new StaticColor(0xf800);
         
     public:
-        Horizon(YGConfigRef config) : Element(config) {}
+        Horizon(Element* parent) : Element(parent) {}
 
-        Horizon(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {}
+        Horizon(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {}
 
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();

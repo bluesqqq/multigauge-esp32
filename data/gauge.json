@@ -77,20 +77,16 @@
           },
           "children": [
             {
+              "type": "horizon",
+              "style": "inherit"
+            },
+            {
               "type": "text",
               "style": { "height": 14, "flex": { "align": "center" } },
               "props": {
                 "text": "MAIN",
                 "textStyle": { "family": "sans", "weight": "bold", "slant": "normal", "pt": 12, "color": 65535 },
                 "ellipses": true
-              }
-            },
-            {
-              "type": "horizon",
-              "style": {
-                "width": "100%",
-                "height": "100%",
-                "flex": { "justify": "center", "align": "center", "grow": 1, "shrink": 1 }
               }
             }
           ]

@@ -10,9 +10,9 @@ class RectangleElement : public Element {
         float radius = 0.0f;
 
     public:
-        explicit RectangleElement(YGConfigRef config);
+        explicit RectangleElement(Element* parent);
 
-        RectangleElement(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        RectangleElement(Element* parent, const rapidjson::Value::ConstObject json);
 
         void draw(Graphics& g) const override;
 };

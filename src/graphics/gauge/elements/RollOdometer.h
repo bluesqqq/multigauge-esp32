@@ -16,7 +16,7 @@ class RollOdometer : public Element {
         float targetVal = 0;
 
     public:
-        explicit RollOdometer(YGConfigRef config, Value& val) : Element(config), value(val) { }
+        explicit RollOdometer(Element* parent, Value& val) : Element(parent), value(val) { }
 
         void draw(Graphics& g) const override {
             float val = value.getValue(DEFAULT);

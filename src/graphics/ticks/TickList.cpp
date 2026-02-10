@@ -52,6 +52,7 @@ void TickList::drawCircularTick(Graphics &g, uint8_t index, Point<float> pos, fl
         thickness *= 1.0f + (thicknessFactor * highlightFactor);
     }
 
+    /*
     std::pair<float, float> tickRadii = alignLength(radius, length, alignment);
 
     Point<float> unitVector = Point<float>::getPointOnUnitCircle(angle);
@@ -93,6 +94,8 @@ void TickList::drawCircularTick(Graphics &g, uint8_t index, Point<float> pos, fl
             break;
     }
 
+    */
+   
     /*
     // Draw the value if needed
     if (valueStyle.has_value()) {

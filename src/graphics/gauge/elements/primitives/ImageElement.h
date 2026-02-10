@@ -10,9 +10,9 @@ class ImageElement : public Element {
         Image image;
 
     public:
-        explicit ImageElement(YGConfigRef config);
+        explicit ImageElement(Element* parent);
 
-        ImageElement(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        ImageElement(Element* parent, const rapidjson::Value::ConstObject json);
 
         bool init(AssetManager& assetManager) override;
         void draw(Graphics& g) const override;

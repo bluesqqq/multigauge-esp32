@@ -23,8 +23,8 @@ private:
     Value& throttlePosition;
 
 public:
-    ThrottleElement(YGConfigRef config, Value& throttlePos)
-        : Element(config), throttlePosition(throttlePos)
+    ThrottleElement(Element* parent, Value& throttlePos)
+        : Element(parent), throttlePosition(throttlePos)
     {
         bodyFill   = new StaticColor(42292);
         bodyStroke = new StaticColor(0xFFFF);
@@ -62,7 +62,7 @@ public:
         if (t < 0.0f) t = 0.0f;
         if (t > 1.0f) t = 1.0f;
 
-        // -------- Body (two rectangles like your original) --------
+        // -------- Body (two Rects like your original) --------
         // In original:
         // 1) wide rect: (bodySize + 2*sideThickness) x (bodySize - 2*sideThickness)
         // 2) main square: bodySize x bodySize
@@ -84,7 +84,7 @@ public:
         );
 
         g.setStroke(bodyStroke->getColor());
-        g.strokeRect(Rectangle<int>(
+        g.strokeRect(Rect<int>(
             int(std::lround(cx - wideW * 0.5f)),
             int(std::lround(cy - wideH * 0.5f)),
             int(std::lround(wideW)),
@@ -101,7 +101,7 @@ public:
         );
 
         g.setStroke(bodyStroke->getColor());
-        g.strokeRect(Rectangle<int>(
+        g.strokeRect(Rect<int>(
             int(std::lround(cx - bodySize * 0.5f)),
             int(std::lround(cy - bodySize * 0.5f)),
             int(std::lround(bodySize)),
@@ -151,13 +151,13 @@ public:
             const int plateW    = plateRx * 2;
             const int plateH    = plateRy * 2;
 
-            const Rectangle<int> plateArea(plateLeft, plateTop, plateW, plateH);
+            const Rect<int> plateArea(plateLeft, plateTop, plateW, plateH);
 
             g.setFill(plateFill->getColor());
-            g.fillEllipse(plateArea);
+            //g.fillEllipse(plateArea);
 
             g.setStroke(plateStroke->getColor());
-            g.strokeEllipse(plateArea);
+            //g.strokeEllipse(plateArea);
         }
 
 
@@ -174,15 +174,11 @@ public:
         );
 
         g.setStroke(bodyStroke->getColor());
-        g.strokeRect(Rectangle<int>(
+        g.strokeRect(Rect<int>(
             int(std::lround(cx - shaftW * 0.5f)),
             int(std::lround(cy - shaftH * 0.5f)),
             int(std::lround(shaftW)),
             int(std::lround(shaftH))
         ));
-    }
-
-    JsonDocument serialize() {
-        return JsonDocument();
     }
 };

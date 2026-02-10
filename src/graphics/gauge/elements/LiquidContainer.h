@@ -63,14 +63,12 @@ class LiquidContainer : public Element {
         int heightCached = 0;
 
     public:
-        LiquidContainer(YGConfigRef config, Value& value, Value& rollValue, Value& pitchValue, size_t resolution) : Element(config), value(value), rollValue(rollValue), pitchValue(pitchValue) {
+        LiquidContainer(Element* parent, Value& value, Value& rollValue, Value& pitchValue, size_t resolution) : Element(parent), value(value), rollValue(rollValue), pitchValue(pitchValue) {
             points.resize(resolution);
             liquidColor     = new StaticColor(0xF800);
             backgroundColor = new StaticColor(0x0000);
             outlineColor    = new StaticColor(0xFFFF);
         }
-
-        
 
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();

@@ -15,7 +15,7 @@ private:
     const char* label = "Shift";
 
 public:
-    ShiftLightElement(YGConfigRef config, Value& value, Color* color) : Element(config), value(value), lightColor(color) {
+    ShiftLightElement(Element* parent, Value& value, Color* color) : Element(parent), value(value), lightColor(color) {
         if (!lightColor) lightColor = new StaticColor(0xFFFF);
     }
 

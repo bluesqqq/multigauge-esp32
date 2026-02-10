@@ -1,8 +1,8 @@
 #include "RectangleElement.h"
 
-RectangleElement::RectangleElement(YGConfigRef config) : Element(config) {}
+RectangleElement::RectangleElement(Element* parent) : Element(parent) {}
 
-RectangleElement::RectangleElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+RectangleElement::RectangleElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

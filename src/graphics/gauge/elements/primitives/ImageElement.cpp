@@ -1,8 +1,8 @@
 #include "ImageElement.h"
 
-ImageElement::ImageElement(YGConfigRef config) : Element(config), path("/placeholder.bmp") { }
+ImageElement::ImageElement(Element* parent) : Element(parent), path("/placeholder.bmp") { }
 
-ImageElement::ImageElement(YGConfigRef config, const rapidjson::Value::ConstObject json) : Element(config, json) {
+ImageElement::ImageElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 

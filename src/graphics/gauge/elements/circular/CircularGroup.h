@@ -3,17 +3,20 @@
 #include "graphics/gauge/Element.h"
 #include "graphics/DisplayValue.h"
 
+struct CircularContext {
+    DisplayValue value = nullptr;
+    float startAngle = 0;
+    float endAngle = 360;
+};
+
 class CircularGroup : public Element {
     private:
-        DisplayValue value = nullptr;
-
-        float startAngle = 0;
-        float endAngle = 360;
+        CircularContext elementContext;
 
     public:
-        explicit CircularGroup(YGConfigRef config);
+        explicit CircularGroup(Element* parent);
 
-        CircularGroup(YGConfigRef config, const rapidjson::Value::ConstObject json);
+        CircularGroup(Element* parent, const rapidjson::Value::ConstObject json);
 
         Type getType() const override { return Type::CircularGroup; }
 };

@@ -14,7 +14,7 @@ class DisplayValue {
 
     private:
         /// @brief The base `Value` object being wrapped
-        Value* value;
+        Value* value = nullptr;
 
         /// @brief Optional custom minimum value pointer. 
         std::optional<float> minimum = std::nullopt;
