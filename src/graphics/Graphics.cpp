@@ -50,11 +50,11 @@ void Graphics::strokeLine(const Point<int> &p1, const Point<int> &p2) const { st
 
 void Graphics::strokeLine(const Line<int> &line) const { strokeLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y); }
 
-void Graphics::fillWideLine(int x0, int y0, int x1, int y1, float t) const { context->fillWideLine(x0, y0, x1, y1, strokeValue, t); }
+void Graphics::fillWideLine(int x0, int y0, int x1, int y1, float t) const { context->fillWideLine(x0, y0, x1, y1, fillValue, t); }
 
-void Graphics::fillWideLine(const Point<int> &p1, const Point<int> &p2, float t) const { context->fillWideLine(p1.x, p1.y, p2.x, p2.y, strokeValue, t); }
+void Graphics::fillWideLine(const Point<int> &p1, const Point<int> &p2, float t) const { context->fillWideLine(p1.x, p1.y, p2.x, p2.y, fillValue, t); }
 
-void Graphics::fillWideLine(const Line<int> &line, float t) const { context->fillWideLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y, strokeValue, t); }
+void Graphics::fillWideLine(const Line<int> &line, float t) const { context->fillWideLine(line.p1.x, line.p1.y, line.p2.x, line.p2.y, fillValue, t); }
 
 //----------[ RECTANGLE ]----------//
 

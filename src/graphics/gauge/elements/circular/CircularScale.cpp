@@ -25,3 +25,9 @@ void CircularScale::draw(Graphics &g) const {
     
     ticks.drawCircular(g, {cx, cy}, radius, startAngle, endAngle, value.getMinimumBase(), value.getMaximumBase());
 }
+
+void CircularScale::update(int deltaTime) {
+    DisplayValue value = resolvedDisplayValue();
+
+    ticks.setDisplayValue(value.getValueBase());
+}

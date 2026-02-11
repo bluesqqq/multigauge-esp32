@@ -23,7 +23,7 @@ class TickList {
 
         float displayValue = 0;
         
-        float lengthFactor = 1;
+        float lengthFactor = 2;
         float thicknessFactor = 0;
         float textSizeFactor = 1;
 
@@ -73,7 +73,7 @@ class TickList {
         }
 
         void drawLineTick(Graphics& g, Line<float> line, float thickness, FillStroke& fillStroke) const {
-            g.setFill(*fillStroke.fill);
+            g.setFill(fillStroke.fill.get()->getColor());
             g.fillWideLine(line.toInt(), thickness);
         }
 
@@ -127,4 +127,6 @@ class TickList {
                 }
             }
         }
+
+        void setDisplayValue(float newValue) { displayValue = newValue; }
 };

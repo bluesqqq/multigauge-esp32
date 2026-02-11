@@ -17,4 +17,6 @@ class CircularScale : public CircularElement {
         CircularScale(Element* parent, const rapidjson::Value::ConstObject json);
 
         void draw(Graphics& g) const override;
+
+        void update(int deltaTime) override;
 };
