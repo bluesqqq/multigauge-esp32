@@ -18,5 +18,5 @@ GaugeFace::GaugeFace(const rapidjson::Document& json) : Element(nullptr, json.Ge
 
 void GaugeFace::draw(Graphics &g) const {
     if (backgroundColor) g.fillAll(*backgroundColor);
-    else g.fillAll(0xF800);
+    else g.fillAll(rgb(0, 0, 0));
 }

@@ -16,7 +16,7 @@ private:
 
 public:
     ShiftLightElement(Element* parent, Value& value, Color* color) : Element(parent), value(value), lightColor(color) {
-        if (!lightColor) lightColor = new StaticColor(0xFFFF);
+        if (!lightColor) lightColor = new StaticColor(rgb(255, 255, 255));
     }
 
     void draw(Graphics& g) const override {
@@ -29,7 +29,7 @@ public:
         const float cx = b.position.x + b.width  * 0.5f;
         const float cy = b.position.y + b.height * 0.5f;
 
-        const uint16_t c = lightColor->getColor();
+        const rgba c = lightColor->getColor();
 
         // "On" when value exceeds warning
         if (value.getValueBase() > warningValue) {

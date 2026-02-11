@@ -14,7 +14,7 @@ class Horizon : public Element {
         float zPosition = 0;
         float xPosition = 0;
 
-        Color* horizonColor = new StaticColor(0xf800);
+        Color* horizonColor = new StaticColor(rgb(255, 0, 0));
         
     public:
         Horizon(Element* parent) : Element(parent) {}
@@ -39,10 +39,10 @@ class Horizon : public Element {
             background2.setBottom(halfY);
             background2.reduce(1);
 
-            g.setFill(0x8000);
+            g.setFill(rgb(127, 0, 0));
             g.fillRect(background);
 
-            g.setFill(0x3004);
+            g.setFill(rgb(127, 0, 127));
             g.fillRect(background2);
 
             g.setStroke(*horizonColor);

@@ -37,7 +37,7 @@ class ColorTimeline {
     public:
         ColorTimeline();
 
-        ColorTimeline(uint16_t color);
+        ColorTimeline(rgba color);
 
         ColorTimeline(const rapidjson::Value::ConstArray json);
 
@@ -57,7 +57,7 @@ class ColorTimeline {
         /// @brief Adds a StaticColor color keyframe to the timeline
         /// @param color The 16-bit color value
         /// @param position The position in the timeline
-        void addKeyframe(uint16_t color, float position);
+        void addKeyframe(rgba color, float position);
 
         /// @brief Adds a color keyframe to the timeline.
         /// @param color The color object for this keyframe
@@ -89,14 +89,14 @@ class ColorTimeline {
         /// @brief Gets the interpolated color at a specific position.
         /// @param position The position in the timeline
         /// @return The 16-bit color value at that position
-        uint16_t getColor(float position) const;
+        rgba getColor(float position) const;
 
         /// @brief Samples the timeline at regular intervals.
         /// @param startPosition The starting position for sampling
         /// @param endPosition The ending position for sampling
         /// @param numSamples The number of samples to take
         /// @return Vector of 16-bit color values
-        std::vector<uint16_t> sample(float startPosition, float endPosition, size_t numSamples);
+        std::vector<rgba> sample(float startPosition, float endPosition, size_t numSamples);
 
         //----------[ BLENDING ]----------//
 
@@ -104,7 +104,7 @@ class ColorTimeline {
         /// @param color The 16-bit color value to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
         /// @return A new ColorTimeline object with the blended result
-        ColorTimeline blended(uint16_t color, float alpha) const;
+        ColorTimeline blended(rgba color, float alpha) const;
 
         /// @brief Blends this timeline with another Color object.
         /// @param other The Color object to blend with
@@ -146,7 +146,7 @@ struct FillStrokeTimeline {
 
     //----------[ BLENDING ]----------//
 
-    FillStrokeTimeline blended(uint16_t color, float alpha) const;
+    FillStrokeTimeline blended(rgba color, float alpha) const;
     FillStrokeTimeline blended(const Color& color, float alpha) const;
     FillStrokeTimeline blended(const ColorTimeline& color, float alpha) const;
     FillStrokeTimeline blended(const FillStrokeTimeline& other, float alpha) const;

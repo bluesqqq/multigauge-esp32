@@ -22,7 +22,6 @@ constexpr uint32_t BI_ALPHABITFIELDS = 6; // adds alpha mask
 struct ImageInfo {
     int width = 0;
     int height = 0;
-    // RGB565 pixels, row-major, owns its memory
     std::vector<uint16_t> pixels;
 };
 

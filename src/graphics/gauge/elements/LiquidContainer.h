@@ -56,7 +56,7 @@ class LiquidContainer : public Element {
         float centerYCached = 0.0f;
         float forwardAmountCached = 0.0f;
         float maxYCached = 0.0f;
-        uint16_t shadedColorCached = 0;
+        rgba shadedColorCached = {0, 0, 0, 255};
         int leftCached = 0;
         int topCached = 0;
         int widthCached = 0;
@@ -65,9 +65,9 @@ class LiquidContainer : public Element {
     public:
         LiquidContainer(Element* parent, Value& value, Value& rollValue, Value& pitchValue, size_t resolution) : Element(parent), value(value), rollValue(rollValue), pitchValue(pitchValue) {
             points.resize(resolution);
-            liquidColor     = new StaticColor(0xF800);
-            backgroundColor = new StaticColor(0x0000);
-            outlineColor    = new StaticColor(0xFFFF);
+            liquidColor     = new StaticColor(rgb(255, 0, 0));
+            backgroundColor = new StaticColor(rgb(0, 0, 0));
+            outlineColor    = new StaticColor(rgb(255, 255, 255));
         }
 
         void draw(Graphics& g) const override {
@@ -76,7 +76,7 @@ class LiquidContainer : public Element {
             const float spacing       = spacingCached;
             const float forwardAmount = forwardAmountCached;
             const float maxY          = maxYCached;
-            const uint16_t shadedColor = shadedColorCached;
+            const rgba shadedColor = shadedColorCached;
 
             const int left   = b.getLeft();
             const int top    = b.getTop();
@@ -147,10 +147,10 @@ class LiquidContainer : public Element {
             g.setStroke(outlineColor->getColor());
             g.strokeRect(b);
 
-            g.setFill((uint16_t)0);
+            g.setFill({0,0,0,0});
             g.drawText(value.getValueString(DEFAULT_UNIT), b.getCenter().translated(2,2), Anchor::Center);
 
-            g.setFill(0xFFFF);
+            g.setFill({255,255,255,255});
             g.drawText(value.getValueString(DEFAULT_UNIT), b.getCenter(), Anchor::Center);
         }
 
@@ -197,7 +197,7 @@ class LiquidContainer : public Element {
             for (auto& p : points) p.update();
 
             forwardAmountCached = 20.0f + (pitchValue.getValue(DEFAULT) / 90.0f) * 40.0f;
-            shadedColorCached = Color::blend(liquidColor->getColor(), 0x0000, 0.5f);
+            shadedColorCached = liquidColor->getColor().blend(rgb(0, 0, 0), 0.5f);
 
             // This is WORLD max Y for drawing, with your old "-2" quirk.
             maxYCached = float(topCached + heightCached - 2);

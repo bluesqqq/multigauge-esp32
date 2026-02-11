@@ -1,11 +1,11 @@
 #include "Graphics.h"
 
-uint16_t Graphics::getCachedColor(const Color& color) {
+rgba Graphics::getCachedColor(const Color& color) {
     auto it = colorCache.find(&color);
     if (it != colorCache.end())
         return it->second;
 
-    uint16_t c = color.getColor();
+    rgba c = color.getColor();
     colorCache[&color] = c;
     return c;
 }
@@ -18,15 +18,26 @@ Rect<int> Graphics::getScreenBounds() { return Rect<int>(0, 0, context->getScree
 
 void Graphics::clearColorCache() { colorCache.clear(); }
 
-void Graphics::setFill(uint16_t color) { fillValue = color; }
+void Graphics::setFill(rgba color) { fillValue = color; }
 
 void Graphics::setFill(const Color& color) { fillValue = getCachedColor(color); }
 
-void Graphics::setStroke(uint16_t color) { strokeValue = color; }
+void Graphics::setStroke(rgba color) { strokeValue = color; }
 
 void Graphics::setStroke(const Color& color) { strokeValue = getCachedColor(color); }
 
 void Graphics::setStrokeThickness(float t) { thickness = t; }
+
+void Graphics::setFillStroke(const FillStroke &fillStroke) {
+    if (fillStroke.fill) {
+        setFill(*fillStroke.fill);
+    }
+    
+    if (fillStroke.stroke) {
+        setStroke(*fillStroke.stroke);
+        setStrokeThickness(fillStroke.thickness);
+    }
+}
 
 //----------[ FILL ]----------//
 
@@ -34,7 +45,7 @@ void Graphics::fillAll() const { fillAll(fillValue); }
 
 void Graphics::fillAll(const Color& color) { context->fillAll(getCachedColor(color)); }
 
-void Graphics::fillAll(uint16_t color) const { context->fillAll(color); }
+void Graphics::fillAll(rgba color) const { context->fillAll(color); }
 
 //----------[ PIXEL ]----------//
 
@@ -152,7 +163,7 @@ void Graphics::setFontSlant(FontSlant slant) { slant = slant; }
 
 void Graphics::setFontPoint(float pt) { this->pt = pt; }
 
-void Graphics::setTextColor(uint16_t color) { textValue = color; }
+void Graphics::setTextColor(rgba color) { textValue = color; }
 
 void Graphics::setTextColor(const Color &color) { textValue = getCachedColor(color); }
 
@@ -226,7 +237,7 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
     const int maxLines = rect.height / lineHeight;
     if (maxLines <= 0) return;
 
-    uint16_t textColor = fillValue;
+    rgba textColor = fillValue;
 
     std::string scratch;
     scratch.reserve(128);

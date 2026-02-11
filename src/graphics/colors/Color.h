@@ -1,10 +1,12 @@
 #pragma once
 
+#include "rgba.h"
+
 #include "rapidjson/document.h"
 #include <memory>
 #include "values/value.h"
 
-#define DEFAULT_COLOR 0
+#define DEFAULT_COLOR { 0, 0, 0, 255}
 
 class ColorTimeline;
 
@@ -21,7 +23,7 @@ class Color {
 
         /// @brief Gets the current color value.
         /// @return The 16-bit color value
-        virtual uint16_t getColor() const = 0;
+        virtual rgba getColor() const = 0;
 
         /// @brief Gets the color timeline if this color type has one.
         /// @return Pointer to ColorTimeline, or nullptr if this color has no timeline
@@ -35,19 +37,12 @@ class Color {
         virtual Type getType() const = 0;
 
         //----------[ BLENDING ]----------//
-
-        /// @brief Blends two 16-bit (RGB565) color values together.
-        /// @param base The base color value
-        /// @param blend The color value to blend with
-        /// @param alpha The blend amount (0.0 = base, 1.0 = blend)
-        /// @return The blended 16-bit color value
-        static uint16_t blend(const uint16_t& base, const uint16_t& blend, float alpha);
         
         /// @brief Blends this color with a static color value.
         /// @param color The 16-bit color value to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
         /// @return A new Color object with the blended result
-        virtual std::unique_ptr<Color> blended(uint16_t color, float alpha) const = 0;
+        virtual std::unique_ptr<Color> blended(rgba color, float alpha) const = 0;
 
         /// @brief Blends this color with another Color object.
         /// @param color The Color object to blend with
@@ -68,7 +63,7 @@ struct FillStroke {
     FillStroke(std::unique_ptr<Color> fill, std::unique_ptr<Color> stroke, float thickness = 1.0f);
     FillStroke(const rapidjson::Value::ConstObject json);
 
-    FillStroke blended(uint16_t color, float alpha) const;
+    FillStroke blended(rgba color, float alpha) const;
     FillStroke blended(const Color& color, float alpha) const;
     FillStroke blended(const FillStroke& other, float alpha) const;
 };

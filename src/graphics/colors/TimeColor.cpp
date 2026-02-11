@@ -54,7 +54,7 @@ TimeColor &TimeColor::operator=(const TimeColor &other) {
     return *this;
 }
 
-std::unique_ptr<Color> TimeColor::blended(uint16_t color, float alpha) const { return std::make_unique<TimeColor>(timeline.blended(color, alpha)); }
+std::unique_ptr<Color> TimeColor::blended(rgba color, float alpha) const { return std::make_unique<TimeColor>(timeline.blended(color, alpha)); }
 
 std::unique_ptr<Color> TimeColor::blended(const Color &other, float alpha) const {
     switch(other.getType()) {
@@ -74,6 +74,6 @@ std::unique_ptr<Color> TimeColor::blended(const Color &other, float alpha) const
 
 std::unique_ptr<Color> TimeColor::clone() const { return std::make_unique<TimeColor>(*this); }
 
-uint16_t TimeColor::getColor() const { return timeline.getColor(getTime()); }
+rgba TimeColor::getColor() const { return timeline.getColor(getTime()); }
 
 Color::Type TimeColor::getType() const { return Type::Time; }

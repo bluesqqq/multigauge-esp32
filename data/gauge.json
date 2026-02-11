@@ -6,7 +6,7 @@
     "padding": { "all": 6 }
   },
   "props": {
-    "backgroundColor": 0,
+    "backgroundColor": "#000000",
     "title": "Scale Only"
   },
   "children": [
@@ -20,7 +20,7 @@
       },
       "props": {
         "radius": 10,
-        "color": { "fill": 6470, "stroke": 9771, "thickness": 1 }
+        "color": { "fill": "#192831", "stroke": "#21c65a", "thickness": 1 }
       },
       "children": [
         {
@@ -28,7 +28,6 @@
           "style": "inherit",
           "props": {
             "radius": 0.8,
-
             "startAngle": -135,
             "endAngle": 135,
             "value": {
@@ -37,7 +36,6 @@
               "max": 8000,
               "unitIndex": 0
             },
-
             "ticks": {
               "offset": 0,
               "root": {
@@ -47,10 +45,10 @@
                 "thickness": 3,
                 "color": {
                   "fill": [
-                    { "position": 0.0, "color": 65535 }
+                    { "position": 0.0, "color": "#ffffff" }
                   ],
                   "stroke": [
-                    { "position": 0.0, "color": 0 }
+                    { "position": 0.0, "color": "#000000" }
                   ],
                   "thickness": 1
                 }
@@ -71,7 +69,7 @@
               "props": {
                 "radius": 0.5,
                 "color": {
-                  "fill": 65535
+                  "fill": "#ff0000"
                 }
               }
             }

@@ -43,7 +43,7 @@ size_t ColorTimeline::getKeyframeIndexAtPosition(float position) const {
 
 ColorTimeline::ColorTimeline() {}
 
-ColorTimeline::ColorTimeline(uint16_t color) { addKeyframe(color, 0.0f); }
+ColorTimeline::ColorTimeline(rgba color) { addKeyframe(color, 0.0f); }
 
 ColorTimeline::ColorTimeline(const rapidjson::Value::ConstArray json) {
     for (const auto& keyframe : json)
@@ -66,7 +66,7 @@ ColorTimeline &ColorTimeline::operator=(const ColorTimeline &other) {
     return *this;
 }
 
-ColorTimeline ColorTimeline::blended(uint16_t color, float alpha) const {
+ColorTimeline ColorTimeline::blended(rgba color, float alpha) const {
     ColorTimeline newTimeline;
 
     // TODO: addKeyframe is inefficient in this case. emplace_back directly into the keyframes would be better
@@ -93,9 +93,9 @@ ColorTimeline ColorTimeline::blended(const ColorTimeline &other, float alpha) co
 
     // TODO: this only creates static colors, figure out a way to make it work for all types
     for (float position : positions) {
-        uint16_t colorA = this->getColor(position);
-        uint16_t colorB = other.getColor(position);
-        uint16_t blended = Color::blend(colorA, colorB, alpha);
+        rgba colorA = this->getColor(position);
+        rgba colorB = other.getColor(position);
+        rgba blended = colorA.blended(colorB, alpha);
 
         newTimeline.addKeyframe(blended, position);
     }
@@ -103,7 +103,7 @@ ColorTimeline ColorTimeline::blended(const ColorTimeline &other, float alpha) co
     return newTimeline;
 }
 
-void ColorTimeline::addKeyframe(uint16_t color, float position) { addKeyframe(ColorKeyframe(std::make_unique<StaticColor>(color), position)); }
+void ColorTimeline::addKeyframe(rgba color, float position) { addKeyframe(ColorKeyframe(std::make_unique<StaticColor>(color), position)); }
 
 void ColorTimeline::addKeyframe(std::unique_ptr<Color> color, float position) { addKeyframe(ColorKeyframe(std::move(color), position)); }
 
@@ -119,7 +119,7 @@ size_t ColorTimeline::size() const { return keyframes.size(); }
 
 bool ColorTimeline::empty() const { return keyframes.empty(); }
 
-uint16_t ColorTimeline::getColor(float position) const {
+rgba ColorTimeline::getColor(float position) const {
     if (keyframes.empty()) return DEFAULT_COLOR;
 
     size_t index = getKeyframeIndexAtPosition(position);
@@ -128,7 +128,7 @@ uint16_t ColorTimeline::getColor(float position) const {
 
     float normalized = (position - keyframes[index].position) / (keyframes[index + 1].position - keyframes[index].position);
 
-    return Color::blend(keyframes[index].color->getColor(), keyframes[index + 1].color->getColor(), normalized);
+    return keyframes[index].color->getColor().blended(keyframes[index + 1].color->getColor(), normalized);
 }
 
 float ColorTimeline::getStartPosition() const { return !keyframes.empty() ? keyframes.front().position : 0.0f; }
@@ -154,8 +154,8 @@ std::vector<float> ColorTimeline::getPositionsMapped(float start, float end) con
     return positions;
 }
 
-std::vector<uint16_t> ColorTimeline::sample(float startPosition, float endPosition, size_t numSamples) {
-    std::vector<uint16_t> result;
+std::vector<rgba> ColorTimeline::sample(float startPosition, float endPosition, size_t numSamples) {
+    std::vector<rgba> result;
     if (keyframes.empty() || numSamples == 0) return result;
     result.reserve(numSamples);
 
@@ -163,8 +163,8 @@ std::vector<uint16_t> ColorTimeline::sample(float startPosition, float endPositi
     size_t startIndex = 0;
     size_t endIndex = (keyframes.size() > 1) ? 1 : 0;
 
-    uint16_t startColor = keyframes[startIndex].color->getColor();
-    uint16_t endColor   = keyframes[endIndex].color->getColor();
+    rgba startColor = keyframes[startIndex].color->getColor();
+    rgba endColor   = keyframes[endIndex].color->getColor();
 
     for (size_t sample = 0; sample < numSamples; ++sample) {
         float position = startPosition + step * sample;
@@ -184,7 +184,7 @@ std::vector<uint16_t> ColorTimeline::sample(float startPosition, float endPositi
             t = (delta != 0) ? (position - keyframes[startIndex].position) / delta : 0;
         }
 
-        result.push_back(Color::blend(startColor, endColor, t));
+        result.push_back(startColor.blended(endColor, t));
     }
 
     return result;
@@ -198,7 +198,7 @@ FillStrokeTimeline::FillStrokeTimeline(const rapidjson::Value::ConstObject json)
     if (json.HasMember("thickness") && json["thickness"].IsNumber()) thickness = json["thickness"].GetFloat();
 }
 
-FillStrokeTimeline FillStrokeTimeline::blended(uint16_t color, float alpha) const {
+FillStrokeTimeline FillStrokeTimeline::blended(rgba color, float alpha) const {
     return FillStrokeTimeline(fill.blended(color, alpha), stroke.blended(color, alpha), thickness);
 }
 

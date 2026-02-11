@@ -45,7 +45,7 @@ class TimeColor : public Color {
 
         /// @brief Gets the current color value on the timeline.
         /// @return The current 16-bit color value
-        uint16_t getColor() const override;
+        rgba getColor() const override;
 
         /// @brief Gets the type of this color.
         /// @return Type::Time
@@ -59,7 +59,7 @@ class TimeColor : public Color {
         /// @param color The 16-bit color value to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
         /// @return A new TimeColor object with the blended result
-        std::unique_ptr<Color> blended(uint16_t color, float alpha) const override;
+        std::unique_ptr<Color> blended(rgba color, float alpha) const override;
 
         /// @brief Blends this color with another Color object.
         /// @param color The Color object to blend with

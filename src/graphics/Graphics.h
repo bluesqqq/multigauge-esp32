@@ -19,18 +19,19 @@ class Graphics final {
 
         //----------[ COLORS ]----------//
 
-        uint16_t fillValue;
-        uint16_t strokeValue;
-        uint16_t textValue;
+        rgba fillValue;
+        rgba strokeValue;
+        rgba textValue;
+
         float thickness = 0.0f; // for stroke
 
         /// @brief Cache that stores a color's value for quick lookup
-        std::unordered_map<const Color*, uint16_t> colorCache;
+        std::unordered_map<const Color*, rgba> colorCache;
 
         /// @brief Gets a color's value from the cache.
         /// @param color The Color object to get the color value of
         /// @return The current Color object's 16-bit color value
-        uint16_t getCachedColor(const Color& color);
+        rgba getCachedColor(const Color& color);
 
         //----------[ Font ]----------//
         std::string family = "default";
@@ -47,17 +48,19 @@ class Graphics final {
 
         void clearColorCache();
 
-        void setFill(uint16_t color);
+        void setFill(rgba color);
         void setFill(const Color& color);
 
-        void setStroke(uint16_t color);
+        void setStroke(rgba color);
         void setStroke(const Color& color);
         void setStrokeThickness(float thickness);
+
+        void setFillStroke(const FillStroke& fillStroke);
 
         //----------[ FILL ]----------//
         void fillAll() const;
         void fillAll(const Color& color);
-        void fillAll(uint16_t color) const;
+        void fillAll(rgba color) const;
 
         //----------[ PIXEL ]----------//
         void fillPixel(int x, int y) const;
@@ -150,7 +153,7 @@ class Graphics final {
         void setFontSlant(FontSlant slant);
         void setFontPoint(float pt);
 
-        void setTextColor(uint16_t color);
+        void setTextColor(rgba color);
         void setTextColor(const Color& color);
 
         void setTextStyle(const TextStyle& style);

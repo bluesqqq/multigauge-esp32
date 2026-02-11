@@ -73,6 +73,7 @@ bool AssetManager::loadImage(const std::string &path, Image &out) {
             return false;
     }
     
-    out = ctx.createNativeImage(info.pixels.data(), info.width, info.height);
+    //out = ctx.createNativeImage(info.pixels.data(), info.width, info.height);
+    // TODO: FIX THIS TOO!!
     return true;
 }

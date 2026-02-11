@@ -158,85 +158,85 @@ void GraphicsContextLovyanGFX::endFrame() {
     buffer.pushSprite(0, 0);
 }
 
-void GraphicsContextLovyanGFX::drawPixel(int x, int y, uint16_t color) {
-    buffer.drawPixel(x, y, color);
+void GraphicsContextLovyanGFX::drawPixel(int x, int y, rgba color) {
+    buffer.drawPixel(x, y, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::strokeLine(int x0, int y0, int x1, int y1, uint16_t color) {
-    buffer.drawLine(x0, y0, x1, y1, color);
+void GraphicsContextLovyanGFX::strokeLine(int x0, int y0, int x1, int y1, rgba color) {
+    buffer.drawLine(x0, y0, x1, y1, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillWideLine(int x0, int y0, int x1, int y1, uint16_t color, float thickness) {
-    buffer.drawWideLine(x0, y0, x1, y1, thickness, color);
+void GraphicsContextLovyanGFX::fillWideLine(int x0, int y0, int x1, int y1, rgba color, float thickness) {
+    buffer.drawWideLine(x0, y0, x1, y1, thickness, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color, float thickness) {
-    buffer.drawTriangle(x0, y0, x1, y1, x2, y2, color);
+void GraphicsContextLovyanGFX::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, rgba color, float thickness) {
+    buffer.drawTriangle(x0, y0, x1, y1, x2, y2, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, uint16_t color) {
-    buffer.fillTriangle(x0, y0, x1, y1, x2, y2, color);
+void GraphicsContextLovyanGFX::fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, rgba color) {
+    buffer.fillTriangle(x0, y0, x1, y1, x2, y2, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillRect(int x, int y, int w, int h, uint16_t color) { buffer.fillRect(x, y, w + 1, h + 1, color); }
+void GraphicsContextLovyanGFX::fillRect(int x, int y, int w, int h, rgba color) { buffer.fillRect(x, y, w + 1, h + 1, lgfxColor(color)); }
 
-void GraphicsContextLovyanGFX::strokeRect(int x, int y, int w, int h, uint16_t color, float thickness) {
-    buffer.drawRect(x, y, w + 1, h + 1, color);
+void GraphicsContextLovyanGFX::strokeRect(int x, int y, int w, int h, rgba color, float thickness) {
+    buffer.drawRect(x, y, w + 1, h + 1, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float radius, uint16_t color) {
-    buffer.fillRoundRect(x, y, w, h, radius, color);
+void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float radius, rgba color) {
+    buffer.fillRoundRect(x, y, w, h, radius, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color) {
+void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, rgba color) {
     // TODO: CHANGE IMPL
-    buffer.fillRoundRect(x, y, w, h, r1, color);
+    buffer.fillRoundRect(x, y, w, h, r1, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float radius, uint16_t color, float thickness) {
-    buffer.drawRoundRect(x, y, w, h, radius, color);
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float radius, rgba color, float thickness) {
+    buffer.drawRoundRect(x, y, w, h, radius, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, uint16_t color, float thickness) {
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, rgba color, float thickness) {
     // TODO: CHANGE IMPL
-    buffer.drawRoundRect(x, y, w, h, r1, color);
+    buffer.drawRoundRect(x, y, w, h, r1, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, uint16_t color) { buffer.fillCircle(cx, cy, r, color); }
+void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, rgba color) { buffer.fillCircle(cx, cy, r, lgfxColor(color)); }
 
-void GraphicsContextLovyanGFX::strokeCircle(int cx, int cy, int r, uint16_t color, float thickness) {
-    buffer.drawCircle(cx, cy, r, color);
+void GraphicsContextLovyanGFX::strokeCircle(int cx, int cy, int r, rgba color, float thickness) {
+    buffer.drawCircle(cx, cy, r, lgfxColor(color));
 }
 
-void GraphicsContextLovyanGFX::fillRing(int cx, int cy, int r, uint16_t color) {
+void GraphicsContextLovyanGFX::fillRing(int cx, int cy, int r, rgba color) {
 }
 
-void GraphicsContextLovyanGFX::strokeRing(int cx, int cy, int r, uint16_t color, float thickness) {
+void GraphicsContextLovyanGFX::strokeRing(int cx, int cy, int r, rgba color, float thickness) {
 }
 
-void GraphicsContextLovyanGFX::fillArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color) { buffer.fillArc(cx, cy, r1, r2, start, end, color); }
+void GraphicsContextLovyanGFX::fillArc(int cx, int cy, int r1, int r2, float start, float end, rgba color) { buffer.fillArc(cx, cy, r1, r2, start, end, lgfxColor(color)); }
 
-void GraphicsContextLovyanGFX::strokeArc(int cx, int cy, int r1, int r2, float start, float end, uint16_t color, float thickness) { buffer.drawArc(cx, cy, r1, r2, start, end, color); }
+void GraphicsContextLovyanGFX::strokeArc(int cx, int cy, int r1, int r2, float start, float end, rgba color, float thickness) { buffer.drawArc(cx, cy, r1, r2, start, end, lgfxColor(color)); }
 
-void GraphicsContextLovyanGFX::fillEllipse(int cx, int cy, int rx, int ry, uint16_t color) { buffer.fillEllipse(cx, cy, rx, ry, color); }
+void GraphicsContextLovyanGFX::fillEllipse(int cx, int cy, int rx, int ry, rgba color) { buffer.fillEllipse(cx, cy, rx, ry, lgfxColor(color)); }
 
-void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, uint16_t color, float thickness) { buffer.drawEllipse(cx, cy, rx, ry, color);  }
+void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, rgba color, float thickness) { buffer.drawEllipse(cx, cy, rx, ry, lgfxColor(color));  }
 
-void GraphicsContextLovyanGFX::fillAll(uint16_t color) { buffer.fillScreen(color); }
+void GraphicsContextLovyanGFX::fillAll(rgba color) { buffer.fillScreen(lgfxColor(color)); }
 
 float GraphicsContextLovyanGFX::getTextWidth(const char *text, std::string family, float pt, FontWeight weight, FontSlant slant) { 
     setFontInternal(family, pt, weight, slant);
     return buffer.textWidth(text);
 }
 
-void GraphicsContextLovyanGFX::drawText(const char* text, int x, int y, std::string family, float pt, FontWeight weight, FontSlant slant, uint16_t color, Anchor anchor) {
+void GraphicsContextLovyanGFX::drawText(const char* text, int x, int y, std::string family, float pt, FontWeight weight, FontSlant slant, rgba color, Anchor anchor) {
     setFontInternal(family, pt, weight, slant);
     buffer.setTextDatum(anchorToDatum(anchor));
-    buffer.setTextColor(color);
+    buffer.setTextColor(lgfxColor(color));
     buffer.drawString(text, x, y);
 }
 
-Image GraphicsContextLovyanGFX::createNativeImage(const uint16_t* pixels, int w, int h) {
+Image GraphicsContextLovyanGFX::createNativeImage(const rgba* pixels, int w, int h) {
     auto* spr = new lgfx::LGFX_Sprite(&buffer);
     spr->setColorDepth(16);
     spr->setPsram(true);
@@ -247,7 +247,8 @@ Image GraphicsContextLovyanGFX::createNativeImage(const uint16_t* pixels, int w,
     }
 
     spr->setSwapBytes(true);
-    spr->pushImage(0, 0, w, h, pixels);
+    //spr->pushImage(0, 0, w, h, pixels);
+    // TODO: FIX THIS!!!
     spr->setSwapBytes(false);
 
     return Image(w, h, spr, [](void* ptr) { delete static_cast<lgfx::LGFX_Sprite*>(ptr); });

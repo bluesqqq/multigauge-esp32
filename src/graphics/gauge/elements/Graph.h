@@ -147,7 +147,7 @@ class Graph : public Element {
                 }
             }
 
-            g.setTextColor(0xFFFF);
+            g.setTextColor(rgb(255, 255, 255));
             g.drawText(value ? value->getValueString(DEFAULT, true) : "N/A", b.getTopLeft().toInt().translated(2, 2), Anchor::TopLeft);
         }
 

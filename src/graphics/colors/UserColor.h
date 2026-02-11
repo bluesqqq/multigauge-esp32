@@ -13,7 +13,7 @@ class UserColor : public Color {
     private:
         Slot slot;
         
-        static uint16_t userColors[3];
+        static rgba userColors[3];
     
     public:
         UserColor(Slot slot = Slot::Primary);
@@ -24,7 +24,7 @@ class UserColor : public Color {
         
         /// @brief Gets the user-defined color value.
         /// @return The 16-bit color value
-        uint16_t getColor() const override;
+        rgba getColor() const override;
 
         /// @brief Gets the type of this color.
         /// @return Type::User
@@ -34,7 +34,7 @@ class UserColor : public Color {
         /// @param color The 16-bit color value to blend with
         /// @param alpha The blend amount (0.0 = this color, 1.0 = blend color)
         /// @return A new StaticColor object with the blended result
-        std::unique_ptr<Color> blended(uint16_t color, float alpha) const override;
+        std::unique_ptr<Color> blended(rgba color, float alpha) const override;
 
         /// @brief Blends this color with another Color object.
         /// @param color The Color object to blend with
