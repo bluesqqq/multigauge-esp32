@@ -77,7 +77,7 @@ static inline void parseFlagsTight(uint8_t& flags, std::string_view rhs, ParseEr
 
     // Reject any whitespace anywhere in flags.
     for (char c : rhs) {
-        if (isSpace(c)) { err = ParseError::BadFlags; return; }
+        if (isspace(c)) { err = ParseError::BadFlags; return; }
     }
 
     // Split on commas. Empty tokens are rejected.
@@ -104,7 +104,7 @@ static inline EmbedSpec parseEmbedInnerTight(std::string_view s) {
     if (s.empty()) { spec.error = ParseError::Empty; return spec; }
 
     for (char c : s) {
-        if (isSpace(c)) { spec.error = ParseError::TrailingJunk; return spec; }
+        if (isspace(c)) { spec.error = ParseError::TrailingJunk; return spec; }
     }
 
     std::string_view lhs, rhs;
@@ -114,9 +114,9 @@ static inline EmbedSpec parseEmbedInnerTight(std::string_view s) {
     size_t i = 0;
 
     if (lhs.empty()) { spec.error = ParseError::MissingName; return spec; }
-    if (!isLetter(lhs[0])) { spec.error = ParseError::BadNameChar; return spec; }
+    if (!isalpha(lhs[0])) { spec.error = ParseError::BadNameChar; return spec; }
 
-    while (i < lhs.size() && isLetterOrNumber(lhs[i])) i++;
+    while (i < lhs.size() && isalnum(lhs[i])) i++;
     spec.valueName = lhs.substr(0, i);
     if (spec.valueName.empty()) { spec.error = ParseError::MissingName; return spec; }
 

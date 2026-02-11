@@ -69,7 +69,7 @@
               "props": {
                 "radius": 0.5,
                 "color": {
-                  "fill": "#ff0000"
+                  "fill": "green"
                 }
               }
             }
