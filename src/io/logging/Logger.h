@@ -3,11 +3,6 @@
 #include <cstdarg>
 #include <cstdint>
 
-#define LOG_DEBUG(logger, tag, fmt, ...) (logger).log(LogLevel::Debug, tag, fmt, ##__VA_ARGS__)
-#define LOG_INFO(logger, tag, fmt, ...) (logger).log(LogLevel::Info,  tag, fmt, ##__VA_ARGS__)
-#define LOG_WARN(logger, tag, fmt, ...) (logger).log(LogLevel::Warn,  tag, fmt, ##__VA_ARGS__)
-#define LOG_ERROR(logger, tag, fmt, ...) (logger).log(LogLevel::Error, tag, fmt, ##__VA_ARGS__)
-
 enum class LogLevel : uint8_t {
     Debug,
     Info,
@@ -31,3 +26,11 @@ class Logger {
 
         void setMinLevel(LogLevel l);
 };
+
+Logger* getLogger();
+void setLogger(Logger& logger);
+
+#define LOG_DEBUG(tag, fmt, ...)  do { if (auto* _l = getLogger()) _l->log(LogLevel::Debug, tag, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_INFO(tag,  fmt, ...)  do { if (auto* _l = getLogger()) _l->log(LogLevel::Info,  tag, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_WARN(tag,  fmt, ...)  do { if (auto* _l = getLogger()) _l->log(LogLevel::Warn,  tag, fmt, ##__VA_ARGS__); } while (0)
+#define LOG_ERROR(tag, fmt, ...)  do { if (auto* _l = getLogger()) _l->log(LogLevel::Error, tag, fmt, ##__VA_ARGS__); } while (0)

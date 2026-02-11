@@ -32,37 +32,37 @@ static inline bool canDecodeBMP(const uint8_t* data, size_t size) {
     return data[0] == 'B' && data[1] == 'M';
 }
 
-static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
+static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
     out = ImageInfo{};
 
     if (!canDecodeBMP(data, size)) {
-        LOG_ERROR(log, "BMP", "Data is not a BMP.");
+        LOG_ERROR("BMP", "Data is not a BMP.");
         return false;
     }
 
     // BITMAPFILEHEADER
     uint32_t pixelOffset = 0;
     if (!read_u32(data, size, 10, pixelOffset)) {
-        LOG_ERROR(log, "BMP", "Truncated BMP header.");
+        LOG_ERROR("BMP", "Truncated BMP header.");
         return false;
     }
     if (pixelOffset >= size) {
-        LOG_ERROR(log, "BMP", "Pixel offset out of range.");
+        LOG_ERROR("BMP", "Pixel offset out of range.");
         return false;
     }
 
     // DIB header size
     uint32_t dibSize = 0;
     if (!read_u32(data, size, 14, dibSize)) {
-        LOG_ERROR(log, "BMP", "Missing DIB header.");
+        LOG_ERROR("BMP", "Missing DIB header.");
         return false;
     }
     if (14 + (size_t)dibSize > size) {
-        LOG_ERROR(log, "BMP", "Truncated DIB header.");
+        LOG_ERROR("BMP", "Truncated DIB header.");
         return false;
     }
     if (dibSize < 40) {
-        LOG_ERROR(log, "BMP", "Unsupported DIB header size: %u", (unsigned)dibSize);
+        LOG_ERROR("BMP", "Unsupported DIB header size: %u", (unsigned)dibSize);
         return false;
     }
 
@@ -76,16 +76,16 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         !read_u16(data, size, 28, bpp) ||
         !read_u32(data, size, 30, compression) ||
         !read_u32(data, size, 46, colorsUsed)) {
-        LOG_ERROR(log, "BMP", "Truncated BITMAPINFOHEADER.");
+        LOG_ERROR("BMP", "Truncated BITMAPINFOHEADER.");
         return false;
     }
 
     if (planes != 1) {
-        LOG_ERROR(log, "BMP", "Invalid planes (expected 1, got %u)", (unsigned)planes);
+        LOG_ERROR("BMP", "Invalid planes (expected 1, got %u)", (unsigned)planes);
         return false;
     }
     if (width <= 0 || height == 0) {
-        LOG_ERROR(log, "BMP", "Invalid dimensions (W=%d, H=%d)", (int)width, (int)height);
+        LOG_ERROR("BMP", "Invalid dimensions (W=%d, H=%d)", (int)width, (int)height);
         return false;
     }
 
@@ -94,13 +94,13 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
 
     // Reject RLE (you can add support later)
     if (compression == BI_RLE8 || compression == BI_RLE4) {
-        LOG_ERROR(log, "BMP", "RLE compressed BMP not supported (compression=%u).", (unsigned)compression);
+        LOG_ERROR("BMP", "RLE compressed BMP not supported (compression=%u).", (unsigned)compression);
         return false;
     }
 
     // Allow only these compression modes
     if (!(compression == BI_RGB || compression == BI_BITFIELDS || compression == BI_ALPHABITFIELDS)) {
-        LOG_ERROR(log, "BMP", "Unsupported BMP compression: %u", (unsigned)compression);
+        LOG_ERROR("BMP", "Unsupported BMP compression: %u", (unsigned)compression);
         return false;
     }
 
@@ -112,7 +112,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         if (!read_u32(data, size, masksOffset + 0, rMask) ||
             !read_u32(data, size, masksOffset + 4, gMask) ||
             !read_u32(data, size, masksOffset + 8, bMask)) {
-            LOG_ERROR(log, "BMP", "Missing BITFIELDS masks.");
+            LOG_ERROR("BMP", "Missing BITFIELDS masks.");
             return false;
         }
         if (masksOffset + 16 <= size) {
@@ -138,7 +138,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         const size_t palBytes = (size_t)paletteEntries * 4;
 
         if (palOffset + palBytes > size) {
-            LOG_ERROR(log, "BMP", "Truncated palette.");
+            LOG_ERROR("BMP", "Truncated palette.");
             return false;
         }
 
@@ -169,12 +169,12 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
     const size_t pixelBase = (size_t)pixelOffset;
 
     if (pixelBase >= size) {
-        LOG_ERROR(log, "BMP", "Pixel data starts out of bounds.");
+        LOG_ERROR("BMP", "Pixel data starts out of bounds.");
         return false;
     }
     if (pixelBase + inStride * (size_t)outH > size) {
         // allow if file is slightly truncated? No, fail to be safe.
-        LOG_ERROR(log, "BMP", "Pixel data truncated (need %u bytes).", (unsigned)(inStride * (size_t)outH));
+        LOG_ERROR("BMP", "Pixel data truncated (need %u bytes).", (unsigned)(inStride * (size_t)outH));
         return false;
     }
 
@@ -243,7 +243,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         }
         else if (bpp == 8) {
             if (palette.empty()) {
-                LOG_ERROR(log, "BMP", "8bpp BMP missing palette.");
+                LOG_ERROR("BMP", "8bpp BMP missing palette.");
                 return false;
             }
             for (int x = 0; x < outW; ++x) {
@@ -257,7 +257,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         }
         else if (bpp == 4) {
             if (palette.empty()) {
-                LOG_ERROR(log, "BMP", "4bpp BMP missing palette.");
+                LOG_ERROR("BMP", "4bpp BMP missing palette.");
                 return false;
             }
             for (int x = 0; x < outW; ++x) {
@@ -272,7 +272,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
         }
         else if (bpp == 1) {
             if (palette.empty()) {
-                LOG_ERROR(log, "BMP", "1bpp BMP missing palette.");
+                LOG_ERROR("BMP", "1bpp BMP missing palette.");
                 return false;
             }
             for (int x = 0; x < outW; ++x) {
@@ -287,7 +287,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out, L
             }
         }
         else {
-            LOG_ERROR(log, "BMP", "Unsupported bpp: %u", (unsigned)bpp);
+            LOG_ERROR("BMP", "Unsupported bpp: %u", (unsigned)bpp);
             return false;
         }
     }
@@ -304,11 +304,11 @@ static inline bool canDecodePNG(const uint8_t* data, size_t size) {
            data[4] == 0x0D && data[5] == 0x0A && data[6] == 0x1A && data[7] == 0x0A;
 }
 
-static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
+static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out) {
     out = ImageInfo{};
 
     if (!canDecodePNG(data, size)) {
-        LOG_ERROR(log, "PNG", "Data is not a PNG.");
+        LOG_ERROR("PNG", "Data is not a PNG.");
         return false;
     }
 
@@ -317,12 +317,12 @@ static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, L
 
     const unsigned err = lodepng::decode(rgba, w, h, data, size);
     if (err != 0) {
-        LOG_ERROR(log, "PNG", "Decode failed: %s", lodepng_error_text(err));
+        LOG_ERROR("PNG", "Decode failed: %s", lodepng_error_text(err));
         return false;
     }
 
     if (w == 0 || h == 0) {
-        LOG_ERROR(log, "PNG", "Invalid dimensions (W=%u, H=%u).", w, h);
+        LOG_ERROR("PNG", "Invalid dimensions (W=%u, H=%u).", w, h);
         return false;
     }
 
@@ -330,7 +330,7 @@ static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out, L
     const size_t needBytes = pxCount * 4;
 
     if (rgba.size() < needBytes) {
-        LOG_ERROR(log, "PNG", "Truncated RGBA buffer (have=%u need=%u).",
+        LOG_ERROR("PNG", "Truncated RGBA buffer (have=%u need=%u).",
                   (unsigned)rgba.size(), (unsigned)needBytes);
         return false;
     }
@@ -460,11 +460,11 @@ static int tjpgd_out_cb(JDEC* jd, void* bitmap, JRECT* rect) {
     return 1; // non-zero tells tjpgd to continue
 }
 
-static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out, Logger& log) {
+static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out) {
     out = ImageInfo{};
 
     if (!canDecodeJPG(data, size)) {
-        LOG_ERROR(log, "JPG", "Data is not a JPG.");
+        LOG_ERROR("JPG", "Data is not a JPG.");
         return false;
     }
 
@@ -482,13 +482,13 @@ static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out, L
     JDEC jd;
     JRESULT res = jd_prepare(&jd, tjpgd_in_cb, work, sizeof(work), &src);
     if (res != JDR_OK) {
-        LOG_ERROR(log, "JPG", "jd_prepare failed (%d).", (int)res);
+        LOG_ERROR("JPG", "jd_prepare failed (%d).", (int)res);
         return false;
     }
 
     // Dimensions are available after prepare
     if (jd.width == 0 || jd.height == 0) {
-        LOG_ERROR(log, "JPG", "Invalid dimensions (W=%u H=%u).", (unsigned)jd.width, (unsigned)jd.height);
+        LOG_ERROR("JPG", "Invalid dimensions (W=%u H=%u).", (unsigned)jd.width, (unsigned)jd.height);
         return false;
     }
 
@@ -501,7 +501,7 @@ static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out, L
 
     res = jd_decomp(&jd, tjpgd_out_cb, scale);
     if (res != JDR_OK) {
-        LOG_ERROR(log, "JPG", "jd_decomp failed (%d).", (int)res);
+        LOG_ERROR("JPG", "jd_decomp failed (%d).", (int)res);
         return false;
     }
 

@@ -13,7 +13,6 @@ class AssetManager {
     private:
         FileSystem& fs;
         GraphicsContext& ctx;
-        Logger& log;
 
         enum class ImageType {
             Unknown,
@@ -46,7 +45,7 @@ class AssetManager {
         }
 
     public:
-        AssetManager(FileSystem& fs, GraphicsContext& ctx, Logger& log) : fs(fs), ctx(ctx), log(log) {}
+        AssetManager(FileSystem& fs, GraphicsContext& ctx) : fs(fs), ctx(ctx) {}
 
         bool loadJson(const std::string& path, rapidjson::Document& out);
 

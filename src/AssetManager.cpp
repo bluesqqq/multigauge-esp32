@@ -4,12 +4,12 @@
 bool AssetManager::loadJson(const std::string &path, rapidjson::Document &out) {
     std::vector<uint8_t> bytes;
     if (!fs.readAll(path, bytes)) {
-        LOG_ERROR(log, "asset", "loadJson: readAll failed: %s", path.c_str());
+        LOG_ERROR("asset", "loadJson: readAll failed: %s", path.c_str());
         return false;
     }
 
     if (bytes.empty()) {
-        LOG_ERROR(log, "asset", "loadJson: empty file: %s", path.c_str());
+        LOG_ERROR("asset", "loadJson: empty file: %s", path.c_str());
         return false;
     }
 
@@ -23,7 +23,7 @@ bool AssetManager::loadJson(const std::string &path, rapidjson::Document &out) {
     if (out.HasParseError()) {
         const auto code = out.GetParseError();
         const size_t off = out.GetErrorOffset();
-        LOG_ERROR(log, "asset", "loadJson: parse error: %s (offset=%u) file=%s", rapidjson::GetParseErrorFunc(code), (unsigned)off, path.c_str());
+        LOG_ERROR("asset", "loadJson: parse error: %s (offset=%u) file=%s", rapidjson::GetParseErrorFunc(code), (unsigned)off, path.c_str());
         return false;
     }
 
@@ -32,18 +32,18 @@ bool AssetManager::loadJson(const std::string &path, rapidjson::Document &out) {
 
 bool AssetManager::loadImage(const std::string &path, Image &out) {
     if (!fs.exists(path)) {
-        LOG_ERROR(log, "asset", "Image does not exist: %s", path.c_str());
+        LOG_ERROR("asset", "Image does not exist: %s", path.c_str());
         return false;
     }
 
     std::vector<uint8_t> data;
     if (!fs.readAll(path, data)) {
-        LOG_ERROR(log, "asset", "Failed to read image: %s", path.c_str());
+        LOG_ERROR("asset", "Failed to read image: %s", path.c_str());
         return false;
     }
 
     if (data.empty()) {
-        LOG_ERROR(log, "asset", "Image is empty: %s", path.c_str());
+        LOG_ERROR("asset", "Image is empty: %s", path.c_str());
         return false;
     }
 
@@ -53,23 +53,23 @@ bool AssetManager::loadImage(const std::string &path, Image &out) {
 
     switch (type) {
         case ImageType::BMP: {
-            LOG_DEBUG(log, "asset", "decoding BMP: %s", path.c_str());
-            if (!decodeBMP(data.data(), data.size(), info, log)) return false;
+            LOG_DEBUG("asset", "decoding BMP: %s", path.c_str());
+            if (!decodeBMP(data.data(), data.size(), info)) return false;
             break;
         }
 
         case ImageType::PNG:
-            LOG_DEBUG(log, "asset", "decoding PNG: %s", path.c_str());
-            if (!decodePNG(data.data(), data.size(), info, log)) return false;
+            LOG_DEBUG("asset", "decoding PNG: %s", path.c_str());
+            if (!decodePNG(data.data(), data.size(), info)) return false;
             break;
 
         case ImageType::JPG:
-            LOG_DEBUG(log, "asset", "decoding JPG: %s", path.c_str());
-            if (!decodeJPG(data.data(), data.size(), info, log)) return false;
+            LOG_DEBUG("asset", "decoding JPG: %s", path.c_str());
+            if (!decodeJPG(data.data(), data.size(), info)) return false;
             break;
 
         default:
-            LOG_DEBUG(log, "asset", "Unsupported image format: %s", path.c_str());
+            LOG_DEBUG("asset", "Unsupported image format: %s", path.c_str());
             return false;
     }
     

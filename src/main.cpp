@@ -40,15 +40,16 @@ namespace mg {
 GraphicsContextLovyanGFX context = GraphicsContextLovyanGFX();
 Graphics g(&context);
 
-AssetManager assetManager = AssetManager(fileSystem, context, logger);
+AssetManager assetManager = AssetManager(fileSystem, context);
 
 static std::unique_ptr<GaugeFace> face;
 
 void setup() { 
+    setLogger(logger);
     logger.init();
 
-    if (!fileSystem.init()) LOG_ERROR(logger, "file", "FileSystem failed to mount.");
-    else LOG_INFO(logger, "file", "FileSystem successfully mounted.");
+    if (!fileSystem.init()) LOG_ERROR("file", "FileSystem failed to mount.");
+    else LOG_INFO("file", "FileSystem successfully mounted.");
 
     std::vector<std::string> dirs;
     fileSystem.listDirectories("/", dirs);
@@ -58,10 +59,10 @@ void setup() {
     rapidjson::Document doc;
     if (assetManager.loadJson("/gauge.json", doc)) {
         face = std::make_unique<GaugeFace>(doc);
-        LOG_INFO(logger, "gauge", "Successfully loaded test gaugeface file.");
+        LOG_INFO("gauge", "Successfully loaded test gaugeface file.");
     } else {
         face = std::make_unique<GaugeFace>();
-        LOG_INFO(logger, "gauge", "Failed to load test gaugeface file.");
+        LOG_INFO("gauge", "Failed to load test gaugeface file.");
     }
 
     face->initRecursive(assetManager);
@@ -90,7 +91,7 @@ uint32_t currentTime = mg::clock.getMicros();
 
     if (t % 60 == 0) {
         float fps = 1000000.0f / (float)deltaUs;
-        LOG_INFO(logger, "perf", "fps=%.2f dt_us=%u", fps, (unsigned)deltaUs);
+        LOG_INFO("perf", "fps=%.2f dt_us=%u", fps, (unsigned)deltaUs);
     }
 
     t++;
