@@ -57,7 +57,7 @@ void setup() {
     context.init();
 
     rapidjson::Document doc;
-    if (assetManager.loadJson("/gauge.json", doc)) {
+    if (assetManager.loadJson("/gauges/gauge.json", doc)) {
         face = std::make_unique<GaugeFace>(doc);
         LOG_INFO("gauge", "Successfully loaded test gaugeface file.");
     } else {

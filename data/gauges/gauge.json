@@ -1,0 +1,22 @@
+{
+	"$schema": "../../src/gauge.schema.json",
+	"style": { "width": "100%", "height": "100%", "padding": { "all": 6 } },
+	"props": { "backgroundColor": "#000000", "title": "RPM Schematic" },
+	"children": [
+		{
+			"type": "circular-scale",
+			"props": {
+				"radius": 5,
+				"startAngle": 0,
+				"endAngle": 180,
+				"ticks": {
+					"root": {
+						"color": {
+							"fill": { "loopType": "forward", "type": "time", "timeline":"white" }
+						}
+					}
+				}
+			}
+		}
+	]
+}

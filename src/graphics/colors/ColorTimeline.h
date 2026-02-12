@@ -39,7 +39,7 @@ class ColorTimeline {
 
         ColorTimeline(rgba color);
 
-        ColorTimeline(const rapidjson::Value::ConstArray json);
+        ColorTimeline(const rapidjson::Value& json);
 
         ColorTimeline(const ColorTimeline& other);
 

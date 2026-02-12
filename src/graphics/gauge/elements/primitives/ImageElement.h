@@ -5,7 +5,7 @@
 
 class ImageElement : public Element {
     private:
-        std::string path;
+        const char* path = "";
 
         Image image;
 

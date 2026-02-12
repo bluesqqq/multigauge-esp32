@@ -13,8 +13,8 @@ struct RootTick {
 
     bool useDivisions = true;
 
-    float length;
-    float thickness;
+    float length = 0;
+    float thickness= 0;
 
     TickStyle style = TickStyle::LINE;
     FillStrokeTimeline color;

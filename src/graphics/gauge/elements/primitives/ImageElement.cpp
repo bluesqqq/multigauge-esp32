@@ -6,8 +6,7 @@ ImageElement::ImageElement(Element* parent, const rapidjson::Value::ConstObject 
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("path") && props["path"].IsString())
-        path = props["path"].GetString();
+    setCString(props, "path", path);
 }
 
 bool ImageElement::init(AssetManager &assetManager) {

@@ -61,6 +61,10 @@ class UnitType {
         /// @param abbreviations If true, returns the unit abbreviations; if false, returns the unit names/
         /// @return A vector of pointers to the unit strings (const char*).
         std::vector<const char*> listUnitStrings(bool abbreviations = false) const;
+
+        int getIndexFromName(const char* name);
+
+        int getIndexFromAbbreviation(const char* abbreviation);
 };
 
 extern UnitType temperature;

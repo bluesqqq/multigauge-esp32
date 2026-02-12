@@ -5,6 +5,7 @@
 #include "rapidjson/document.h"
 #include <memory>
 #include "values/value.h"
+#include "json/rj_helpers.h"
 
 #define DEFAULT_COLOR { 0, 0, 0, 255}
 
@@ -50,6 +51,23 @@ class Color {
         /// @return A new Color object with the blended result
         virtual std::unique_ptr<Color> blended(const Color& color, float alpha) const = 0;
 };
+
+inline bool setColor(const rapidjson::Value::ConstObject &json, const char *key, std::unique_ptr<Color>& out) {
+    auto it = json.FindMember(key);
+    if (it == json.MemberEnd()) return false;
+
+    const auto& v = it->value;
+
+    if (v.IsNull()) { out.reset(); return true; }
+    auto color = Color::fromJson(v);
+    if (!color) {
+        LOG_WARN("setColor", "Key '%s' could not be parsed as Color from %s", key, rjTypeName(v));
+        return false;
+    }
+
+    out = std::move(color);
+    return true;
+}
 
 //----------[ FILL STROKE ]----------//
 

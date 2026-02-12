@@ -32,8 +32,11 @@ bool AssetManager::loadJson(const std::string &path, rapidjson::Document &out) {
     return true;
 }
 
-bool AssetManager::loadImage(const std::string &path, Image &out) {
+bool AssetManager::loadImage(const std::string &p, Image &out) {
     constexpr const char* TAG = "AssetManager::loadImage";
+
+    const std::string path = "/assets/images/" + p;
+
     if (!fs.exists(path)) {
         LOG_ERROR(TAG, "Image does not exist: %s", path.c_str());
         return false;

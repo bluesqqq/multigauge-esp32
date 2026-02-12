@@ -45,9 +45,21 @@ ColorTimeline::ColorTimeline() {}
 
 ColorTimeline::ColorTimeline(rgba color) { addKeyframe(color, 0.0f); }
 
-ColorTimeline::ColorTimeline(const rapidjson::Value::ConstArray json) {
-    for (const auto& keyframe : json)
-        if (keyframe.IsObject()) keyframes.emplace_back(ColorKeyframe(keyframe.GetObject()));
+ColorTimeline::ColorTimeline(const rapidjson::Value &json) {
+    if (json.IsString() || json.IsObject()) {
+        addKeyframe(Color::fromJson(json), 0.0f);
+        return;
+    }
+
+    if (json.IsArray()) {
+        for (const auto& keyframe : json.GetArray()) {
+            if (keyframe.IsObject()) keyframes.emplace_back(ColorKeyframe(keyframe.GetObject()));
+            else LOG_WARN("ColorTimeline", "Bad entry type: %s", rjTypeName(keyframe));
+        }
+        return;
+    }
+
+    LOG_WARN("ColorTimeline", "Bad timeline type: %s", rjTypeName(json));
 }
 
 ColorTimeline::ColorTimeline(const ColorTimeline &other) {
@@ -193,9 +205,9 @@ std::vector<rgba> ColorTimeline::sample(float startPosition, float endPosition, 
 FillStrokeTimeline::FillStrokeTimeline(ColorTimeline f, ColorTimeline s, float t) : fill(f), stroke(s), thickness(t) {}
 
 FillStrokeTimeline::FillStrokeTimeline(const rapidjson::Value::ConstObject json) {
-    if (json.HasMember("fill") && json["fill"].IsArray())     fill = ColorTimeline(json["fill"].GetArray());
-    if (json.HasMember("stroke") && json["stroke"].IsArray()) stroke = ColorTimeline(json["stroke"].GetArray());
-    if (json.HasMember("thickness") && json["thickness"].IsNumber()) thickness = json["thickness"].GetFloat();
+    setValue(json, "fill", fill);
+    setValue(json, "stroke", stroke);
+    setFloat(json, "thickness", thickness);
 }
 
 FillStrokeTimeline FillStrokeTimeline::blended(rgba color, float alpha) const {

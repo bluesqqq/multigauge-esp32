@@ -12,13 +12,12 @@ struct TickValueStyle {
 
     TextStyle textStyle;
 
-    int spacing;
+    int spacing = 1;
 
-    bool flipValuesPosition;
+    bool flipValuesPosition = false;
 
     TickValueStyle(const rapidjson::Value::ConstObject& json) {
-        if (json.HasMember("color") && json["color"].IsArray()) color = ColorTimeline(json["color"].GetArray());
-
+        setValue(json, "color", color);
         setObj(json, "textStyle", textStyle);
         setInt(json, "spacing", spacing);
         setBool(json, "flipValuesPosition", flipValuesPosition);

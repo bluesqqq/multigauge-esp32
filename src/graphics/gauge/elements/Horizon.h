@@ -74,7 +74,7 @@ class Horizon : public Element {
                 float posX = left + i + shift;
 
                 float localX = (posX - left);
-                float localHalf = b.height / 2.0f;
+                float localHalf = b.width / 2.0f;
 
                 float endXLocal = (localX - localHalf) * horizonVAngle + localHalf;
                 float endX = left + endXLocal;

@@ -8,7 +8,7 @@ UnitType::UnitType(const char* baseName, const char* baseAbbreviation, uint8_t b
     setDefaultUnit(defaultUnitIndex);
 }
 
-void UnitType::setDefaultUnit(uint8_t index) { defaultUnitIndex = (index < units.size()) ? index : 0; }
+void UnitType::setDefaultUnit(uint8_t index) { defaultUnitIndex = (index >= 0 && index < units.size()) ? index : 0; }
 
 float UnitType::convert(float value, int fromIndex, int toIndex) const {
     if (fromIndex == toIndex) return value;
@@ -46,6 +46,20 @@ std::vector<const char*> UnitType::listUnitStrings(bool abbreviations) const {
         result.push_back(abbreviations ? unit.abbreviation : unit.name);
 
     return result;
+}
+
+int UnitType::getIndexFromName(const char *name) {
+    if (!name) return DEFAULT_UNIT;
+    for (uint8_t i = 0; i < units.size(); ++i)
+        if (strcmp(name, units[i].name) == 0) return i;
+    return DEFAULT_UNIT;
+}
+
+int UnitType::getIndexFromAbbreviation(const char *abbreviation) {
+    if (!abbreviation) return DEFAULT_UNIT;
+    for (uint8_t i = 0; i < units.size(); ++i)
+        if (strcmp(abbreviation, units[i].abbreviation) == 0) return i;
+    return DEFAULT_UNIT;
 }
 
 UnitType temperature(

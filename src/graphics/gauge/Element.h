@@ -8,6 +8,7 @@
 #include <rapidjson/document.h>
 
 #include "AssetManager.h"
+#include "json/rj_helpers.h"
 
 #define MAX_ELEMENT_REGISTRY_SIZE 64
 

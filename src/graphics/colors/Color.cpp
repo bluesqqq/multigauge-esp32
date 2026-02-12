@@ -4,7 +4,7 @@
 #include "ValueColor.h"
 #include "TimeColor.h"
 
-const ColorTimeline * Color::getTimeline() const { return nullptr; }
+const ColorTimeline* Color::getTimeline() const { return nullptr; }
 
 std::unique_ptr<Color> Color::fromJson(const rapidjson::Value& json) {
     // Parse string as rgba

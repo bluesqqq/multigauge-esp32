@@ -1,5 +1,7 @@
 #include "graphics/gauge/Element.h"
 
+#include "graphics/DisplayValue.h"
+
 struct TimeValue {
     float Value;
     unsigned long Time;
@@ -15,34 +17,22 @@ class Graph : public Element {
         std::unique_ptr<Color> secondsStrokeColor;
         std::unique_ptr<Color> graphStrokeColor;
 
-        Value* value;
+        DisplayValue value;
         float minimum = 0.0f;
         float maximum = 100.0f;
         std::vector<TimeValue> valueMemory;
 
     public:
-        explicit Graph(Element* parent, Value* val) : Element(parent), value(val) {
-            if (value) {
-                minimum = value->getMinimumBase();
-                maximum = value->getMaximumBase();
-            }
-            valueMemory.insert(valueMemory.begin(), {4000, 0});
-        }
-
         Graph(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
             if (!json.HasMember("props") || !json["props"].IsObject()) return;
             const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-            if (props.HasMember("value") && props["value"].IsString())
-                value = Value::find(props["value"].GetString());
+            setObj(props, "value", value);
 
-            if (value) {
-                minimum = value->getMinimumBase();
-                maximum = value->getMaximumBase();
-            }
+            minimum = value.getMinimumBase();
+            maximum = value.getMaximumBase();
 
-            if (props.HasMember("backgroundColor") && props["backgroundColor"].IsObject())
-                backgroundColor = FillStroke(props["backgroundColor"].GetObject());
+            setObj(props, "backgroundColor", backgroundColor);
 
             if (props.HasMember("secondsColor"))
                 secondsStrokeColor = Color::fromJson(props["secondsColor"]);
@@ -148,13 +138,13 @@ class Graph : public Element {
             }
 
             g.setTextColor(rgb(255, 255, 255));
-            g.drawText(value ? value->getValueString(DEFAULT, true) : "N/A", b.getTopLeft().toInt().translated(2, 2), Anchor::TopLeft);
+            g.drawText(value.getValueString(), b.getTopLeft().toInt().translated(2, 2), Anchor::TopLeft);
         }
 
         void update(int deltaTime) override {
             unsigned long currentTime = millis();
 
-            if (value) valueMemory.insert(valueMemory.begin(), {value->getValueBase(), currentTime});
+            valueMemory.insert(valueMemory.begin(), {value.getValueBase(), currentTime});
 
             // remove expired values
             auto it = std::find_if(valueMemory.begin(), valueMemory.end(), [currentTime, this](const TimeValue& tv) {

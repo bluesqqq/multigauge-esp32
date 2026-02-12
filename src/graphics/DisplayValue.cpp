@@ -1,5 +1,7 @@
 #include "DisplayValue.h"
 
+#include "json/rj_helpers.h"
+
 int DisplayValue::getUnitIndex() const { return unitIndex.has_value() ? unitIndex.value() : DEFAULT_UNIT; }
 
 DisplayValue::DisplayValue() {}
