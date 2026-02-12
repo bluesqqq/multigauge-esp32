@@ -22,8 +22,7 @@ struct TextStyle {
         if (json.HasMember("family") && json["family"].IsString())
             family = json["family"].GetString();
 
-        if (json.HasMember("pt") && json["pt"].IsNumber())
-            pt = json["pt"].GetFloat();
+        setFloat(json, "pt", pt);
 
         if (json.HasMember("weight") && json["weight"].IsString()) {
             const char* w = json["weight"].GetString();

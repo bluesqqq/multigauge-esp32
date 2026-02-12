@@ -9,7 +9,18 @@
 class LittleFsFileSystem : public FileSystem {
     public:
         bool init() override {
-            return LittleFS.begin(true);
+            if (LittleFS.begin(false)) {
+                size_t totalB = LittleFS.totalBytes();
+                size_t usedB  = LittleFS.usedBytes();
+
+                LOG_INFO("FS::init", "LittleFS mounted: used=%u KB / total=%u KB",
+                        (unsigned)(usedB  / 1024u),
+                        (unsigned)(totalB / 1024u));
+                return true;
+            }
+
+            LOG_ERROR("LittleFsFileSystem::init", "LittleFS failed to mount");
+            return false;
         }
 
         bool readAll(const std::string& path, std::vector<uint8_t>& out) override {

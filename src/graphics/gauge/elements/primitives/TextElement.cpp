@@ -9,16 +9,12 @@ TextElement::TextElement(Element* parent, const rapidjson::Value::ConstObject js
     if (props.HasMember("text") && props["text"].IsString())
         text = props["text"].GetString();
 
-    if (props.HasMember("textStyle") && props["textStyle"].IsObject())
-        textStyle =TextStyle(props["textStyle"].GetObject());
+   setObj(props, "textStyle", textStyle);
 
     // TODO: Add anchor parsing
 
-    if (props.HasMember("ellipses") && props["ellipses"].IsBool())
-        useEllipses = props["ellipses"].GetBool();
-
-    if (props.HasMember("hyphens") && props["hyphens"].IsBool())
-        useHyphens = props["hyphens"].GetBool();
+    setBool(props, "ellipses", useEllipses);
+    setBool(props, "hyphens", useHyphens);
 }
 
 void TextElement::draw(Graphics &g) const {

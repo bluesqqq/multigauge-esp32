@@ -6,8 +6,7 @@ CircleElement::CircleElement(Element* parent, const rapidjson::Value::ConstObjec
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("color") && props["color"].IsObject())
-        color = FillStroke(props["color"].GetObject());
+    setObj(props, "color", color);
 }
 
 void CircleElement::draw(Graphics &g) const {

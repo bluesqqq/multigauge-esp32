@@ -6,11 +6,8 @@ RectangleElement::RectangleElement(Element* parent, const rapidjson::Value::Cons
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("color") && props["color"].IsObject())
-        color = FillStroke(props["color"].GetObject());
-
-    if (props.HasMember("radius") && props["radius"].IsNumber())
-        radius = props["radius"].GetFloat();
+    setObj(props, "color", color);
+    setFloat(props, "radius", radius);
 }
 
 void RectangleElement::draw(Graphics &g) const {

@@ -14,7 +14,7 @@ class GraphicsContext {
 
     public:
         /// @brief Called once during initialization
-        virtual void init() {}
+        virtual bool init() {}
 
         /// @brief Called before drawing a new frame
         virtual void beginFrame() {};

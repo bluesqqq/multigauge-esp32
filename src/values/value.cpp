@@ -1,5 +1,6 @@
 #include "value.h"
 #include <Arduino.h>
+#include "io/logging/Logger.h"
 
 std::unordered_map<std::string, Value*> Value::registry;
 
@@ -10,7 +11,11 @@ Value::Value(const char* id, const char* name, const UnitType& unitType, float m
 
 Value *Value::find(const std::string& id) {
     auto it = registry.find(id);
-    return (it != registry.end()) ? it->second : nullptr;
+    if (it != registry.end()) return it->second;
+
+    LOG_WARN("Value::find", "Unknown value id '%s' (returning nullptr)", id.c_str());
+
+    return nullptr;
 }
 
 Value::operator float() const { return getValueBase(); }

@@ -1,6 +1,6 @@
 #include "GraphicsContextTFT_eSPI.h"
 
-void GraphicsContextTFT_eSPI::init() {
+bool GraphicsContextTFT_eSPI::init() {
     display.init();
     display.setRotation(1);
     display.fillScreen(TFT_BLACK);

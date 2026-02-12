@@ -95,18 +95,31 @@ void GraphicsContextLovyanGFX::setFontInternal(std::string family, float pt, Fon
     buffer.setTextSize(pt / currentFontPoint);
 }
 
-void GraphicsContextLovyanGFX::init() {
-    display.init();
+bool GraphicsContextLovyanGFX::init() {
+    LOG_INFO("GraphicsContextLovyanGFX::init", "Starting...");
+    
+    if (!display.init()) {
+        LOG_ERROR("GFX::init", "display.init() failed");
+        return false;
+
+    }
+
     display.setBrightness(255);
     display.setRotation(0);
-    display.fillScreen(TFT_RED);
-
-    buffer.setColorDepth(16);
-    buffer.setPsram(false);
-    buffer.createSprite(display.width(), display.height());
 
     width = display.width();
     height = display.height();
+
+    if (width <= 0 || height <= 0) {
+        LOG_ERROR("GFX::init", "Display reported invalid size %dx%d", width, height);
+        return false;
+    }
+
+    LOG_INFO("GFX::init", "Display ok: size=%dx%d rotation=%d brightness=%d", width, height, 0, 255);
+
+    buffer.setColorDepth(16);
+    buffer.setPsram(false);
+    buffer.createSprite(width, height);
 
     // Font registry system
 

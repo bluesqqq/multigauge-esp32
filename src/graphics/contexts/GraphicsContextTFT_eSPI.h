@@ -11,7 +11,7 @@ class GraphicsContextTFT_eSPI : public GraphicsContext {
     public:
         GraphicsContextTFT_eSPI() : display(TFT_eSPI()), buffer(&this->display) {}
 
-        void init() override;
+        bool init() override;
 
         void endFrame() override;
 

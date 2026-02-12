@@ -54,7 +54,7 @@ class GraphicsContextLovyanGFX : public GraphicsContext {
     public:
         GraphicsContextLovyanGFX() : display(LGFX()), buffer(&this->display) {}
 
-        void init() override;
+        bool init() override;
 
         void endFrame() override;
 
