@@ -10,6 +10,8 @@ bool GraphicsContextTFT_eSPI::init() {
 
     width = display.width();
     height = display.height();
+
+    return true;
 }
 
 void GraphicsContextTFT_eSPI::endFrame() {

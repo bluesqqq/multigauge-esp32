@@ -1,77 +1,118 @@
 {
   "type": "gaugeface",
-  "style": {
-    "width": "100%",
-    "height": "100%",
-    "padding": { "all": 6 }
-  },
-  "props": {
-    "backgroundColor": "#000000",
-    "title": "Scale Only"
-  },
+  "style": { "width": "100%", "height": "100%", "padding": { "all": 6 } },
+  "props": { "backgroundColor": "#000000", "title": "RPM Schematic" },
   "children": [
     {
       "type": "rectangle",
-      "style": {
-        "width": "100%",
-        "height": "100%",
-        "padding": { "all": 8 },
-        "flex": { "justify": "center", "align": "center" }
-      },
+      "style": { "width": "100%", "height": "100%", "padding": { "all": 10 } },
       "props": {
-        "radius": 10,
-        "color": { "fill": "#192831", "stroke": "#21c65a", "thickness": 1 }
+        "radius": 14,
+        "color": { "fill": "#050505", "stroke": "#ffffff", "thickness": 2 }
       },
       "children": [
         {
-          "type": "circular-scale",
-          "style": "inherit",
+          "type": "rectangle",
+          "style": {
+            "width": "100%",
+            "height": "100%",
+            "padding": { "all": 10 },
+            "gap": { "row": 8 },
+            "flex": { "direction": "column", "justify": "start", "align": "center" }
+          },
           "props": {
-            "radius": 0.8,
-            "startAngle": -135,
-            "endAngle": 135,
-            "value": {
-              "id": "engineRPM",
-              "min": 0,
-              "max": 8000,
-              "unitIndex": 0
-            },
-            "ticks": {
-              "offset": 0,
-              "root": {
-                "useDivisions": true,
-                "divisions": 8,
-                "length": 10,
-                "thickness": 3,
-                "color": {
-                  "fill": [
-                    { "position": 0.0, "color": "#ffffff" }
-                  ],
-                  "stroke": [
-                    { "position": 0.0, "color": "#000000" }
-                  ],
-                  "thickness": 1
-                }
-              },
-              "subs": [
-                {
-                  "divisions": 4,
-                  "thickness": 2,
-                  "length": 5
-                }
-              ]
-            }
+            "radius": 12,
+            "color": { "fill": "#0b0b0b", "stroke": "#2a2a2a", "thickness": 1 }
           },
           "children": [
             {
-              "type": "circular-needle",
-              "style": "inherit",
+              "type": "rectangle",
+              "style": {
+                "width": "100%",
+                "flex": { "grow": 1, "shrink": 1, "justify": "center", "align": "center" },
+                "padding": { "all": 6 }
+              },
               "props": {
-                "radius": 0.5,
-                "color": {
-                  "fill": "green"
+                "radius": 10,
+                "color": { "fill": "#0f0f0f", "stroke": "#3a3a3a", "thickness": 1 }
+              },
+              "children": [
+                {
+                  "type": "image",
+                  "style": { "width": "100%", "height": "100%" },
+                  "props": {
+                    "path": "/test.png"
+                  }
                 }
-              }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "style": {
+                "width": "100%",
+                "flex": { "grow": 3, "shrink": 1, "justify": "center", "align": "center" }
+              },
+              "props": {
+                "radius": 10,
+                "color": { "fill": "#000000", "stroke": "#2a2a2a", "thickness": 1 }
+              },
+              "children": [
+                {
+                  "type": "horizon",
+                  "style": { "width": "100%", "height": "100%" },
+                  "props": {
+                    "backgroundColor": "#1a1a1a",
+                    "groundColor": "#2b0000",
+                    "horizonColor": "#8b0000",
+                    "borderColor": "#ff2d2d"
+                  },
+                  "children": [
+                    {
+                      "type": "circular-scale",
+                      "style": "inherit",
+                      "props": {
+                        "radius": 0.80,
+                        "startAngle": -140,
+                        "endAngle": 140,
+                        "value": { "id": "engineRPM", "min": 0, "max": 8000, "unitIndex": 0 },
+                        "ticks": {
+                          "offset": 0,
+                          "root": {
+                            "useDivisions": false,
+                            "interval": 1000,
+                            "length": 6,
+                            "thickness": 2,
+                            "color": {
+                              "fill": [
+                                { "position": 0, "color": "#bdbdbd" },
+                                { "position": 6000, "color": "#ffffff" },
+                                { "position": 8000, "color": "#ff2d2d" }
+                              ],
+                              "stroke": [
+                                { "position": 0.0, "color": "#000000" }
+                              ],
+                              "thickness": 1
+                            }
+                          },
+                          "subs": [
+                            { "divisions": 1, "thickness": 1, "length": 3 }
+                          ]
+                        }
+                      },
+                      "children": [
+                        {
+                          "type": "circular-needle",
+                          "style": "inherit",
+                          "props": {
+                            "radius": 0.5,
+                            "color": { "fill": "#ffffff" }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }

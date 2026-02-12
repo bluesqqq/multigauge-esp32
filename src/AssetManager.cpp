@@ -75,8 +75,9 @@ bool AssetManager::loadImage(const std::string &path, Image &out) {
             LOG_DEBUG(TAG, "Unsupported image format: %s", path.c_str());
             return false;
     }
+
+    LOG_INFO(TAG, "Successfully loaded image: %s, w=%d, h=%d", path.c_str(), info.width, info.height);
     
-    //out = ctx.createNativeImage(info.pixels.data(), info.width, info.height);
-    // TODO: FIX THIS TOO!!
+    out = ctx.createNativeImage(info.pixels.data(), info.width, info.height);
     return true;
 }

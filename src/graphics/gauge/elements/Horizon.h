@@ -14,12 +14,28 @@ class Horizon : public Element {
         float zPosition = 0;
         float xPosition = 0;
 
-        Color* horizonColor = new StaticColor(rgb(255, 0, 0));
+        std::unique_ptr<Color> backgroundColor;
+        std::unique_ptr<Color> groundColor;
+        std::unique_ptr<Color> horizonColor;
+        std::unique_ptr<Color> borderColor;
         
     public:
-        Horizon(Element* parent) : Element(parent) {}
+        Horizon(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {
+            if (!json.HasMember("props") || !json["props"].IsObject()) return;
+            const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-        Horizon(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) {}
+            if (props.HasMember("backgroundColor"))
+                backgroundColor = Color::fromJson(props["backgroundColor"]);
+
+            if (props.HasMember("groundColor"))
+                groundColor = Color::fromJson(props["groundColor"]);
+            
+            if (props.HasMember("horizonColor"))
+                horizonColor = Color::fromJson(props["horizonColor"]);
+
+            if (props.HasMember("borderColor"))
+                borderColor = Color::fromJson(props["borderColor"]);
+        }
 
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();
@@ -31,19 +47,19 @@ class Horizon : public Element {
 
             const int halfY = b.getCenterY();
 
+            auto ground = Rect<int>(b);
+            ground.setTop(halfY);
+            ground.reduce(1);
+
             auto background = Rect<int>(b);
-            background.setTop(halfY);
+            background.setBottom(halfY);
             background.reduce(1);
 
-            auto background2 = Rect<int>(b);
-            background2.setBottom(halfY);
-            background2.reduce(1);
+            g.setFill(*groundColor);
+            g.fillRect(ground);
 
-            g.setFill(rgb(127, 0, 0));
+            g.setFill(*backgroundColor);
             g.fillRect(background);
-
-            g.setFill(rgb(127, 0, 127));
-            g.fillRect(background2);
 
             g.setStroke(*horizonColor);
 
@@ -82,6 +98,8 @@ class Horizon : public Element {
 
                 g.strokeLine(left, y, right, y);
             }
+
+            g.setStroke(*borderColor);
             g.strokeRect(b);
         }
 

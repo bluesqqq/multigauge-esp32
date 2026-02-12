@@ -22,7 +22,7 @@ class RollOdometer : public Element {
         RollOdometer(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) { }
 
         void draw(Graphics& g) const override {
-            float val = value.getValue(DEFAULT);
+            float val = value.getValue();
 
             Rect marginless = getBounds().reduced(margin);
 

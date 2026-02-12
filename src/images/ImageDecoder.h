@@ -9,6 +9,7 @@
 #include "utils.h"
 
 #include "lodepng/lodepng.h"
+#include "tjpgd/tjpgd.h"
 
 // BMP compression types (from BMP spec)
 constexpr uint32_t BI_RGB            = 0; // no compression
@@ -22,10 +23,10 @@ constexpr uint32_t BI_ALPHABITFIELDS = 6; // adds alpha mask
 struct ImageInfo {
     int width = 0;
     int height = 0;
-    std::vector<uint16_t> pixels;
+    std::vector<rgba> pixels;
 };
 
-//----------[ BMP ]----------//
+//----------------------[ BMP ]----------------------//
 
 static inline bool canDecodeBMP(const uint8_t* data, size_t size) {
     if (!data || size < 2) return false;
@@ -92,7 +93,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
     const bool topDown = (height < 0);
     const int32_t absH = topDown ? -height : height;
 
-    // Reject RLE (you can add support later)
+    // Reject RLE
     if (compression == BI_RLE8 || compression == BI_RLE4) {
         LOG_ERROR("BMP", "RLE compressed BMP not supported (compression=%u).", (unsigned)compression);
         return false;
@@ -157,7 +158,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
 
     out.width = outW;
     out.height = outH;
-    out.pixels.assign((size_t)outW * (size_t)outH, 0);
+    out.pixels.assign((size_t)outW * (size_t)outH, rgba{0,0,0,0});
 
     auto rowStrideBytes = [&](int w, uint16_t bitsPerPixel) -> size_t {
         const size_t bits = (size_t)w * (size_t)bitsPerPixel;
@@ -173,12 +174,11 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
         return false;
     }
     if (pixelBase + inStride * (size_t)outH > size) {
-        // allow if file is slightly truncated? No, fail to be safe.
         LOG_ERROR("BMP", "Pixel data truncated (need %u bytes).", (unsigned)(inStride * (size_t)outH));
         return false;
     }
 
-    auto write565 = [&](int x, int y, uint16_t px) {
+    auto writeRGBA = [&](int x, int y, rgba px) {
         out.pixels[(size_t)y * (size_t)outW + (size_t)x] = px;
     };
 
@@ -189,15 +189,13 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
         const uint8_t* row = data + rowOff;
 
         if (bpp == 24) {
-            const size_t need = (size_t)outW * 3;
             for (int x = 0; x < outW; ++x) {
                 const size_t o = (size_t)x * 3;
                 const uint8_t b = row[o + 0];
                 const uint8_t g = row[o + 1];
                 const uint8_t r = row[o + 2];
-                write565(x, y, rgb888_to_565(r, g, b));
+                writeRGBA(x, y, rgba{r, g, b, 255});
             }
-            (void)need;
         }
         else if (bpp == 32) {
             for (int x = 0; x < outW; ++x) {
@@ -208,18 +206,22 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
                     ((uint32_t)row[o + 2] << 16) |
                     ((uint32_t)row[o + 3] << 24);
 
-                uint8_t r = 0, g = 0, b = 0;
+                uint8_t r = 0, g = 0, b = 0, a = 255;
+
                 if (compression == BI_BITFIELDS || compression == BI_ALPHABITFIELDS) {
                     r = extract_and_scale(v, rMask);
                     g = extract_and_scale(v, gMask);
                     b = extract_and_scale(v, bMask);
+                    if (aMask) a = extract_and_scale(v, aMask);
                 } else {
-                    // BI_RGB default: BGRA
+                    // BI_RGB default: BGRA in file
                     b = (uint8_t)(v & 0xFF);
                     g = (uint8_t)((v >> 8) & 0xFF);
                     r = (uint8_t)((v >> 16) & 0xFF);
+                    a = (uint8_t)((v >> 24) & 0xFF);
                 }
-                write565(x, y, rgb888_to_565(r, g, b));
+
+                writeRGBA(x, y, rgba{r, g, b, a});
             }
         }
         else if (bpp == 16) {
@@ -238,7 +240,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
                     g = (uint8_t)(((v16 >> 5)  & 0x1F) * 255 / 31);
                     b = (uint8_t)(((v16)       & 0x1F) * 255 / 31);
                 }
-                write565(x, y, rgb888_to_565(r, g, b));
+                writeRGBA(x, y, rgba{r, g, b, 255});
             }
         }
         else if (bpp == 8) {
@@ -252,7 +254,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
                 const uint8_t r = (uint8_t)((rgb >> 16) & 0xFF);
                 const uint8_t g = (uint8_t)((rgb >> 8) & 0xFF);
                 const uint8_t b = (uint8_t)(rgb & 0xFF);
-                write565(x, y, rgb888_to_565(r, g, b));
+                writeRGBA(x, y, rgba{r, g, b, 255});
             }
         }
         else if (bpp == 4) {
@@ -267,7 +269,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
                 const uint8_t r = (uint8_t)((rgb >> 16) & 0xFF);
                 const uint8_t g = (uint8_t)((rgb >> 8) & 0xFF);
                 const uint8_t b = (uint8_t)(rgb & 0xFF);
-                write565(x, y, rgb888_to_565(r, g, b));
+                writeRGBA(x, y, rgba{r, g, b, 255});
             }
         }
         else if (bpp == 1) {
@@ -283,7 +285,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
                 const uint8_t r = (uint8_t)((rgb >> 16) & 0xFF);
                 const uint8_t g = (uint8_t)((rgb >> 8) & 0xFF);
                 const uint8_t b = (uint8_t)(rgb & 0xFF);
-                write565(x, y, rgb888_to_565(r, g, b));
+                writeRGBA(x, y, rgba{r, g, b, 255});
             }
         }
         else {
@@ -295,7 +297,7 @@ static inline bool decodeBMP(const uint8_t* data, size_t size, ImageInfo& out) {
     return true;
 }
 
-//----------[ PNG ]----------//
+//----------------------[ PNG ]----------------------//
 
 static inline bool canDecodePNG(const uint8_t* data, size_t size) {
     if (!data || size < 8) return false;
@@ -312,10 +314,10 @@ static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out) {
         return false;
     }
 
-    std::vector<unsigned char> rgba;
+    std::vector<unsigned char> pngBytes; // RGBA8888 bytes
     unsigned w = 0, h = 0;
 
-    const unsigned err = lodepng::decode(rgba, w, h, data, size);
+    const unsigned err = lodepng::decode(pngBytes, w, h, data, size);
     if (err != 0) {
         LOG_ERROR("PNG", "Decode failed: %s", lodepng_error_text(err));
         return false;
@@ -329,30 +331,31 @@ static inline bool decodePNG(const uint8_t* data, size_t size, ImageInfo& out) {
     const size_t pxCount = (size_t)w * (size_t)h;
     const size_t needBytes = pxCount * 4;
 
-    if (rgba.size() < needBytes) {
+    if (pngBytes.size() < needBytes) {
         LOG_ERROR("PNG", "Truncated RGBA buffer (have=%u need=%u).",
-                  (unsigned)rgba.size(), (unsigned)needBytes);
+                  (unsigned)pngBytes.size(), (unsigned)needBytes);
         return false;
     }
 
     out.width  = (int)w;
     out.height = (int)h;
-    out.pixels.assign(pxCount, 0);
+    out.pixels.resize(pxCount);
 
-    // Convert RGBA8888 -> RGB565 (alpha ignored here)
     for (size_t i = 0; i < pxCount; ++i) {
-        const uint8_t r = rgba[i * 4 + 0];
-        const uint8_t g = rgba[i * 4 + 1];
-        const uint8_t b = rgba[i * 4 + 2];
-        out.pixels[i] = rgb888_to_565(r, g, b);
+        out.pixels[i] = rgba{
+            (uint8_t)pngBytes[i * 4 + 0],
+            (uint8_t)pngBytes[i * 4 + 1],
+            (uint8_t)pngBytes[i * 4 + 2],
+            (uint8_t)pngBytes[i * 4 + 3]
+        };
     }
+
+    LOG_INFO("PNG", "Successfully loaded png.");
 
     return true;
 }
 
-//----------[ JPG ]----------//
-
-#include "tjpgd/tjpgd.h"
+//----------------------[ JPG ]----------------------//
 
 static inline bool canDecodeJPG(const uint8_t* data, size_t size) {
     if (!data || size < 3) return false;
@@ -412,31 +415,29 @@ static int tjpgd_out_cb(JDEC* jd, void* bitmap, JRECT* rect) {
     // RGB888: bitmap is uint8_t*, 3 bytes per pixel, row-major for the rect size
     const uint8_t* srcPx = static_cast<const uint8_t*>(bitmap);
 
-    // Note: the provided bitmap corresponds to the original rect width/height,
-    // not the clipped rw/rh, so compute using rect->left/top etc carefully.
+    // Provided bitmap corresponds to the original rect width/height
     const int rectW = (rect->right - rect->left + 1);
 
     for (int y = 0; y < rh; ++y) {
         const int dstY = top + y;
 
-        // Starting pixel index in the provided block for this row, adjusted for clipping
         const int blockRow = (dstY - rect->top);
         const int blockColStart = (left - rect->left);
 
         const uint8_t* row = srcPx + (size_t)(blockRow * rectW + blockColStart) * 3;
 
-        uint16_t* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
+        rgba* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
 
         for (int x = 0; x < rw; ++x) {
             const uint8_t r = row[x * 3 + 0];
             const uint8_t g = row[x * 3 + 1];
             const uint8_t b = row[x * 3 + 2];
-            dst[x] = rgb888_to_565(r, g, b);
+            dst[x] = rgba{r, g, b, 255};
         }
     }
 
 #elif JD_FORMAT == 1
-    // RGB565: bitmap is uint16_t* (already 565). Just copy into out.
+    // RGB565: bitmap is uint16_t*. Expand to RGBA.
     const uint16_t* src565 = static_cast<const uint16_t*>(bitmap);
     const int rectW = (rect->right - rect->left + 1);
 
@@ -446,13 +447,14 @@ static int tjpgd_out_cb(JDEC* jd, void* bitmap, JRECT* rect) {
         const int blockColStart = (left - rect->left);
 
         const uint16_t* row = src565 + (size_t)(blockRow * rectW + blockColStart);
-        uint16_t* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
+        rgba* dst = out.pixels.data() + (size_t)dstY * (size_t)outW + (size_t)left;
 
-        std::copy(row, row + rw, dst);
+        for (int x = 0; x < rw; ++x) {
+            dst[x] = rgb565_to_rgba(row[x]);
+        }
     }
 
 #else
-    // Other formats exist (grayscale etc). Add if you enable them.
     (void)rw; (void)rh;
     return 0;
 #endif
@@ -469,8 +471,6 @@ static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out) {
     }
 
     // Work buffer: tjpgd needs a scratch buffer.
-    // Bigger generally improves reliability for larger images.
-    // 4096 is a decent starting point; if jd_prepare fails on some images, try 8192 or 16384.
     static uint8_t work[8192];
 
     TjpgdMemSrc src;
@@ -486,7 +486,6 @@ static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out) {
         return false;
     }
 
-    // Dimensions are available after prepare
     if (jd.width == 0 || jd.height == 0) {
         LOG_ERROR("JPG", "Invalid dimensions (W=%u H=%u).", (unsigned)jd.width, (unsigned)jd.height);
         return false;
@@ -494,7 +493,7 @@ static inline bool decodeJPG(const uint8_t* data, size_t size, ImageInfo& out) {
 
     out.width  = (int)jd.width;
     out.height = (int)jd.height;
-    out.pixels.assign((size_t)out.width * (size_t)out.height, 0);
+    out.pixels.assign((size_t)out.width * (size_t)out.height, rgba{0,0,0,0});
 
     // scale: 0=full, 1=1/2, 2=1/4, 3=1/8
     const uint8_t scale = 0;

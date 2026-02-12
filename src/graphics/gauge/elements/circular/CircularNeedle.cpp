@@ -31,7 +31,6 @@ void CircularNeedle::draw(Graphics &g) const {
     g.setFillStroke(color);
     g.fillWideLine(needle.toInt(), 10);
 
-    g.drawText(value.getValueString(true), {cx, cy}, Anchor::Center);
     /*
     if (color.fill) {
         g.setFill(*color.fill);

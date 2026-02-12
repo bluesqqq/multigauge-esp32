@@ -123,48 +123,56 @@ bool GraphicsContextLovyanGFX::init() {
 
     // Font registry system
 
-    LGFXFontFamily sans;
-    sans.addStroke(9,  {&lgfx::fonts::FreeSans9pt7b,  &lgfx::fonts::FreeSansBold9pt7b,  &lgfx::fonts::FreeSansOblique9pt7b,  &lgfx::fonts::FreeSansBoldOblique9pt7b});
-    sans.addStroke(12, {&lgfx::fonts::FreeSans12pt7b, &lgfx::fonts::FreeSansBold12pt7b, &lgfx::fonts::FreeSansOblique12pt7b, &lgfx::fonts::FreeSansBoldOblique12pt7b});
-    sans.addStroke(18, {&lgfx::fonts::FreeSans18pt7b, &lgfx::fonts::FreeSansBold18pt7b, &lgfx::fonts::FreeSansOblique18pt7b, &lgfx::fonts::FreeSansBoldOblique18pt7b});
-    sans.addStroke(24, {&lgfx::fonts::FreeSans24pt7b, &lgfx::fonts::FreeSansBold24pt7b, &lgfx::fonts::FreeSansOblique24pt7b, &lgfx::fonts::FreeSansBoldOblique24pt7b});
-    fontFamilies["sans"] = sans;
+    {
+        auto& sans = fontFamilies["sans"];
+        sans.addStroke(9,  {&lgfx::fonts::FreeSans9pt7b,  &lgfx::fonts::FreeSansBold9pt7b,  &lgfx::fonts::FreeSansOblique9pt7b,  &lgfx::fonts::FreeSansBoldOblique9pt7b});
+        sans.addStroke(12, {&lgfx::fonts::FreeSans12pt7b, &lgfx::fonts::FreeSansBold12pt7b, &lgfx::fonts::FreeSansOblique12pt7b, &lgfx::fonts::FreeSansBoldOblique12pt7b});
+        sans.addStroke(18, {&lgfx::fonts::FreeSans18pt7b, &lgfx::fonts::FreeSansBold18pt7b, &lgfx::fonts::FreeSansOblique18pt7b, &lgfx::fonts::FreeSansBoldOblique18pt7b});
+        sans.addStroke(24, {&lgfx::fonts::FreeSans24pt7b, &lgfx::fonts::FreeSansBold24pt7b, &lgfx::fonts::FreeSansOblique24pt7b, &lgfx::fonts::FreeSansBoldOblique24pt7b});
+    }
 
-    LGFXFontFamily serif;
-    serif.addStroke(9,  {&lgfx::fonts::FreeSerif9pt7b,  &lgfx::fonts::FreeSerifBold9pt7b,  &lgfx::fonts::FreeSerifItalic9pt7b,  &lgfx::fonts::FreeSerifBoldItalic9pt7b});
-    serif.addStroke(12, {&lgfx::fonts::FreeSerif12pt7b, &lgfx::fonts::FreeSerifBold12pt7b, &lgfx::fonts::FreeSerifItalic12pt7b, &lgfx::fonts::FreeSerifBoldItalic12pt7b});
-    serif.addStroke(18, {&lgfx::fonts::FreeSerif18pt7b, &lgfx::fonts::FreeSerifBold18pt7b, &lgfx::fonts::FreeSerifItalic18pt7b, &lgfx::fonts::FreeSerifBoldItalic18pt7b});
-    serif.addStroke(24, {&lgfx::fonts::FreeSerif24pt7b, &lgfx::fonts::FreeSerifBold24pt7b, &lgfx::fonts::FreeSerifItalic24pt7b, &lgfx::fonts::FreeSerifBoldItalic24pt7b});
-    fontFamilies["serif"] = serif;
+    {
+        auto& serif = fontFamilies["serif"];
+        serif.addStroke(9,  {&lgfx::fonts::FreeSerif9pt7b,  &lgfx::fonts::FreeSerifBold9pt7b,  &lgfx::fonts::FreeSerifItalic9pt7b,  &lgfx::fonts::FreeSerifBoldItalic9pt7b});
+        serif.addStroke(12, {&lgfx::fonts::FreeSerif12pt7b, &lgfx::fonts::FreeSerifBold12pt7b, &lgfx::fonts::FreeSerifItalic12pt7b, &lgfx::fonts::FreeSerifBoldItalic12pt7b});
+        serif.addStroke(18, {&lgfx::fonts::FreeSerif18pt7b, &lgfx::fonts::FreeSerifBold18pt7b, &lgfx::fonts::FreeSerifItalic18pt7b, &lgfx::fonts::FreeSerifBoldItalic18pt7b});
+        serif.addStroke(24, {&lgfx::fonts::FreeSerif24pt7b, &lgfx::fonts::FreeSerifBold24pt7b, &lgfx::fonts::FreeSerifItalic24pt7b, &lgfx::fonts::FreeSerifBoldItalic24pt7b});
+    }
 
-    LGFXFontFamily mono;
-    mono.addStroke(9,  {&lgfx::fonts::FreeMono9pt7b,  &lgfx::fonts::FreeMonoBold9pt7b,  &lgfx::fonts::FreeMonoOblique9pt7b,  &lgfx::fonts::FreeMonoBoldOblique9pt7b});
-    mono.addStroke(12, {&lgfx::fonts::FreeMono12pt7b, &lgfx::fonts::FreeMonoBold12pt7b, &lgfx::fonts::FreeMonoOblique12pt7b, &lgfx::fonts::FreeMonoBoldOblique12pt7b});
-    mono.addStroke(18, {&lgfx::fonts::FreeMono18pt7b, &lgfx::fonts::FreeMonoBold18pt7b, &lgfx::fonts::FreeMonoOblique18pt7b, &lgfx::fonts::FreeMonoBoldOblique18pt7b});
-    mono.addStroke(24, {&lgfx::fonts::FreeMono24pt7b, &lgfx::fonts::FreeMonoBold24pt7b, &lgfx::fonts::FreeMonoOblique24pt7b, &lgfx::fonts::FreeMonoBoldOblique24pt7b});
-    fontFamilies["mono"] = mono;
+    {
+        auto& mono = fontFamilies["mono"];
+        mono.addStroke(9,  {&lgfx::fonts::FreeMono9pt7b,  &lgfx::fonts::FreeMonoBold9pt7b,  &lgfx::fonts::FreeMonoOblique9pt7b,  &lgfx::fonts::FreeMonoBoldOblique9pt7b});
+        mono.addStroke(12, {&lgfx::fonts::FreeMono12pt7b, &lgfx::fonts::FreeMonoBold12pt7b, &lgfx::fonts::FreeMonoOblique12pt7b, &lgfx::fonts::FreeMonoBoldOblique12pt7b});
+        mono.addStroke(18, {&lgfx::fonts::FreeMono18pt7b, &lgfx::fonts::FreeMonoBold18pt7b, &lgfx::fonts::FreeMonoOblique18pt7b, &lgfx::fonts::FreeMonoBoldOblique18pt7b});
+        mono.addStroke(24, {&lgfx::fonts::FreeMono24pt7b, &lgfx::fonts::FreeMonoBold24pt7b, &lgfx::fonts::FreeMonoOblique24pt7b, &lgfx::fonts::FreeMonoBoldOblique9pt7b}); // double-check this last font pointer
+    }
 
-    LGFXFontFamily orbitron;
-    orbitron.addStroke(24, {&lgfx::fonts::Orbitron_Light_24});
-    orbitron.addStroke(32, {&lgfx::fonts::Orbitron_Light_32});
-    fontFamilies["orbitron"] = orbitron;
+    {
+        auto& orbitron = fontFamilies["orbitron"];
+        orbitron.addStroke(24, {&lgfx::fonts::Orbitron_Light_24});
+        orbitron.addStroke(32, {&lgfx::fonts::Orbitron_Light_32});
+    }
 
-    LGFXFontFamily dejavu;
-    dejavu.addStroke(9, {&lgfx::fonts::DejaVu9});
-    dejavu.addStroke(12, {&lgfx::fonts::DejaVu12});
-    dejavu.addStroke(18, {&lgfx::fonts::DejaVu18});
-    dejavu.addStroke(24, {&lgfx::fonts::DejaVu24});
-    dejavu.addStroke(40, {&lgfx::fonts::DejaVu40});
-    dejavu.addStroke(56, {&lgfx::fonts::DejaVu56});
-    dejavu.addStroke(72, {&lgfx::fonts::DejaVu72});
-    fontFamilies["dejavu"] = dejavu;
+    {
+        auto& dejavu = fontFamilies["dejavu"];
+        dejavu.addStroke(9,  {&lgfx::fonts::DejaVu9});
+        dejavu.addStroke(12, {&lgfx::fonts::DejaVu12});
+        dejavu.addStroke(18, {&lgfx::fonts::DejaVu18});
+        dejavu.addStroke(24, {&lgfx::fonts::DejaVu24});
+        dejavu.addStroke(40, {&lgfx::fonts::DejaVu40});
+        dejavu.addStroke(56, {&lgfx::fonts::DejaVu56});
+        dejavu.addStroke(72, {&lgfx::fonts::DejaVu72});
+    }
 
-    LGFXFontFamily roboto;
-    roboto.addStroke(24, {&lgfx::fonts::Roboto_Thin_24});
-    fontFamilies["roboto"] = roboto;
+    {
+        auto& roboto = fontFamilies["roboto"];
+        roboto.addStroke(24, {&lgfx::fonts::Roboto_Thin_24});
+    }
 
     buffer.setFont(&lgfx::fonts::FreeSans12pt7b);
     currentFontPoint = 12;
+
+    return true;
 }
 
 void GraphicsContextLovyanGFX::endFrame() {
@@ -251,6 +259,7 @@ void GraphicsContextLovyanGFX::drawText(const char* text, int x, int y, std::str
 
 Image GraphicsContextLovyanGFX::createNativeImage(const rgba* pixels, int w, int h) {
     auto* spr = new lgfx::LGFX_Sprite(&buffer);
+
     spr->setColorDepth(16);
     spr->setPsram(true);
 
@@ -259,9 +268,24 @@ Image GraphicsContextLovyanGFX::createNativeImage(const rgba* pixels, int w, int
         return Image(0, 0, nullptr, nullptr);
     }
 
+
     spr->setSwapBytes(true);
-    //spr->pushImage(0, 0, w, h, pixels);
-    // TODO: FIX THIS!!!
+
+    std::vector<uint16_t> tmp;
+    tmp.resize((size_t)w * (size_t)h);
+
+    for (size_t i = 0; i < tmp.size(); ++i) {
+        const rgba px = pixels[i];
+
+        if (px.a == 0) {
+            tmp[i] = TFT_TRANSPARENT;
+        } else {
+            tmp[i] = rgb888_to_565(px.r, px.g, px.b);
+        }
+    }
+
+    spr->pushImage(0, 0, w, h, tmp.data());
+
     spr->setSwapBytes(false);
 
     return Image(w, h, spr, [](void* ptr) { delete static_cast<lgfx::LGFX_Sprite*>(ptr); });
@@ -316,7 +340,10 @@ void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor 
             break;
     }
 
-    spr->pushSprite(drawX, drawY);
+    uint16_t key = TFT_TRANSPARENT;
+    uint16_t key_swapped = (key << 8) | (key >> 8);
+
+    spr->pushSprite(&buffer, drawX, drawY, key_swapped);
 }
 
 void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, int width, int height) {
@@ -328,7 +355,10 @@ void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, int wid
     const float zx = (float)width  / (float)img.width;
     const float zy = (float)height / (float)img.height;
 
-    spr->pushRotateZoom(x + width / 2, y + height / 2, 0.0f, zx, zy);
+    uint16_t key = TFT_TRANSPARENT;
+    uint16_t key_swapped = (key << 8) | (key >> 8);
+
+    spr->pushRotateZoom(&buffer, x + width / 2, y + height / 2, 0.0f, zx, zy, key_swapped);
 }
 
 //----------[ CLIP ]----------//
