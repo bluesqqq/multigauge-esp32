@@ -20,6 +20,8 @@ public:
         maxGForce.resize((size_t)numberOfPoints, 0.3f);
     }
 
+    GForceElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) { }
+
     void update(int deltaTime) override {
         (void)deltaTime;
 
@@ -58,7 +60,7 @@ public:
         if (r <= 0 || numberOfPoints < 3) return;
 
         // Rings
-        g.setStroke(0xFFFF);
+        g.setStroke(rgb(255, 255, 255));
         g.strokeCircle(cx, cy, r);
         g.strokeCircle(cx, cy, r / 2);
 
@@ -82,21 +84,23 @@ public:
                 firstX = ix; firstY = iy;
                 prevX  = ix; prevY  = iy;
             } else {
-                g.setStroke(0xF800);
+                g.setStroke(rgb(255, 255, 255));
                 g.strokeLine(prevX, prevY, ix, iy);
                 prevX = ix; prevY = iy;
             }
         }
 
         // Close polygon
-        g.setStroke(0xF800);
+        g.setStroke(rgb(255, 0, 0));
         g.strokeLine(prevX, prevY, firstX, firstY);
 
         // Current g dot
         const int dotX = (int)std::lround(cx + gforce.x * r);
         const int dotY = (int)std::lround(cy + gforce.y * r);
 
-        g.setFill(0xF800);
+        g.setFill(rgb(255, 255, 0));
         g.fillCircle(dotX, dotY, 8);
     }
 };
+
+REGISTER_ELEMENT_TYPE("g-force", GForceElement);

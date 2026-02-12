@@ -58,6 +58,7 @@ std::string Value::getLongestValueString(int index, bool abbreviation) {
     return (maximumString.length() > minimumString.length()) ? maximumString : minimumString;
 }
 
+Value dummy("n/a", "n/a", percentage, 0.0f, 100.0f);
 Value engineRPM("engineRPM", "RPM", revolutions, 0.0f, 8000.0f);
 Value engineCoolantTemp("engineCoolantTemp", "Coolant Temp", temperature, -40.0f, 120.0f);
 Value engineOilTemp("engineOilTemp", "Oil Temp", temperature, -40.0f, 120.0f);

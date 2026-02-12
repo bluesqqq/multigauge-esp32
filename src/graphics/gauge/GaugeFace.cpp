@@ -6,14 +6,9 @@ GaugeFace::GaugeFace(const rapidjson::Document& json) : Element(nullptr, json.Ge
     if (!json.HasMember("props") || !json["props"].IsObject()) return;
     const rapidjson::Value::ConstObject props = json["props"].GetObject();
 
-    if (props.HasMember("backgroundColor"))
-        backgroundColor = Color::fromJson(props["backgroundColor"]);
-
-    if (props.HasMember("title") && props["title"].IsString())
-        title = props["title"].GetString();
-
-    if (props.HasMember("description") && props["description"].IsString())
-        description = props["description"].GetString();
+    setObj(props, "backgroundColor", backgroundColor);
+    setCString(props, "title", title);
+    setCString(props, "description", description);
 }
 
 void GaugeFace::draw(Graphics &g) const {

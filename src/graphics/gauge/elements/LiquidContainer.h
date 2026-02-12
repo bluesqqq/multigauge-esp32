@@ -1,5 +1,6 @@
 #include "graphics/gauge/Element.h"
 #include "graphics/colors/StaticColor.h"
+#include "graphics/DisplayValue.h"
 
 class LiquidPoint {
     public:
@@ -34,7 +35,7 @@ class LiquidPoint {
 
 class LiquidContainer : public Element {
     private:
-        Value& value;
+        DisplayValue value;
         Value& rollValue;
         Value& pitchValue;
 
@@ -63,12 +64,7 @@ class LiquidContainer : public Element {
         int heightCached = 0;
 
     public:
-        LiquidContainer(Element* parent, Value& value, Value& rollValue, Value& pitchValue, size_t resolution) : Element(parent), value(value), rollValue(rollValue), pitchValue(pitchValue) {
-            points.resize(resolution);
-            liquidColor     = new StaticColor(rgb(255, 0, 0));
-            backgroundColor = new StaticColor(rgb(0, 0, 0));
-            outlineColor    = new StaticColor(rgb(255, 255, 255));
-        }
+        LiquidContainer(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json), rollValue(dummy), pitchValue(dummy) { }
 
         void draw(Graphics& g) const override {
             const auto b = getBounds().toInt();
@@ -210,3 +206,5 @@ class LiquidContainer : public Element {
         }
 
 };
+
+REGISTER_ELEMENT_TYPE("liquid-container", LiquidContainer);

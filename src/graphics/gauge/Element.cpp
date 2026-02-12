@@ -2,6 +2,9 @@
 
 #include "layout.h"
 
+Element::Entry Element::registry[MAX_ELEMENT_REGISTRY_SIZE] = {};
+size_t Element::registryCount = 0;
+
 void Element::clearLayoutDirtyRecursive() {
     layoutDirty = false;
     for (auto& child : children) child->clearLayoutDirtyRecursive();
@@ -58,27 +61,74 @@ Element::~Element() {
 #include "elements/circular/CircularNeedle.h"
 #include "elements/circular/CircularScale.h"
 
-std::unique_ptr<Element> Element::fromJson(Element* parent, const rapidjson::Value::ConstObject json) {
-    if (!json.HasMember("type") || !json["type"].IsString()) return std::make_unique<Element>(parent, json);
+bool Element::registerType(const char *type, FactoryFn fn) {
+    constexpr const char* TAG = "Element::registerType";
+    if (!type || !fn) {
+        LOG_ERROR(TAG, "Invalid registration (type=%p fn=%p)", (void*)type, (void*)fn);
+        return false;
+    }
+
+    for (size_t i = 0; i < registryCount; ++i)
+        if (registry[i].type && std::strcmp(registry[i].type, type) == 0) {
+            LOG_WARN(TAG, "Duplicate type '%s' registered; overwriting factory", type);
+            registry[i].fn = fn; 
+            return true;
+        }
+    
+    if (registryCount >= MAX_ELEMENT_REGISTRY_SIZE) {
+        LOG_ERROR(TAG, "Registry full (%u/%u). Cannot register '%s'", (unsigned)registryCount, (unsigned)MAX_ELEMENT_REGISTRY_SIZE, type);
+        return false;
+    }
+
+    registry[registryCount++] = {type, fn};
+    LOG_DEBUG(TAG, "Registered '%s' (count=%u)", type, (unsigned)registryCount);
+    return true;
+}
+
+std::unique_ptr<Element> Element::fromJson(Element *parent, const rapidjson::Value::ConstObject json) {
+    constexpr const char* TAG = "Element::fromJson";
+
+    if (!json.HasMember("type")) {
+        LOG_INFO(TAG, "No 'type' field; constructing base Element.");
+        return std::make_unique<Element>(parent, json);
+    } 
+    
+    if (!json["type"].IsString()) {
+        LOG_WARN(TAG, "'type' field exists but is not a string; falling back to base Element.");
+        return std::make_unique<Element>(parent, json);
+    } 
 
     const char* type = json["type"].GetString();
 
-    if (strcmp(type, "text") == 0)      return std::make_unique<TextElement>(parent, json);
-    if (strcmp(type, "rectangle") == 0) return std::make_unique<RectangleElement>(parent, json);
-    if (strcmp(type, "circle") == 0)    return std::make_unique<CircleElement>(parent, json);
-    if (strcmp(type, "image") == 0)     return std::make_unique<ImageElement>(parent, json);
-    if (strcmp(type, "horizon") == 0)   return std::make_unique<Horizon>(parent, json);
-    if (strcmp(type, "graph") == 0)     return std::make_unique<Graph>(parent, json);
+    if (registryCount == 0) LOG_ERROR(TAG, "Registry is empty. No element types registered. type='%s'", type);
 
-    if (strcmp(type, "circular-needle") == 0) return std::make_unique<CircularNeedle>(parent, json);
-    if (strcmp(type, "circular-scale") == 0) return std::make_unique<CircularScale>(parent, json);
-    
+    if (type) {
+        for (size_t i = 0; i < registryCount; ++i) {
+            if (!registry[i].type || !registry[i].fn) {
+                LOG_WARN(TAG, "Bad registry entry %u (type=%p fn=%p)", (unsigned)i, (void*)registry[i].type, (void*)registry[i].fn);
+                continue;
+            }
+
+            if (std::strcmp(registry[i].type, type) == 0) {
+                LOG_INFO(TAG, "Matched type='%s'; constructing", type);
+                return registry[i].fn(parent, json);
+            }
+        }
+    }
+
+    LOG_WARN(TAG, "Unknown type='%s' (registryCount=%u). Falling back to base Element.", type, (unsigned)registryCount);
+
     return std::make_unique<Element>(parent, json);
 }
 
 void Element::addChild(const rapidjson::Value::ConstObject json) {
+    constexpr const char* TAG = "Element::addChild";
+
     std::unique_ptr<Element> child = fromJson(this, json);
-    if (!child) return;
+    if (!child) {
+        LOG_ERROR(TAG, "fromJson returned nullptr; child skipped");
+        return;
+    }
 
     Element* yogaParent = this->getLayoutOwner();
     
@@ -95,14 +145,21 @@ void Element::addChild(const rapidjson::Value::ConstObject json) {
 }
 
 bool Element::removeChild(Element *child) {
-    if (!child) return false;
+    constexpr const char* TAG = "Element::removeChild";
+    if (!child) {
+        LOG_WARN(TAG, "Called with null child");
+        return false;
+    }
 
     for (size_t i = 0; i < children.size(); ++i) {
         if (children[i].get() == child) {
+            LOG_DEBUG(TAG, "Removing child=%p from parent=%p", (void*)child, (void*)parent);
             if (child->ownsLayout()) {
                 Element* yogaParent = this->getLayoutOwner();
                 if (yogaParent && yogaParent->node && child->node) {
                     YGNodeRemoveChild(yogaParent->node, child->node);
+                } else {
+                    LOG_WARN(TAG, "Could not remove Yoga node (yogaParent=%p yogaNode=%p childNode=%p)", (void*)yogaParent, yogaParent ? (void*)yogaParent->node : nullptr, (void*)child->node);
                 }
             }
 
@@ -114,6 +171,8 @@ bool Element::removeChild(Element *child) {
             return true;
         }
     }
+
+    LOG_WARN(TAG, "Child=%p not found under parent=%p", (void*)child, (void*)this);
     return false;
 }
 

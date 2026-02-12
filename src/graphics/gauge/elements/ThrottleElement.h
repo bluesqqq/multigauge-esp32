@@ -23,18 +23,7 @@ private:
     Value& throttlePosition;
 
 public:
-    ThrottleElement(Element* parent, Value& throttlePos)
-        : Element(parent), throttlePosition(throttlePos)
-    {
-        bodyFill   = new StaticColor(42292);
-        bodyStroke = new StaticColor(0xFFFF);
-
-        plateFill   = new StaticColor(52851);
-        plateStroke = new StaticColor(0xFFFF);
-
-        boltFill   = new StaticColor(54970);
-        boltStroke = new StaticColor(0xFFFF);
-    }
+    ThrottleElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) { }
 
     void draw(Graphics& g) const override {
         const auto b = getBounds().toInt();
@@ -182,3 +171,5 @@ public:
         ));
     }
 };
+
+REGISTER_ELEMENT_TYPE("throttle", ThrottleElement);

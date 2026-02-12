@@ -45,3 +45,5 @@ void CircularNeedle::draw(Graphics &g) const {
     }
     */
 }
+
+REGISTER_ELEMENT_TYPE("circular-needle", CircularNeedle);

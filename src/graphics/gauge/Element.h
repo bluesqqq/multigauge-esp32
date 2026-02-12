@@ -9,6 +9,8 @@
 
 #include "AssetManager.h"
 
+#define MAX_ELEMENT_REGISTRY_SIZE 64
+
 class Element {
     private:
         //----------[ TREE ]----------//
@@ -31,7 +33,6 @@ class Element {
         YGConfigRef config = nullptr;
         /// @brief True when the layout needs to be recalculated at the root
         bool layoutDirty = true;
-        
 
         void refreshInheritanceCacheRecursive() {
             if (!inherited) layoutOwner = this;
@@ -43,6 +44,7 @@ class Element {
 
             for (auto& c : children) c->refreshInheritanceCacheRecursive();
         }
+
         void clearLayoutDirtyRecursive();
 
         YGConfigRef createConfig();
@@ -53,7 +55,7 @@ class Element {
             if (!it->value.IsString()) return false;
             return std::strcmp(it->value.GetString(), "inherit") == 0;
         }
-        
+
     protected:
         void markLayoutDirty();
         bool needsLayout() const { return layoutDirty; }
@@ -71,7 +73,6 @@ class Element {
         explicit Element(Element* parent, bool inherit = false);
         explicit Element(Element* parent, const rapidjson::Value::ConstObject json);
         virtual ~Element();
-        static std::unique_ptr<Element> fromJson(Element* parent, const rapidjson::Value::ConstObject json);
 
         virtual Type getType() const { return Type::Base; }
         
@@ -99,4 +100,26 @@ class Element {
         //----------[ LAYOUT ]----------//
 
         void layoutRecursive(float width, float height, YGDirection direction = YGDirectionLTR);
+
+        //----------[ REGISTRY ]----------//
+
+        using FactoryFn = std::unique_ptr<Element>(*)(Element*, const rapidjson::Value::ConstObject&);
+
+        static bool registerType(const char* type, FactoryFn fn);
+        static std::unique_ptr<Element> fromJson(Element* parent, const rapidjson::Value::ConstObject json);
+
+    private:
+        struct Entry { const char* type; FactoryFn fn; };
+        static Entry registry[MAX_ELEMENT_REGISTRY_SIZE];
+        static size_t registryCount;
 };
+
+#define REGISTER_ELEMENT_TYPE(TYPE_STR, CLASS)                                \
+    namespace {                                                               \
+        static std::unique_ptr<Element> _make_##CLASS(                        \
+            Element* parent, const rapidjson::Value::ConstObject& json) {     \
+            return std::make_unique<CLASS>(parent, json);                     \
+        }                                                                     \
+        static const bool _registered_##CLASS =                               \
+            Element::registerType(TYPE_STR, &_make_##CLASS);                  \
+    }

@@ -1,4 +1,7 @@
+#pragma once
+
 #include "graphics/gauge/Element.h"
+#include "graphics/DisplayValue.h"
 
 class RollOdometer : public Element {
     private:
@@ -10,13 +13,13 @@ class RollOdometer : public Element {
         Color* primaryColor;
         Color* secondaryColor;
 
-        Value& value;
+        DisplayValue value;
         int t = 0;
 
         float targetVal = 0;
 
     public:
-        explicit RollOdometer(Element* parent, Value& val) : Element(parent), value(val) { }
+        RollOdometer(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) { }
 
         void draw(Graphics& g) const override {
             float val = value.getValue(DEFAULT);
@@ -116,3 +119,5 @@ class RollOdometer : public Element {
             */
         }
 };
+
+REGISTER_ELEMENT_TYPE("roll-odometer", RollOdometer);

@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 
+#include "io/logging/Logger.h"
 
 // ----------[ FLOAT / MATH ]---------- //
 
@@ -130,23 +131,67 @@ inline void trimWhitespace(const char* s) {
 
 // ----------[ JSON ]---------- //
 
+inline const char* rjTypeName(const rapidjson::Value& v) {
+    using rapidjson::kNullType;
+    using rapidjson::kFalseType;
+    using rapidjson::kTrueType;
+    using rapidjson::kObjectType;
+    using rapidjson::kArrayType;
+    using rapidjson::kStringType;
+    using rapidjson::kNumberType;
+
+    switch (v.GetType()) {
+        case kNullType:   return "null";
+        case kFalseType:  return "false";
+        case kTrueType:   return "true";
+        case kObjectType: return "object";
+        case kArrayType:  return "array";
+        case kStringType: return "string";
+        case kNumberType: return "number";
+        default:          return "unknown";
+    }
+}
+
+inline bool setCString(const rapidjson::Value::ConstObject& o, const char* k, const char*& out) {
+    auto it = o.FindMember(k);
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsString()) {
+        LOG_WARN("setCString", "Key '%s' expected string but got %s", k, rjTypeName(it->value));
+        return false;
+    }
+    out = it->value.GetString();
+    return true;
+}
+
 inline bool setInt(const rapidjson::Value::ConstObject& o, const char* k, int& out) {
     auto it = o.FindMember(k);
-    if (it == o.MemberEnd() || !it->value.IsNumber()) return false;
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsNumber()) {
+        LOG_WARN("setInt", "Key '%s' expected number but got %s", k, rjTypeName(it->value));
+        return false;
+    }
     out = it->value.GetInt();
     return true;
 }
 
 inline bool setFloat(const rapidjson::Value::ConstObject& o, const char* k, float& out) {
     auto it = o.FindMember(k);
-    if (it == o.MemberEnd() || !it->value.IsNumber()) return false;
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsNumber()) {
+        LOG_WARN("setFloat", "Key '%s' expected number but got %s", k, rjTypeName(it->value));
+        return false;
+    }
     out = it->value.GetFloat();
     return true;
 }
 
 inline bool setBool(const rapidjson::Value::ConstObject& o, const char* k, bool& out) {
     auto it = o.FindMember(k);
-    if (it == o.MemberEnd() || !it->value.IsBool()) return false;
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsBool()) {
+        LOG_WARN("setBool", "Key '%s' expected bool but got %s", k, rjTypeName(it->value));
+        return false;
+    }
     out = it->value.GetBool();
     return true;
 }
@@ -154,7 +199,11 @@ inline bool setBool(const rapidjson::Value::ConstObject& o, const char* k, bool&
 template <class T>
 inline bool setObj(const rapidjson::Value::ConstObject& o, const char* k, T& out) {
     auto it = o.FindMember(k);
-    if (it == o.MemberEnd() || !it->value.IsObject()) return false;
+    if (it == o.MemberEnd()) return false;
+    if (!it->value.IsObject()) {
+        LOG_WARN("setObj", "Key '%s' expected object but got %s", k, rjTypeName(it->value));
+        return false;
+    }
     out = T(it->value.GetObject());
     return true;
 }
@@ -163,15 +212,26 @@ template <class T>
 inline bool setObjVector(const rapidjson::Value::ConstObject& o, const char* k, std::vector<T>& out) {
     auto it = o.FindMember(k);
     if (it == o.MemberEnd()) return false;
-    if (!it->value.IsArray()) return false;
+    if (!it->value.IsArray()) {
+        LOG_WARN("setObjVector", "Key '%s' expected array but got %s", k, rjTypeName(it->value));
+        return false;
+    }
     
+    const auto arr = it->value.GetArray();
     out.clear();
-    out.reserve(out.size() + it->value.Size());
+    out.reserve(arr.Size());
 
-    for (const auto& v : it->value.GetArray()) {
-        if (!v.IsObject()) continue;               // or return false / log
+    bool hadBad = false;
+    for (rapidjson::SizeType i = 0; i < arr.Size(); ++i) {
+        const auto& v = arr[i];
+        if (!v.IsObject()) {
+            hadBad = true;
+            continue;
+        }
         out.emplace_back(v.GetObject());
     }
+
+    if (hadBad) LOG_WARN("setObjVector", "Key '%s' array contained non-objects; some entries were skipped", k);
     return true;
 }
 
@@ -179,8 +239,16 @@ template <class T>
 inline bool setOptObj(const rapidjson::Value::ConstObject& o, const char* k, std::optional<T>& out) {
     auto it = o.FindMember(k);
     if (it == o.MemberEnd()) return false;
-    if (!it->value.IsObject()) return false;
-    out = T(it->value.GetObject());
+
+    const auto& v = it->value;
+    if (v.IsNull()) { out.reset(); return true; }
+
+    if (!v.IsObject()) {
+        LOG_WARN("setOptObj", "Key '%s' expected object|null but got %s", k, rjTypeName(v));
+        return false;
+    }
+
+    out = T(v.GetObject());
     return true;
 }
 
@@ -191,7 +259,11 @@ inline bool setOptFloat(const rapidjson::Value::ConstObject& o, const char* k, s
     const auto& v = it->value;
     if (v.IsNull()) { out.reset(); return true; }
 
-    if (!v.IsNumber()) return false;
+    if (!v.IsNumber()) {
+        LOG_WARN("setOptFloat", "Key '%s' expected number|null but got %s", k, rjTypeName(v));
+        return false;
+    }
+
     out = v.GetFloat();
     return true;
 }
@@ -203,7 +275,11 @@ inline bool setOptInt(const rapidjson::Value::ConstObject& o, const char* k, std
     const auto& v = it->value;
     if (v.IsNull()) { out.reset(); return true; }
 
-    if (!v.IsInt()) return false;          // strict int
+    if (!v.IsNumber()) {
+        LOG_WARN("setOptInt", "Key '%s' expected number|null but got %s", k, rjTypeName(v));
+        return false;
+    }
+    
     out = v.GetInt();
     return true;
 }

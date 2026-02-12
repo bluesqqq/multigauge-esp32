@@ -49,3 +49,5 @@ class CircularElement : public Element {
         
         Type getType() const override { return Type::Circular; }
 };
+
+REGISTER_ELEMENT_TYPE("circular-element", CircularElement);

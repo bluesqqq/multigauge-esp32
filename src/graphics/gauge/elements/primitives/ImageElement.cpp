@@ -19,3 +19,5 @@ void ImageElement::draw(Graphics &g) const {
 
     g.drawImage(image, b);
 }
+
+REGISTER_ELEMENT_TYPE("image", ImageElement);

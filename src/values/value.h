@@ -75,6 +75,7 @@ class Value {
         std::string getLongestValueString(int index = DEFAULT_UNIT, bool abbreviation = true);
 };
 
+extern Value dummy;
 extern Value engineRPM;
 extern Value engineCoolantTemp;
 extern Value calculatedEngineLoad;

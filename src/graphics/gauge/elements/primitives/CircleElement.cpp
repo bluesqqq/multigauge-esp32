@@ -32,3 +32,5 @@ void CircleElement::draw(Graphics &g) const {
         g.strokeCircle(cx, cy, radius);
     }
 }
+
+REGISTER_ELEMENT_TYPE("circle", CircleElement);

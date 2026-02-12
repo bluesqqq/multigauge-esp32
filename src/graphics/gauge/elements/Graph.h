@@ -166,3 +166,5 @@ class Graph : public Element {
             }
         }
 };
+
+REGISTER_ELEMENT_TYPE("graph", Graph);

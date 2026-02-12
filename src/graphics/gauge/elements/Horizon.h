@@ -90,3 +90,5 @@ class Horizon : public Element {
             xPosition -= 0.01f; //speed.getValueRaw() * xVelMultiplier; //xValue.getValue(DEFAULT) * xVelMultiplier;
         }
 };
+
+REGISTER_ELEMENT_TYPE("horizon", Horizon);

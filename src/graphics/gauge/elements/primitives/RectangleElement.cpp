@@ -29,3 +29,5 @@ void RectangleElement::draw(Graphics &g) const {
         else g.strokeRect(b);
     }
 }
+
+REGISTER_ELEMENT_TYPE("rectangle", RectangleElement);

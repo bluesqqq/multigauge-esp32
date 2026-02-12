@@ -2,11 +2,12 @@
 
 #include "graphics/gauge/Element.h"
 #include "graphics/colors/StaticColor.h"
+#include "graphics/DisplayValue.h"
 #include <algorithm>
 
 class ShiftLightElement : public Element {
 private:
-    Value& value;
+    DisplayValue value;
     float warningValue = 5000;
 
     Color* lightColor = nullptr;
@@ -15,9 +16,7 @@ private:
     const char* label = "Shift";
 
 public:
-    ShiftLightElement(Element* parent, Value& value, Color* color) : Element(parent), value(value), lightColor(color) {
-        if (!lightColor) lightColor = new StaticColor(rgb(255, 255, 255));
-    }
+    ShiftLightElement(Element* parent, const rapidjson::Value::ConstObject json) : Element(parent, json) { }
 
     void draw(Graphics& g) const override {
         const auto b = getBounds().toFloat();
@@ -44,3 +43,5 @@ public:
         }
     }
 };
+
+REGISTER_ELEMENT_TYPE("shift-light", ShiftLightElement);
