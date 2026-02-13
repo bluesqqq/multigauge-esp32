@@ -19,6 +19,8 @@ class TickList {
         RootTick root;
         std::vector<SubTick> subs;
 
+        LengthAlignment align = LengthAlignment::OUTER;
+
         float offset = 0;
 
         float displayValue = 0;
@@ -27,13 +29,13 @@ class TickList {
         float thicknessFactor = 0;
         float textSizeFactor = 1;
 
-        float leftHighlightBase = 0.5f;
+        float leftHighlightBase = 0.0f;
         float leftHighlightFactor = 1.0f;
-        float leftHighlightDistance = 5.0f;
+        float leftHighlightDistance = 1000.0f;
 
         float rightHighlightBase = 0.0f;
-        float rightHighlightFactor = 0.5f;
-        float rightHighlightDistance = 3;
+        float rightHighlightFactor = 1.0f;
+        float rightHighlightDistance = 1000;
 
         float getLength(uint8_t index) const;
         float getThickness(uint8_t index) const;

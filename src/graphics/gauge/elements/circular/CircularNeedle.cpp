@@ -30,19 +30,6 @@ void CircularNeedle::draw(Graphics &g) const {
     Line<float> needle(cx, cy, cx + cos(needleAngle) * radius, cy + sin(needleAngle) * radius);
     g.setFillStroke(color);
     g.fillWideLine(needle.toInt(), 10);
-
-    /*
-    if (color.fill) {
-        g.setFill(*color.fill);
-        g.fillCircle(cx, cy, radius);
-    }
-
-    if (color.stroke) {
-        g.setStroke(*color.stroke);
-        g.setStrokeThickness(color.thickness);
-        g.strokeCircle(cx, cy, radius);
-    }
-    */
 }
 
 REGISTER_ELEMENT_TYPE("circular-needle", CircularNeedle);

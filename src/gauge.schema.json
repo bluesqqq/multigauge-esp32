@@ -631,9 +631,6 @@
         },
         "max": {
           "type": "number"
-        },
-        "format": {
-          "type": "string"
         }
       }
     },
@@ -666,18 +663,12 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "value": {
-                  "$ref": "#/$defs/valueId"
-                },
-                "backgroundColor": {
-                  "$ref": "#/$defs/fillStroke"
-                },
-                "secondsColor": {
-                  "$ref": "#/$defs/color"
-                },
-                "graphColor": {
-                  "$ref": "#/$defs/color"
-                }
+                "value": { "$ref": "#/$defs/displayValue" },
+                "backgroundColor": { "$ref": "#/$defs/color"},
+                "secondsColor": {"$ref": "#/$defs/color"},
+                "graphColor": { "$ref": "#/$defs/color"},
+                "borderColor": {"$ref": "#/$defs/color"},
+                "seconds": { "type": "number" }
               }
             }
           }

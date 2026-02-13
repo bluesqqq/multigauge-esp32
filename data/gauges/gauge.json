@@ -1,22 +1,31 @@
 {
-	"$schema": "../../src/gauge.schema.json",
-	"style": { "width": "100%", "height": "100%", "padding": { "all": 6 } },
-	"props": { "backgroundColor": "#000000", "title": "RPM Schematic" },
-	"children": [
-		{
-			"type": "circular-scale",
-			"props": {
-				"radius": 5,
-				"startAngle": 0,
-				"endAngle": 180,
-				"ticks": {
-					"root": {
-						"color": {
-							"fill": { "loopType": "forward", "type": "time", "timeline":"white" }
-						}
-					}
-				}
-			}
-		}
-	]
+  "$schema": "../../src/gauge.schema.json",
+  "type": "gaugeface",
+  "style": {
+    "width": "100%",
+    "height": "100%",
+    "padding": { "all": 6 },
+    "flex": { "align": "center", "justify": "center" }
+  },
+  "props": {
+    "backgroundColor": "#000000",
+    "title": "RPM Schematic"
+  },
+  "children": [
+    {
+      "type": "graph",
+      "style": {
+        "width": "70%",
+        "height": "70%"
+      },
+      "props": {
+        "seconds": 3,
+        "backgroundColor": "#000000",
+        "secondsColor": "red",
+        "graphColor": "white",
+        "borderColor": "white",
+        "value": { "id": "engineRPM" }
+      }
+    }
+  ]
 }

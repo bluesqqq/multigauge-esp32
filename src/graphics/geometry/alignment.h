@@ -21,9 +21,9 @@ enum class Anchor {
 };
 
 enum LengthAlignment {
-    LENGTH_OUTER = -1,
-    LENGTH_CENTER = 0,
-    LENGTH_INNER = 1
+    OUTER = -1,
+    CENTER = 0,
+    INNER = 1
 };
 
 std::pair<float, float> alignLength(float start, float length, LengthAlignment alignment);

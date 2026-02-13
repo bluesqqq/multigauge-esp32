@@ -91,7 +91,7 @@ uint32_t currentTime = mg::clock.getMicros();
 
     if (t % 60 == 0) {
         float fps = 1000000.0f / (float)deltaUs;
-        //LOG_INFO("perf", "fps=%.2f dt_us=%u", fps, (unsigned)deltaUs);
+        LOG_INFO("perf", "fps=%.2f dt_us=%u", fps, (unsigned)deltaUs);
     }
 
     t++;

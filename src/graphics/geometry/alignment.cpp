@@ -2,15 +2,15 @@
 
 std::pair<float, float> alignLength(float start, float length, LengthAlignment alignment) {
     switch (alignment) {
-        case LENGTH_OUTER:
+        case OUTER:
             return std::pair<float, float>(start, start - length);
 
-        case LENGTH_CENTER: {
+        case CENTER: {
             const float halfLength = length / 2.0;
             return std::pair<float, float>(start - halfLength, start + halfLength);
         }
 
-        case LENGTH_INNER:
+        case INNER:
             return std::pair<float, float>(start, start + length);
         
         default:

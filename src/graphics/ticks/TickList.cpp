@@ -52,7 +52,7 @@ void TickList::drawCircularTick(Graphics &g, uint8_t index, Point<float> pos, fl
         thickness *= 1.0f + (thicknessFactor * highlightFactor);
     }
     
-    std::pair<float, float> tickRadii = alignLength(radius, length, LENGTH_CENTER);
+    std::pair<float, float> tickRadii = alignLength(radius, length, align);
 
     Point<float> unitVector = Point<float>::getPointOnUnitCircle(angle);
     Line<float> line = Line<float>(pos + unitVector * tickRadii.first, pos + unitVector * tickRadii.second);
@@ -76,15 +76,15 @@ void TickList::drawCircularTick(Graphics &g, uint8_t index, Point<float> pos, fl
             break;
 
         case TRIANGLE:
-            switch(LENGTH_CENTER) {
-                case LENGTH_INNER: // Triangle points outwards
+            switch(align) {
+                case INNER: // Triangle points outwards
                     drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
-                case LENGTH_CENTER: // Triangles points both ways
+                case CENTER: // Triangles points both ways
                     drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
 
-                case LENGTH_OUTER: // Triangle points inwards
+                case OUTER: // Triangle points inwards
                     drawTriangleTick(g, line, thickness, temporaryFS);
                     break;
             }

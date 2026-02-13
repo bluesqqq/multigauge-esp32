@@ -52,4 +52,6 @@ class DisplayValue {
         const Unit* getUnit() const;
 
         std::string getValueString(bool abbreviation = false) const;
+
+        const char* getName() const;
 };

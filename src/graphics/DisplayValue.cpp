@@ -73,3 +73,7 @@ const Unit *DisplayValue::getUnit() const {
 std::string DisplayValue::getValueString(bool abbreviation) const {
     return value ? value->getValueString(getUnitIndex(), abbreviation) : "n/a";
 }
+
+const char *DisplayValue::getName() const {
+    return value ? value->getName() : "n/a";
+}
