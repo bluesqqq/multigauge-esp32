@@ -1,5 +1,6 @@
 #include "Point.h"
 #include <cmath>
+#include <algorithm>
 
 #include "Line.h"
 #include "Rect.h"
@@ -160,8 +161,9 @@ Point<T> Point<T>::scaledFromPoint(const Point<T>& other, float scale) const {
 template <typename T>
 float Point<T>::angle() const {
     float a = atan2f(y, x);
-    return a >= 0 ? a : a + 2 * PI;
+    return a >= 0 ? a : a + 2 * M_PI;
 }
+
 template <typename T>
 float Point<T>::angleTo(const Point<T>& other) const { return atan2f(other.y - y, other.x - x); }
 

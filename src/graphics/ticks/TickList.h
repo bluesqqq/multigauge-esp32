@@ -95,14 +95,14 @@ class TickList {
             if (delta < 0.f) {
                 if (leftHighlightDistance <= 0.f || delta <= -leftHighlightDistance) return leftHighlightBase;
                 
-                return lerp(leftHighlightBase, leftHighlightFactor, 1.f - min(1.f, (float)abs(delta) / leftHighlightDistance));
+                return lerp(leftHighlightBase, leftHighlightFactor, 1.f - std::min(1.f, (float)abs(delta) / leftHighlightDistance));
             } else if (delta > 0.f) {
                 if (rightHighlightDistance <= 0.f || delta >= rightHighlightDistance) return rightHighlightBase;
 
-                return lerp(rightHighlightBase, rightHighlightFactor, 1.f - min(1.f, (float)abs(delta) / rightHighlightDistance));
+                return lerp(rightHighlightBase, rightHighlightFactor, 1.f - std::min(1.f, (float)abs(delta) / rightHighlightDistance));
             }
 
-            return max(leftHighlightFactor, rightHighlightFactor);
+            return std::max(leftHighlightFactor, rightHighlightFactor);
         }
 
     public:
@@ -117,8 +117,8 @@ class TickList {
         void drawCircular(Graphics& g, Point<float> pos, float radius, float startAngle, float endAngle, float startValue, float endValue) const {
             auto tickPositions = getTickPositions(startValue, endValue);
 
-            float rStartAngle = startAngle * DEG_TO_RAD; 
-            float rEndAngle = endAngle * DEG_TO_RAD;
+            float rStartAngle = startAngle * (M_PI / 180.0); 
+            float rEndAngle = endAngle * (M_PI / 180.0);
 
             for (int i = tickPositions.size() - 1; i >= 0; --i) {
                 for (float& position : tickPositions[i]) {

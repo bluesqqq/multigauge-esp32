@@ -2,6 +2,9 @@
 
 #include "point.h"
 
+#include <optional>
+#include <vector>
+
 template <typename T>
 class Rect;
 

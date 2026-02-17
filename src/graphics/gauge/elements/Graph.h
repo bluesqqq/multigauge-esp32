@@ -79,7 +79,7 @@ class Graph : public Element {
             const float minimum = value.getMinimumBase();
             const float maximum = value.getMaximumBase();
 
-            const unsigned long currentTime = millis();
+            const unsigned long currentTime = 0; //millis(); // TODO HANGE TO ABSTRACT TIME CLASS
             const float secondLength = b.width / seconds; // length of 1 second
 
             if (backgroundColor) {
@@ -190,7 +190,7 @@ class Graph : public Element {
         }
 
         void update(int deltaTime) override {
-            unsigned long currentTime = millis();
+            unsigned long currentTime = 0; //millis(); // TODO: CHANGE TO ABSTRACT TIME CLASS
 
             valueMemory.insert(valueMemory.begin(), {value.getValueBase(), currentTime});
 

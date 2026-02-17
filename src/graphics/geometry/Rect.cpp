@@ -1,6 +1,7 @@
 #include "Rect.h"
 #include <algorithm>
 #include <cmath>
+#include <array>
 
 template<typename T>
 Rect<T>::Rect(T x, T y, T w, T h) : Rect(Point<T>(x, y), w, h) {}

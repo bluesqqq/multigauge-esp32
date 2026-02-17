@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include "Arduino.h"
 #include "alignment.h"
 
 template <typename T>

@@ -1,5 +1,7 @@
 #include "Graphics.h"
 
+#include <cmath>
+
 rgba Graphics::getCachedColor(const Color& color) {
     auto it = colorCache.find(&color);
     if (it != colorCache.end())
@@ -119,7 +121,7 @@ void Graphics::fillCircleInRect(int x, int y, int w, int h) const { fillCircleIn
 
 void Graphics::fillCircleInRect(const Rect<int> &area) const {
     const auto center = area.getCenter();
-    context->fillCircle(center.x, center.y, min(area.width / 2, area.height / 2), fillValue);
+    context->fillCircle(center.x, center.y, std::min(area.width / 2, area.height / 2), fillValue);
 }
 
 void Graphics::strokeCircle(int cx, int cy, int radius) const { context->strokeCircle(cx, cy, radius, strokeValue, 1); }
@@ -130,7 +132,7 @@ void Graphics::strokeCircleInRect(int x, int y, int w, int h) const { strokeCirc
 
 void Graphics::strokeCircleInRect(const Rect<int> &area) const {
     const auto center = area.getCenter();
-    context->strokeCircle(center.x, center.y, min(area.width / 2, area.height / 2), strokeValue, thickness);
+    context->strokeCircle(center.x, center.y, std::min(area.width / 2, area.height / 2), strokeValue, thickness);
 }
 
 //----------[ ARC ]----------//

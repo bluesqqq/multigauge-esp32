@@ -1,7 +1,5 @@
 #include "StaticColor.h"
 
-#include "Arduino.h"
-
 StaticColor::StaticColor() : color(DEFAULT_COLOR) { }
 
 StaticColor::StaticColor(rgba color) : color(color) {}

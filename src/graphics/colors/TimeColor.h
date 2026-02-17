@@ -2,7 +2,6 @@
 
 #include "color.h"
 #include "ColorTimeline.h"
-#include "Arduino.h" // TODO: REMOVE THIS AND CHANGE TO ABSTRACT TIME CLASS
 
 class TimeColor : public Color {
     public:

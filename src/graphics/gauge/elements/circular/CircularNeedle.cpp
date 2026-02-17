@@ -22,8 +22,8 @@ void CircularNeedle::draw(Graphics &g) const {
     const float cy = b.y + h * 0.5f;
 
     const DisplayValue& value = resolvedDisplayValue();
-    float startAngle = resolvedStartAngle() * DEG_TO_RAD;
-    float endAngle = resolvedEndAngle() * DEG_TO_RAD;
+    float startAngle = resolvedStartAngle() * (M_PI / 180.0);
+    float endAngle = resolvedEndAngle() * (M_PI / 180.0);
 
     float needleAngle = mapf(value.getInterpolationValue(), 0.0f, 1.0f, startAngle, endAngle);
 
