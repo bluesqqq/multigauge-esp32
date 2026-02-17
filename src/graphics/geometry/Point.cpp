@@ -49,7 +49,7 @@ Point<T> Point<T>::getAnchored(const Point<T>& point, T width, T height, Anchor 
 
 template <typename T>
 Point<T> Point<T>::getAnchored(const Rect<T>& rectangle, Anchor anchor) {
-    return Point<T>::getAnchored(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor);
+    return Point<T>::getAnchored(rectangle.x, rectangle.y, rectangle.width, rectangle.height, anchor);
 }
 
 template <typename T>

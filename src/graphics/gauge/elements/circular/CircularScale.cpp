@@ -16,8 +16,8 @@ void CircularScale::draw(Graphics &g) const {
     const float diameter = std::min(w, h);
     const float radius   = diameter * 0.5f * this->radius;
 
-    const float cx = b.position.x + w * 0.5f;
-    const float cy = b.position.y + h * 0.5f;
+    const float cx = b.x + w * 0.5f;
+    const float cy = b.y + h * 0.5f;
 
     DisplayValue value = resolvedDisplayValue();
     float startAngle = resolvedStartAngle();

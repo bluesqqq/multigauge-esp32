@@ -25,8 +25,8 @@ public:
         const float diameter = std::min(b.width, b.height);
         const float radius   = diameter * 0.5f;
 
-        const float cx = b.position.x + b.width  * 0.5f;
-        const float cy = b.position.y + b.height * 0.5f;
+        const float cx = b.x + b.width  * 0.5f;
+        const float cy = b.y + b.height * 0.5f;
 
         const rgba c = lightColor->getColor();
 

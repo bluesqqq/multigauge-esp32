@@ -3,19 +3,18 @@
 #include <cmath>
 
 template<typename T>
-Rect<T>::Rect(T x, T y, T w, T h)
-    : Rect(Point<T>(x, y), w, h) {}
+Rect<T>::Rect(T x, T y, T w, T h) : Rect(Point<T>(x, y), w, h) {}
 
 template<typename T>
-Rect<T>::Rect(const Point<T>& pos, T w, T h)
-    : position(pos), width(w), height(h) {}
+Rect<T>::Rect(const Point<T>& pos, T w, T h) : x(pos.x), y(pos.y), width(w), height(h) {}
 
 template<typename T>
-Rect<T> Rect<T>::fromPoints(Point<T> p1, Point<T> p2) {
-    return Rect<T>(p1, p2.x - p1.x, p2.y - p1.y);
-}
+Rect<T> Rect<T>::fromPoints(Point<T> p1, Point<T> p2) { return Rect<T>(p1, p2.x - p1.x, p2.y - p1.y);}
 
-template<typename T>
+template <typename T>
+Point<T> Rect<T>::position() const { return Point<T>(x, y); }
+
+template <typename T>
 T Rect<T>::area() const { return width * height; }
 
 template<typename T>
@@ -26,7 +25,7 @@ bool Rect<T>::isEmpty() const { return width == 0 && height == 0; }
 
 template<typename T>
 bool Rect<T>::operator==(const Rect<T>& other) const {
-    return position == other.position && width == other.width && height == other.height;
+    return x == other.x && y == other.y && width == other.width && height == other.height;
 }
 
 template<typename T>
@@ -97,45 +96,45 @@ Rect<T> Rect<T>::clipped(const Rect<T>& other) const {
 template<typename T>
 void Rect<T>::setTop(T top) {
     T bottom = getBottom();
-    position.y = top;
+    y = top;
     height = bottom - top;
 }
 
 template<typename T>
 void Rect<T>::setBottom(T bottom) {
-    height = bottom - position.y;
+    height = bottom - y;
 }
 
 template<typename T>
 void Rect<T>::setLeft(T left) {
     T right = getRight();
-    position.x = left;
+    x = left;
     width = right - left;
 }
 
 template<typename T>
 void Rect<T>::setRight(T right) {
-    width = right - position.x;
+    width = right - x;
 }
 
 template<typename T>
 void Rect<T>::setCenterX(T centerX) {
-    position.x = centerX - (width / (T)2);
+    x = centerX - (width / (T)2);
 }
 
 template<typename T>
 void Rect<T>::setCenterY(T centerY) {
-    position.y = centerY - (height / (T)2);
+    y = centerY - (height / (T)2);
 }
 
 template<typename T>
-T Rect<T>::getTop() const { return position.y; }
+T Rect<T>::getTop() const { return y; }
 template<typename T>
-T Rect<T>::getBottom() const { return position.y + height; }
+T Rect<T>::getBottom() const { return y + height; }
 template<typename T>
-T Rect<T>::getLeft() const { return position.x; }
+T Rect<T>::getLeft() const { return x; }
 template<typename T>
-T Rect<T>::getRight() const { return position.x + width; }
+T Rect<T>::getRight() const { return x + width; }
 template<typename T>
 T Rect<T>::getCenterX() const { return getLeft() + (width / (T)2); }
 template<typename T>
@@ -148,15 +147,15 @@ template <typename T>
 int Rect<T>::getRightPixel() const { return this->getRight() - 1; }
 
 template<typename T>
-Point<T> Rect<T>::getTopLeft() const { return position; }
+Point<T> Rect<T>::getTopLeft() const { return Point<T>(x, y); }
 template<typename T>
-Point<T> Rect<T>::getBottomLeft() const { return position.translated((T)0, height); }
+Point<T> Rect<T>::getBottomLeft() const { return Point<T>(x, y + height); }
 template<typename T>
-Point<T> Rect<T>::getTopRight() const { return position.translated(width, (T)0); }
+Point<T> Rect<T>::getTopRight() const { return Point<T>(x + width, y); }
 template<typename T>
-Point<T> Rect<T>::getBottomRight() const { return position.translated(width, height); }
+Point<T> Rect<T>::getBottomRight() const { return Point<T>(x + width, y + height); }
 template<typename T>
-Point<T> Rect<T>::getCenter() const { return position.translated(width / (T)2, height / (T)2); }
+Point<T> Rect<T>::getCenter() const { return Point<T>(x + width / (T)2, y + height / (T)2); }
 
 template <typename T>
 Point<int> Rect<T>::getBottomLeftPixel() const { return Point<int>((int)getLeft(), (int)getBottomPixel()); }
@@ -191,56 +190,56 @@ std::vector<Line<T>> Rect<T>::getEdges() const {
 
 template<typename T>
 void Rect<T>::trimTop(T amount) {
-    position.y += amount;
+    y += amount;
     height -= amount;
 }
 template<typename T>
 void Rect<T>::trimBottom(T amount) { height -= amount; }
 template<typename T>
-void Rect<T>::trimLeft(T amount) { position.x += amount; width -= amount; }
+void Rect<T>::trimLeft(T amount) { x += amount; width -= amount; }
 template<typename T>
 void Rect<T>::trimRight(T amount) { width -= amount; }
 
 template<typename T>
 Rect<T> Rect<T>::trimmedTop(T amount) const {
-    return Rect<T>(position.translated((T)0, amount), width, height - amount);
+    return Rect<T>(x, y + amount, width, height - amount);
 }
 template<typename T>
 Rect<T> Rect<T>::trimmedBottom(T amount) const {
-    return Rect<T>(position, width, height - amount);
+    return Rect<T>(x, y, width, height - amount);
 }
 template<typename T>
 Rect<T> Rect<T>::trimmedLeft(T amount) const {
-    return Rect<T>(position.translated(amount, (T)0), width - amount, height);
+    return Rect<T>(x + amount, y, width - amount, height);
 }
 template<typename T>
 Rect<T> Rect<T>::trimmedRight(T amount) const {
-    return Rect<T>(position, width - amount, height);
+    return Rect<T>(x, y, width - amount, height);
 }
 
 template<typename T>
 Rect<T> Rect<T>::removeFromTop(T amount) {
-    Rect<T> removed(position, width, amount);
-    position.y += amount;
+    Rect<T> removed(x, y, width, amount);
+    y += amount;
     height -= amount;
     return removed;
 }
 template<typename T>
 Rect<T> Rect<T>::removeFromBottom(T amount) {
-    Rect<T> removed(Point<T>(position.x, position.y + height - amount), width, amount);
+    Rect<T> removed(x, y + height - amount, width, amount);
     height -= amount;
     return removed;
 }
 template<typename T>
 Rect<T> Rect<T>::removeFromLeft(T amount) {
-    Rect<T> removed(position, amount, height);
-    position.x += amount;
+    Rect<T> removed(x, y, amount, height);
+    x += amount;
     width -= amount;
     return removed;
 }
 template<typename T>
 Rect<T> Rect<T>::removeFromRight(T amount) {
-    Rect<T> removed(Point<T>(position.x + width - amount, position.y), amount, height);
+    Rect<T> removed(x + width - amount, y, amount, height);
     width -= amount;
     return removed;
 }
@@ -257,63 +256,64 @@ template<typename T>
 Rect<T>& Rect<T>::operator-=(Point<T> delta) { translate(-delta); return *this; }
 
 template<typename T>
-void Rect<T>::translate(T deltaX, T deltaY) { position.translate(deltaX, deltaY); }
+void Rect<T>::translate(T deltaX, T deltaY) { x += deltaX; y += deltaY; }
 template<typename T>
-void Rect<T>::translate(Point<T> delta) { position += delta; }
+void Rect<T>::translate(Point<T> delta) { x += delta.x; y += delta.y; }
 template<typename T>
-Rect<T> Rect<T>::translated(T deltaX, T deltaY) const { return Rect<T>(Point<T>(position.x + deltaX, position.y + deltaY), width, height); }
+Rect<T> Rect<T>::translated(T deltaX, T deltaY) const { return Rect<T>(x + deltaX, y + deltaY, width, height); }
 template<typename T>
-Rect<T> Rect<T>::translated(Point<T> delta) const { return Rect<T>(position + delta, width, height); }
+Rect<T> Rect<T>::translated(Point<T> delta) const { return Rect<T>(x + delta.x, y + delta.y, width, height); }
 
 template<typename T>
 void Rect<T>::interpolate(const Rect<T>& other, float t) {
-    position.interpolate(other.position, t);
+    x = lerp(x, other.x, t);
+    y = lerp(y, other.y, t);
     width = lerp(width, other.width, t);
     height = lerp(height, other.height, t);
 }
 template<typename T>
 Rect<T> Rect<T>::interpolated(const Rect<T>& other, float t) const {
-    return Rect<T>(position.interpolated(other.position, t), lerp(width, other.width, t), lerp(height, other.height, t));
+    return Rect<T>(lerp(x, other.x, t), lerp(y, other.y, t), lerp(width, other.width, t), lerp(height, other.height, t));
 }
 
 // SCALING
 
 template<typename T>
-Rect<T> Rect<T>::operator*(float scale) const { return Rect<T>(position * scale, width * scale, height * scale); }
+Rect<T> Rect<T>::operator*(float scale) const { return Rect<T>(position() * scale, width * scale, height * scale); }
 template<typename T>
-Rect<T>& Rect<T>::operator*=(float scale) { position *= scale; width *= scale; height *= scale; return *this; }
+Rect<T>& Rect<T>::operator*=(float scale) { auto pos = position() *= scale; x = pos.x; y = pos.y; width *= scale; height *= scale; return *this; }
 template<typename T>
-Rect<T> Rect<T>::operator/(float scale) const { return Rect<T>(position / scale, width / scale, height / scale); }
+Rect<T> Rect<T>::operator/(float scale) const { return Rect<T>(position() / scale, width / scale, height / scale); }
 template<typename T>
-Rect<T>& Rect<T>::operator/=(float scale) { position /= scale; width /= scale; height /= scale; return *this; }
+Rect<T>& Rect<T>::operator/=(float scale) { auto pos = position() /= scale; x = pos.x; y = pos.y; width /= scale; height /= scale; return *this; }
 
 template<typename T>
-void Rect<T>::scaleFromOrigin(float scale) { position.scaleFromOrigin(scale); width *= scale; height *= scale; }
+void Rect<T>::scaleFromOrigin(float scale) { auto pos = position(); pos.scaleFromOrigin(scale); x = pos.x; y = pos.y; width *= scale; height *= scale; }
 template<typename T>
-Rect<T> Rect<T>::scaledFromOrigin(float scale) const { return Rect<T>(position.scaledFromOrigin(scale), width * scale, height * scale); }
+Rect<T> Rect<T>::scaledFromOrigin(float scale) const { return Rect<T>(position().scaledFromOrigin(scale), width * scale, height * scale); }
 
 template<typename T>
-void Rect<T>::scaleFromPoint(const Point<T>& other, float scale) { position.scaleFromPoint(other, scale); width *= scale; height *= scale; }
+void Rect<T>::scaleFromPoint(const Point<T>& other, float scale) { auto pos = position(); pos.scaleFromPoint(other, scale); x = pos.x, y = pos.y; width *= scale; height *= scale; }
 template<typename T>
-Rect<T> Rect<T>::scaledFromPoint(const Point<T>& other, float scale) const { return Rect<T>(position.scaledFromPoint(other, scale), width * scale, height * scale); }
+Rect<T> Rect<T>::scaledFromPoint(const Point<T>& other, float scale) const { return Rect<T>(position().scaledFromPoint(other, scale), width * scale, height * scale); }
 
 template<typename T>
-void Rect<T>::reduce(T deltaX, T deltaY) { position.translate(deltaX, deltaY);  width -= (T)(2 * deltaX); height -= (T)(2 * deltaY); }
+void Rect<T>::reduce(T deltaX, T deltaY) { x += deltaX; y += deltaY;  width -= (T)(2 * deltaX); height -= (T)(2 * deltaY); }
 template<typename T>
 void Rect<T>::reduce(T delta) { reduce(delta, delta); }
 
 template<typename T>
-Rect<T> Rect<T>::reduced(T deltaX, T deltaY) const { return Rect<T>(position.translated(deltaX, deltaY), width - (T)(2 * deltaX), height - (T)(2 * deltaY)); }
+Rect<T> Rect<T>::reduced(T deltaX, T deltaY) const { return Rect<T>(Point<T>(x + deltaX, y + deltaY), width - (T)(2 * deltaX), height - (T)(2 * deltaY)); }
 template<typename T>
 Rect<T> Rect<T>::reduced(T delta) const { return reduced(delta, delta); }
 
 template<typename T>
-void Rect<T>::expand(T deltaX, T deltaY) { position.translate(-deltaX, -deltaY);  width += (T)(2 * deltaX); height += (T)(2 * deltaY); }
+void Rect<T>::expand(T deltaX, T deltaY) { x -= deltaX; y -= deltaY; width += (T)(2 * deltaX); height += (T)(2 * deltaY); }
 template<typename T>
 void Rect<T>::expand(T delta) { expand(delta, delta); }
 
 template<typename T>
-Rect<T> Rect<T>::expanded(T deltaX, T deltaY) const { return Rect<T>(position.translated((T)-deltaX, (T)-deltaY), width + (T)(2 * deltaX), height + (T)(2 * deltaY)); }
+Rect<T> Rect<T>::expanded(T deltaX, T deltaY) const { return Rect<T>(x - deltaX, y - deltaY, width + (T)(2 * deltaX), height + (T)(2 * deltaY)); }
 template<typename T>
 Rect<T> Rect<T>::expanded(T delta) const { return expanded(delta, delta); }
 
@@ -420,9 +420,9 @@ Rect<T> Rect<T>::reflectedAcrossVertical(T vertical) const {
 // CONVERSION
 
 template<typename T>
-Rect<float> Rect<T>::toFloat() const { return Rect<float>(position.toFloat(), (float)width, (float)height); }
+Rect<float> Rect<T>::toFloat() const { return Rect<float>((float)x, (float)y, (float)width, (float)height); }
 template<typename T>
-Rect<int> Rect<T>::toInt() const { return Rect<int>(position.toInt(), (int)width, (int)height); }
+Rect<int> Rect<T>::toInt() const { return Rect<int>((int)x, (int)y, (int)width, (int)height); }
 
 template <typename T>
 Path<T> Rect<T>::asPath() const { return Path<T>(*this); }

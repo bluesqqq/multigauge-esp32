@@ -71,19 +71,19 @@ void Graphics::fillWideLine(const Line<int> &line, float t) const { context->fil
 
 void Graphics::fillRect(int x, int y, int w, int h) const { context->fillRect(x, y, w, h, fillValue); }
 
-void Graphics::fillRect(const Rect<int> &rectangle) const { fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+void Graphics::fillRect(const Rect<int> &rectangle) const { fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height); }
 
 void Graphics::fillRoundedRect(int x, int y, int w, int h, float radius) const { context->fillRoundRect(x, y, w, h, radius, fillValue); }
 
-void Graphics::fillRoundedRect(const Rect<int> &rect, float radius) const { context->fillRoundRect(rect.position.x, rect.position.y, rect.width, rect.height, radius, fillValue); }
+void Graphics::fillRoundedRect(const Rect<int> &rect, float radius) const { context->fillRoundRect(rect.x, rect.y, rect.width, rect.height, radius, fillValue); }
 
 void Graphics::strokeRect(int x, int y, int w, int h) const { context->strokeRect(x, y, w, h, strokeValue, thickness); }
 
-void Graphics::strokeRect(const Rect<int> &rectangle) const { strokeRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height); }
+void Graphics::strokeRect(const Rect<int> &rectangle) const { strokeRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height); }
 
 void Graphics::strokeRoundedRect(int x, int y, int w, int h, float radius) const { context->strokeRoundRect(x, y, w, h, radius, strokeValue, thickness); }
 
-void Graphics::strokeRoundedRect(const Rect<int> &rect, float radius) const { context->strokeRoundRect(rect.position.x, rect.position.y, rect.width, rect.height, radius, strokeValue, thickness); }
+void Graphics::strokeRoundedRect(const Rect<int> &rect, float radius) const { context->strokeRoundRect(rect.x, rect.y, rect.width, rect.height, radius, strokeValue, thickness); }
 
 //----------[ ELLIPSE ]----------//
 
@@ -421,36 +421,36 @@ void Graphics::drawTextArea(const std::string& text, int x, int y, int width, in
 
     const int blockHeight = visibleLines * lineHeight;
 
-    int blockTop = rect.position.y;
-    if (vAlign == VAlign::Middle) blockTop = rect.position.y + (rect.height - blockHeight) / 2;
-    if (vAlign == VAlign::Bottom) blockTop = rect.position.y + (rect.height - blockHeight);
+    int blockTop = rect.y;
+    if (vAlign == VAlign::Middle) blockTop = rect.y + (rect.height - blockHeight) / 2;
+    if (vAlign == VAlign::Bottom) blockTop = rect.y + (rect.height - blockHeight);
 
     for (int i = 0; i < visibleLines; ++i) {
         int drawY = blockTop + i * lineHeight;
-        if (drawY + lineHeight > rect.position.y + rect.height) break;
+        if (drawY + lineHeight > rect.y + rect.height) break;
 
         const std::string& line = lines[i];
         if (line.empty()) continue;
 
         int lineW = context->getTextWidth(line.c_str(), family, pt, weight, slant);
 
-        int drawX = rect.position.x;
-        if (hAlign == HAlign::Center) drawX = rect.position.x + (rect.width - lineW) / 2;
-        if (hAlign == HAlign::Right)  drawX = rect.position.x + rect.width - lineW;
+        int drawX = rect.x;
+        if (hAlign == HAlign::Center) drawX = rect.x + (rect.width - lineW) / 2;
+        if (hAlign == HAlign::Right)  drawX = rect.x + rect.width - lineW;
 
         context->drawText(line.c_str(), drawX, drawY, family, pt, weight, slant, textValue, anchor);
     }
 }
 
-void Graphics::drawTextArea(const std::string &text, Rect<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
+void Graphics::drawTextArea(const std::string &text, Rect<int> rectangle, Anchor anchor, bool useEllipses, bool useHyphens) { drawTextArea(text, rectangle.x, rectangle.y, rectangle.width, rectangle.height, anchor, useEllipses, useHyphens); }
 
 void Graphics::drawImage(const Image &image, int x, int y, Anchor anchor) const { context->drawImage(image, x, y, anchor); }
 
-void Graphics::drawImage(const Image &image, Rect<int> rect) const { context->drawImage(image, rect.position.x, rect.position.y, rect.width, rect.height); }
+void Graphics::drawImage(const Image &image, Rect<int> rect) const { context->drawImage(image, rect.x, rect.y, rect.width, rect.height); }
 
 void Graphics::setClipRect(int x, int y, int w, int h) { context->setClipRect(x, y, w, h); }
 
-void Graphics::setClipRect(const Rect<int> &rect) { context->setClipRect(rect.position.x, rect.position.y, rect.width, rect.height); }
+void Graphics::setClipRect(const Rect<int> &rect) { context->setClipRect(rect.x, rect.y, rect.width, rect.height); }
 
 void Graphics::clearClipRect() { context->clearClipRect(); }
 

@@ -12,7 +12,7 @@
 
 template <typename T>
 struct Rect {
-    Point<T> position;
+    T x, y;
     T width, height;
 
     Rect(T x, T y, T width, T height);
@@ -20,6 +20,7 @@ struct Rect {
 
     static Rect<T> fromPoints(Point<T> p1, Point<T> p2);
 
+    Point<T> position() const;
     T area() const;
     T perimeter() const;
     bool isEmpty() const;
