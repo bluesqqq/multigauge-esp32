@@ -2,30 +2,22 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include "graphics/Graphics.h"
-#include "graphics/contexts/GraphicsContextLovyanGFX.h"
-
-#include "graphics/colors/ColorTimeline.h"
-#include "graphics/colors/StaticColor.h"
-#include "graphics/gauge/GaugeFace.h"
-#include "graphics/gauge/elements/primitives/CircleElement.h"
-#include "graphics/gauge/elements/primitives/RectangleElement.h"
-#include "graphics/gauge/elements/ShiftLightElement.h"
+#include "platform/GraphicsContextLovyanGFX.h"
+#include <multigauge/graphics/gauge/GaugeFace.h>
 
 #include <xtensa/hal.h>
-#include "utils.h"
 #include <random>
 #include <functional>
 
-#include "io/file/FileSystem.h"
-#include "io/file/LittleFsFileSystem.h"
+#include <rapidjson/document.h>
 
-#include "io/logging/Logger.h"
-#include "io/logging/SerialLogger.h"
+#include "platform/LittleFsFileSystem.h"
 
-#include "io/time/TimeArduino.h"
+#include "platform/SerialLogger.h"
 
-#include "AssetManager.h"
+#include "platform/TimeArduino.h"
+
+#include <multigauge/AssetManager.h>
 
 #ifndef PIO_UNIT_TESTING
 
