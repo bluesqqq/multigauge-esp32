@@ -64,15 +64,20 @@ int t = 0;
 
 uint32_t lastTime = 0;
 
+#include "graphics_test.h"
+
 void draw(uint32_t deltaUs) {
     auto screen = g.getScreenBounds().toFloat();
 
     g.clearColorCache();
     context.beginFrame();
 
-    face->layoutRecursive(screen.width, screen.height);
-    face->updateRecursive(deltaUs);
-    face->drawRecursive(g);
+    //face->layoutRecursive(screen.width, screen.height);
+    //face->updateRecursive(deltaUs);
+    //face->drawRecursive(g);
+
+    uint32_t nowUs = mg::clock.getMicros();
+    drawGraphicsPrimitiveTest(g, context, assetManager, nowUs);
 
     context.endFrame();
 }

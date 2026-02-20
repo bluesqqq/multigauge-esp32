@@ -2,25 +2,30 @@
 
 //----------[ FONT REGISTRY SYSTEM ]----------//
 
-const lgfx::IFont *LGFXFontStroke::getFont(bool b, bool i) const {
-    if (b && i) {
+const lgfx::IFont* LGFXFontStroke::getFont(bool wantBold, bool wantItalic) const {
+    if (wantBold && wantItalic) {
         if (boldItalic) return boldItalic;
     }
-    if (b) return bold ? bold : normal;
-    if (i) return italic ? italic : normal;
+    if (wantBold)   return bold ? bold : normal;
+    if (wantItalic) return italic ? italic : normal;
     return normal;
 }
 
 auto LGFXFontFamily::findStrokeForPt(float pt) const {
-    auto it = std::upper_bound(strokes.begin(), strokes.end(), pt, [](float value, const auto& elem) { return value < elem.first; });
-
+    auto it = std::upper_bound(
+        strokes.begin(), strokes.end(), pt,
+        [](float value, const auto& elem) { return value < elem.first; }
+    );
     if (it == strokes.begin()) return strokes.begin();
     --it;
     return it;
 }
 
 void LGFXFontFamily::addStroke(float pt, LGFXFontStroke stroke) {
-    auto it = std::lower_bound(strokes.begin(), strokes.end(), pt, [](const auto& elem, float value) { return elem.first < value; });
+    auto it = std::lower_bound(
+        strokes.begin(), strokes.end(), pt,
+        [](const auto& elem, float value) { return elem.first < value; }
+    );
 
     if (it != strokes.end() && it->first == pt) it->second = stroke;
     else strokes.insert(it, {pt, stroke});
@@ -33,53 +38,36 @@ LGFXFontPick LGFXFontFamily::getFont(float pt, bool wantBold, bool wantItalic) c
     const float chosenPt = it->first;
     const LGFXFontStroke& stroke = it->second;
 
-    // Use your stroke fallback logic (includes boldItalic handling)
     const lgfx::IFont* f = stroke.getFont(wantBold, wantItalic);
-
     if (!f) f = &DEFAULT_LGFX_FONT;
 
     return { f, chosenPt };
 }
 
+//----------[ Helpers ]----------//
 
-
-
-
-
-float GraphicsContextLovyanGFX::getFontScaleFactor(float point) {
-    if (point < 1.0f) point = currentFontPoint;
-
-    float scale = point / currentFontPoint;
-    if (scale < 1.0f) scale = 1.0f;
-
-    return scale;
-}
-
-lgfx::v1::textdatum::textdatum_t GraphicsContextLovyanGFX::anchorToDatum(Anchor anchor) {
+lgfx::v1::textdatum::textdatum_t GraphicsContextLovyanGFX::anchorToDatum(Anchor anchor) const {
     using lgfx::v1::textdatum_t;
 
-    switch (anchor)
-    {
+    switch (anchor) {
         case Anchor::TopLeft:      return textdatum_t::top_left;
         case Anchor::TopCenter:    return textdatum_t::top_center;
         case Anchor::TopRight:     return textdatum_t::top_right;
 
         case Anchor::CenterLeft:   return textdatum_t::middle_left;
-        case Anchor::Center: return textdatum_t::middle_center;
+        case Anchor::Center:       return textdatum_t::middle_center;
         case Anchor::CenterRight:  return textdatum_t::middle_right;
 
         case Anchor::BottomLeft:   return textdatum_t::bottom_left;
         case Anchor::BottomCenter: return textdatum_t::bottom_center;
         case Anchor::BottomRight:  return textdatum_t::bottom_right;
     }
-
-    // Fallback if Anchor gets extended without updating this function.
     return textdatum_t::top_left;
 }
 
-void GraphicsContextLovyanGFX::setFontInternal(std::string family, float pt, FontWeight weight, FontSlant slant) {
+void GraphicsContextLovyanGFX::setFontInternal(const std::string& family, float pt, FontWeight weight, FontSlant slant) {
     const lgfx::IFont* f = &DEFAULT_LGFX_FONT;
-    float basePt = DEFAULT_LGFX_FONT_PT; // fallback
+    float basePt = DEFAULT_LGFX_FONT_PT;
 
     auto it = fontFamilies.find(family);
     if (it != fontFamilies.end()) {
@@ -90,38 +78,62 @@ void GraphicsContextLovyanGFX::setFontInternal(std::string family, float pt, Fon
 
     buffer.setTextSize(1);
     buffer.setFont(f);
-    currentFontPoint = buffer.fontHeight();
 
-    buffer.setTextSize(pt / currentFontPoint);
+    currentFontPoint = (float)buffer.fontHeight();
+    if (currentFontPoint < 1.0f) currentFontPoint = (float)basePt;
+
+    float s = pt / currentFontPoint;
+    if (s < 1.0f) s = 1.0f;
+    buffer.setTextSize(s);
 }
 
-bool GraphicsContextLovyanGFX::init() {
-    LOG_INFO("GraphicsContextLovyanGFX::init", "Starting...");
-    
-    if (!display.init()) {
-        LOG_ERROR("GFX::init", "display.init() failed");
-        return false;
-
+void GraphicsContextLovyanGFX::strokeRectThick(int x, int y, int w, int h, uint32_t color, int t) {
+    if (t <= 1) {
+        buffer.drawRect(x, y, w, h, color);
+        return;
     }
+    // Top
+    buffer.fillRect(x, y, w, t, color);
+    // Bottom
+    buffer.fillRect(x, y + h - t, w, t, color);
+    // Left
+    buffer.fillRect(x, y, t, h, color);
+    // Right
+    buffer.fillRect(x + w - t, y, t, h, color);
+}
+
+void GraphicsContextLovyanGFX::strokeRoundRectThick(int x, int y, int w, int h, int radius, uint32_t color, int t) {
+    if (t <= 1) {
+        buffer.drawRoundRect(x, y, w, h, radius, color);
+        return;
+    }
+    for (int i = 0; i < t; ++i) {
+        int xx = x + i;
+        int yy = y + i;
+        int ww = w - 2 * i;
+        int hh = h - 2 * i;
+        if (ww <= 0 || hh <= 0) break;
+        int rr = radius - i;
+        if (rr < 0) rr = 0;
+        buffer.drawRoundRect(xx, yy, ww, hh, rr, color);
+    }
+}
+
+//----------[ Lifecycle ]----------//
+
+bool GraphicsContextLovyanGFX::init() {
+    if (!display.init()) return false;
 
     display.setBrightness(255);
     display.setRotation(0);
 
-    width = display.width();
-    height = display.height();
-
-    if (width <= 0 || height <= 0) {
-        LOG_ERROR("GFX::init", "Display reported invalid size %dx%d", width, height);
-        return false;
-    }
-
-    LOG_INFO("GFX::init", "Display ok: size=%dx%d rotation=%d brightness=%d", width, height, 0, 255);
+    w = display.width();
+    h = display.height();
+    if (w <= 0 || h <= 0) return false;
 
     buffer.setColorDepth(16);
     buffer.setPsram(false);
-    buffer.createSprite(width, height);
-
-    // Font registry system
+    if (!buffer.createSprite(w, h)) return false;
 
     {
         auto& sans = fontFamilies["sans"];
@@ -170,7 +182,7 @@ bool GraphicsContextLovyanGFX::init() {
     }
 
     buffer.setFont(&lgfx::fonts::FreeSans12pt7b);
-    currentFontPoint = 12;
+    currentFontPoint = 12.0f;
 
     return true;
 }
@@ -179,189 +191,303 @@ void GraphicsContextLovyanGFX::endFrame() {
     buffer.pushSprite(0, 0);
 }
 
-void GraphicsContextLovyanGFX::drawPixel(int x, int y, rgba color) {
-    buffer.drawPixel(x, y, lgfxColor(color));
+//----------[ FILL ]----------//
+
+void GraphicsContextLovyanGFX::clear(rgba color) {
+    buffer.fillScreen(lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::strokeLine(int x0, int y0, int x1, int y1, rgba color) {
-    buffer.drawLine(x0, y0, x1, y1, lgfxColor(color));
+//----------[ PIXEL ]----------//
+
+void GraphicsContextLovyanGFX::pixel(int x, int y, rgba color) {
+    buffer.drawPixel(x, y, lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::fillWideLine(int x0, int y0, int x1, int y1, rgba color, float thickness) {
-    buffer.drawWideLine(x0, y0, x1, y1, thickness, lgfxColor(color));
+//----------[ LINE ]----------//
+
+void GraphicsContextLovyanGFX::line(int x0, int y0, int x1, int y1, rgba color, float thickness) {
+    const uint32_t c = lgfxColor888(color);
+    if (thickness <= 1.0f) {
+        buffer.drawLine(x0, y0, x1, y1, c);
+        return;
+    }
+    buffer.drawWideLine(x0, y0, x1, y1, thickness, c);
 }
 
-void GraphicsContextLovyanGFX::strokeTriangle(int x0, int y0, int x1, int y1, int x2, int y2, rgba color, float thickness) {
-    buffer.drawTriangle(x0, y0, x1, y1, x2, y2, lgfxColor(color));
+//----------[ RECTANGLE ]----------//
+
+void GraphicsContextLovyanGFX::rect(int x, int y, int ww, int hh, rgba color) {
+    buffer.fillRect(x, y, ww, hh, lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, rgba color) {
-    buffer.fillTriangle(x0, y0, x1, y1, x2, y2, lgfxColor(color));
+void GraphicsContextLovyanGFX::strokeRect(int x, int y, int ww, int hh, rgba color, float thickness) {
+    line(x, y, x + ww - 1, y, color, thickness);           // Top
+    line(x, y + hh - 1, x + ww - 1, y + hh - 1, color, thickness); // Bottom
+    line(x, y, x, y + hh - 1, color, thickness);         // Left
+    line(x + ww - 1, y, x + ww - 1, y + hh - 1, color, thickness); // Right
 }
 
-void GraphicsContextLovyanGFX::fillRect(int x, int y, int w, int h, rgba color) { buffer.fillRect(x, y, w + 1, h + 1, lgfxColor(color)); }
-
-void GraphicsContextLovyanGFX::strokeRect(int x, int y, int w, int h, rgba color, float thickness) {
-    buffer.drawRect(x, y, w + 1, h + 1, lgfxColor(color));
+void GraphicsContextLovyanGFX::roundRect(int x, int y, int ww, int hh, float radius, rgba color) {
+    buffer.fillRoundRect(x, y, ww, hh, (int)std::lround(radius), lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float radius, rgba color) {
-    buffer.fillRoundRect(x, y, w, h, radius, lgfxColor(color));
+void GraphicsContextLovyanGFX::roundRect(int x, int y, int ww, int hh, float r1, float r2, float r3, float r4, rgba color) {
+    float rr = std::min(std::min(r1, r2), std::min(r3, r4));
+    if (rr < 0) rr = 0;
+    buffer.fillRoundRect(x, y, ww, hh, (int)std::lround(rr), lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::fillRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, rgba color) {
-    // TODO: CHANGE IMPL
-    buffer.fillRoundRect(x, y, w, h, r1, lgfxColor(color));
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int ww, int hh, float radius, rgba color, float thickness) {
+    int t = (int)std::ceil(thickness);
+    if (t < 1) t = 1;
+    strokeRoundRectThick(x, y, ww, hh, (int)std::lround(radius), lgfxColor888(color), t);
 }
 
-void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float radius, rgba color, float thickness) {
-    buffer.drawRoundRect(x, y, w, h, radius, lgfxColor(color));
+void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int ww, int hh, float r1, float r2, float r3, float r4, rgba color, float thickness) {
+    float rr = std::min(std::min(r1, r2), std::min(r3, r4));
+    if (rr < 0) rr = 0;
+    strokeRoundRect(x, y, ww, hh, rr, color, thickness);
 }
 
-void GraphicsContextLovyanGFX::strokeRoundRect(int x, int y, int w, int h, float r1, float r2, float r3, float r4, rgba color, float thickness) {
-    // TODO: CHANGE IMPL
-    buffer.drawRoundRect(x, y, w, h, r1, lgfxColor(color));
-}
+//----------[ CIRCLE ]----------//
 
-void GraphicsContextLovyanGFX::fillCircle(int cx, int cy, int r, rgba color) { buffer.fillCircle(cx, cy, r, lgfxColor(color)); }
+void GraphicsContextLovyanGFX::circle(int cx, int cy, int r, rgba color) {
+    buffer.fillCircle(cx, cy, r, lgfxColor888(color));
+}
 
 void GraphicsContextLovyanGFX::strokeCircle(int cx, int cy, int r, rgba color, float thickness) {
-    buffer.drawCircle(cx, cy, r, lgfxColor(color));
+    const uint32_t c = lgfxColor888(color);
+    int t = (int)std::ceil(thickness);
+    if (t < 1) t = 1;
+
+    if (t == 1) {
+        buffer.drawCircle(cx, cy, r, c);
+        return;
+    }
+
+    int half = t / 2;
+    for (int i = -half; i <= half; ++i) {
+        int rr = r + i;
+        if (rr > 0) buffer.drawCircle(cx, cy, rr, c);
+    }
 }
 
-void GraphicsContextLovyanGFX::fillRing(int cx, int cy, int r, rgba color) {
+//----------[ ELLIPSE ]----------//
+
+void GraphicsContextLovyanGFX::ellipse(int cx, int cy, int rx, int ry, rgba color) {
+    buffer.fillEllipse(cx, cy, rx, ry, lgfxColor888(color));
 }
 
-void GraphicsContextLovyanGFX::strokeRing(int cx, int cy, int r, rgba color, float thickness) {
+void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, rgba color, float thickness) {
+    const uint32_t c = lgfxColor888(color);
+    int t = (int)std::ceil(thickness);
+    if (t < 1) t = 1;
+
+    if (t == 1) {
+        buffer.drawEllipse(cx, cy, rx, ry, c);
+        return;
+    }
+
+    int half = t / 2;
+    for (int i = -half; i <= half; ++i) {
+        int rrx = rx + i;
+        int rry = ry + i;
+        if (rrx > 0 && rry > 0) buffer.drawEllipse(cx, cy, rrx, rry, c);
+    }
 }
 
-void GraphicsContextLovyanGFX::fillArc(int cx, int cy, int r1, int r2, float start, float end, rgba color) { buffer.fillArc(cx, cy, r1, r2, start, end, lgfxColor(color)); }
+//----------[ RING ]----------//
 
-void GraphicsContextLovyanGFX::strokeArc(int cx, int cy, int r1, int r2, float start, float end, rgba color, float thickness) { buffer.drawArc(cx, cy, r1, r2, start, end, lgfxColor(color)); }
+void GraphicsContextLovyanGFX::ring(int cx, int cy, int r1, int r2, rgba color) {
+    arc(cx, cy, r1, r2, 0.0f, 360.0f, color);
+}
 
-void GraphicsContextLovyanGFX::fillEllipse(int cx, int cy, int rx, int ry, rgba color) { buffer.fillEllipse(cx, cy, rx, ry, lgfxColor(color)); }
+void GraphicsContextLovyanGFX::strokeRing(int cx, int cy, int r1, int r2, rgba color, float thickness) {
+    strokeCircle(cx, cy, r1, color, thickness);
+    strokeCircle(cx, cy, r2, color, thickness);
+}
 
-void GraphicsContextLovyanGFX::strokeEllipse(int cx, int cy, int rx, int ry, rgba color, float thickness) { buffer.drawEllipse(cx, cy, rx, ry, lgfxColor(color));  }
+//----------[ ARC ]----------//
 
-void GraphicsContextLovyanGFX::fillAll(rgba color) { buffer.fillScreen(lgfxColor(color)); }
+void GraphicsContextLovyanGFX::arc(int cx, int cy, int r1, int r2, float start, float end, rgba color) {
+    buffer.fillArc(cx, cy, r1, r2, start, end, lgfxColor888(color));
+}
 
-float GraphicsContextLovyanGFX::getTextWidth(const char *text, std::string family, float pt, FontWeight weight, FontSlant slant) { 
+void GraphicsContextLovyanGFX::strokeArc(int cx, int cy, int r1, int r2, float start, float end, rgba color, float thickness) {
+    const float halfThickness = thickness / 2.0f;
+    const uint32_t c = lgfxColor888(color);
+    buffer.fillArc(cx, cy, r1 - halfThickness, r1 + halfThickness, start, end, c);
+    buffer.fillArc(cx, cy, r2 - halfThickness, r2 + halfThickness, start, end, c);
+    line(cx + (int)std::round(r1 * std::cos(start * M_PI / 180.0f)), cy + (int)std::round(r1 * std::sin(start * M_PI / 180.0f)),
+         cx + (int)std::round(r2 * std::cos(start * M_PI / 180.0f)), cy + (int)std::round(r2 * std::sin(start * M_PI / 180.0f)),
+         color, thickness);
+}
+
+//----------[ TRIANGLE ]----------//
+
+void GraphicsContextLovyanGFX::tri(int x0, int y0, int x1, int y1, int x2, int y2, rgba color) {
+    buffer.fillTriangle(x0, y0, x1, y1, x2, y2, lgfxColor888(color));
+}
+
+void GraphicsContextLovyanGFX::strokeTri(int x0, int y0, int x1, int y1, int x2, int y2, rgba color, float thickness) {
+    const uint32_t c = lgfxColor888(color);
+
+    if (thickness <= 1.0f) {
+        buffer.drawTriangle(x0, y0, x1, y1, x2, y2, c);
+        return;
+    }
+
+    // Approx: draw 3 wide lines
+    buffer.drawWideLine(x0, y0, x1, y1, thickness, c);
+    buffer.drawWideLine(x1, y1, x2, y2, thickness, c);
+    buffer.drawWideLine(x2, y2, x0, y0, thickness, c);
+}
+
+//----------[ TEXT ]----------//
+
+float GraphicsContextLovyanGFX::getTextWidth(const char* text, std::string family, float pt, FontWeight weight, FontSlant slant) {
     setFontInternal(family, pt, weight, slant);
-    return buffer.textWidth(text);
+    return (float)buffer.textWidth(text);
 }
 
 void GraphicsContextLovyanGFX::drawText(const char* text, int x, int y, std::string family, float pt, FontWeight weight, FontSlant slant, rgba color, Anchor anchor) {
     setFontInternal(family, pt, weight, slant);
     buffer.setTextDatum(anchorToDatum(anchor));
-    buffer.setTextColor(lgfxColor(color));
+    buffer.setTextColor(lgfxColor888(color));
     buffer.drawString(text, x, y);
 }
 
-Image GraphicsContextLovyanGFX::createNativeImage(const rgba* pixels, int w, int h) {
+//----------[ IMAGE ]----------//
+
+Image GraphicsContextLovyanGFX::createNativeImage(const rgba* pixels, int ww, int hh) {
     auto* spr = new lgfx::LGFX_Sprite(&buffer);
 
     spr->setColorDepth(16);
     spr->setPsram(true);
 
-    if (!spr->createSprite(w, h)) {
+    if (!spr->createSprite(ww, hh)) {
         delete spr;
         return Image(0, 0, nullptr, nullptr);
     }
 
-
     spr->setSwapBytes(true);
 
     std::vector<uint16_t> tmp;
-    tmp.resize((size_t)w * (size_t)h);
+    tmp.resize((size_t)ww * (size_t)hh);
 
     for (size_t i = 0; i < tmp.size(); ++i) {
         const rgba px = pixels[i];
-
-        if (px.a == 0) {
-            tmp[i] = TFT_TRANSPARENT;
-        } else {
-            tmp[i] = rgb888_to_565(px.r, px.g, px.b);
-        }
+        if (px.a == 0) tmp[i] = TRANSPARENT_KEY_565;
+        else tmp[i] = rgb888_to_565(px.r, px.g, px.b);
     }
 
-    spr->pushImage(0, 0, w, h, tmp.data());
-
+    spr->pushImage(0, 0, ww, hh, tmp.data());
     spr->setSwapBytes(false);
 
-    return Image(w, h, spr, [](void* ptr) { delete static_cast<lgfx::LGFX_Sprite*>(ptr); });
+    return Image(ww, hh, spr, [](void* ptr) { delete static_cast<lgfx::LGFX_Sprite*>(ptr); });
 }
 
-void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, Anchor anchor) {
+void GraphicsContextLovyanGFX::drawImage(const Image& img, int x, int y) {
     if (!img.native) return;
     auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
     if (!spr) return;
 
-    int drawX = x;
-    int drawY = y;
-
-    switch (anchor) {
-        case Anchor::TopLeft:
-            break;
-
-        case Anchor::TopCenter:
-            drawX -= img.width / 2;
-            break;
-
-        case Anchor::TopRight:
-            drawX -= img.width;
-            break;
-
-        case Anchor::CenterLeft:
-            drawY -= img.height / 2;
-            break;
-
-        case Anchor::Center:
-            drawX -= img.width / 2;
-            drawY -= img.height / 2;
-            break;
-
-        case Anchor::CenterRight:
-            drawX -= img.width;
-            drawY -= img.height / 2;
-            break;
-
-        case Anchor::BottomLeft:
-            drawY -= img.height;
-            break;
-
-        case Anchor::BottomCenter:
-            drawX -= img.width / 2;
-            drawY -= img.height;
-            break;
-
-        case Anchor::BottomRight:
-            drawX -= img.width;
-            drawY -= img.height;
-            break;
-    }
-
-    uint16_t key = TFT_TRANSPARENT;
-    uint16_t key_swapped = (key << 8) | (key >> 8);
-
-    spr->pushSprite(&buffer, drawX, drawY, key_swapped);
+    const uint16_t key = swapped565(TRANSPARENT_KEY_565);
+    spr->pushSprite(&buffer, x, y, key);
 }
 
-void GraphicsContextLovyanGFX::drawImage(const Image &img, int x, int y, int width, int height) {
+void GraphicsContextLovyanGFX::drawImageStretched(const Image& img, int x, int y, int width, int height) {
     if (!img.native || width <= 0 || height <= 0 || img.width <= 0 || img.height <= 0) return;
-
     auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
     if (!spr) return;
 
     const float zx = (float)width  / (float)img.width;
     const float zy = (float)height / (float)img.height;
 
-    uint16_t key = TFT_TRANSPARENT;
-    uint16_t key_swapped = (key << 8) | (key >> 8);
+    const uint16_t key = swapped565(TRANSPARENT_KEY_565);
+    spr->setPivot(img.width / 2, img.height / 2);
+    spr->pushRotateZoom(&buffer, x + width / 2, y + height / 2, 0.0f, zx, zy, key);
+}
 
-    spr->pushRotateZoom(&buffer, x + width / 2, y + height / 2, 0.0f, zx, zy, key_swapped);
+void GraphicsContextLovyanGFX::drawImageScaled(const Image& img, int x, int y, float sx, float sy) {
+    if (!img.native || img.width <= 0 || img.height <= 0) return;
+    auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
+    if (!spr) return;
+
+    if (sx <= 0.0f || sy <= 0.0f) return;
+
+    const int scaledW = (int)std::lround((float)img.width * sx);
+    const int scaledH = (int)std::lround((float)img.height * sy);
+    if (scaledW <= 0 || scaledH <= 0) return;
+
+    const uint16_t key = swapped565(TRANSPARENT_KEY_565);
+    spr->pushRotateZoom(&buffer, x + scaledW / 2, y + scaledH / 2, 0.0f, sx, sy, key);
+}
+
+void GraphicsContextLovyanGFX::drawImageRotated(const Image& img, int x, int y, float angle, int pivotX, int pivotY) {
+    drawImageTransformed(img, x, y, angle, 1.0f, 1.0f, pivotX, pivotY);
+}
+
+void GraphicsContextLovyanGFX::drawImageTransformed(const Image& img, int x, int y, float angleDeg, float sx, float sy, int pivotX, int pivotY) {
+    if (!img.native || img.width <= 0 || img.height <= 0) return;
+    if (sx <= 0.0f || sy <= 0.0f) return;
+
+    auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
+
+    const int scaledW = (int)std::lround((float)img.width  * sx);
+    const int scaledH = (int)std::lround((float)img.height * sy);
+    if (scaledW <= 0 || scaledH <= 0) return;
+
+    const int destPivotX = x + (int)std::lround((float)pivotX * sx);
+    const int destPivotY = y + (int)std::lround((float)pivotY * sy);
+
+    spr->setPivot(pivotX, pivotY);
+
+    const uint16_t key = swapped565(TRANSPARENT_KEY_565);
+
+    spr->pushRotateZoom(&buffer, destPivotX, destPivotY, angleDeg, sx, sy, key);
+
+    spr->setPivot(0, 0);
+}
+
+void GraphicsContextLovyanGFX::drawImageRegion(const Image& img, int srcX, int srcY, int srcW, int srcH, int destX, int destY, int destW, int destH) {
+    // TODO: this is a temporary implementation until I can find something better.
+    if (!img.native) return;
+    if (srcW <= 0 || srcH <= 0 || destW <= 0 || destH <= 0) return;
+
+    auto* spr = static_cast<lgfx::LGFX_Sprite*>(img.native);
+    if (!spr) return;
+
+    const int iw = img.width;
+    const int ih = img.height;
+
+    if (srcX < 0) { srcW += srcX; srcX = 0; }
+    if (srcY < 0) { srcH += srcY; srcY = 0; }
+    if (srcX + srcW > iw) srcW = iw - srcX;
+    if (srcY + srcH > ih) srcH = ih - srcY;
+    if (srcW <= 0 || srcH <= 0) return;
+
+    clip(destX, destY, destW, destH);
+
+    const float sx = (float)destW / (float)srcW;
+    const float sy = (float)destH / (float)srcH;
+    const int originX = destX - (int)std::lround((float)srcX * sx);
+    const int originY = destY - (int)std::lround((float)srcY * sy);
+
+    const uint16_t key = swapped565(TRANSPARENT_KEY_565);
+
+    spr->setPivot(0, 0);
+
+    spr->pushRotateZoom(&buffer, originX, originY, 0.0f, sx, sy, key);
+    clearClip();
 }
 
 //----------[ CLIP ]----------//
-void GraphicsContextLovyanGFX::setClipRect(int x, int y, int w, int h) { buffer.setClipRect(x, y, w, h); }
 
-void GraphicsContextLovyanGFX::clearClipRect() { buffer.clearClipRect(); }
+void GraphicsContextLovyanGFX::clip(int x, int y, int width, int height) {
+    buffer.setClipRect(x, y, width, height);
+}
+
+void GraphicsContextLovyanGFX::clearClip() {
+    buffer.clearClipRect();
+}
