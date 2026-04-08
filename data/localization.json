@@ -1,0 +1,28 @@
+{
+    "en" : {
+        "languageName" : "English",
+        "languageAbbreviation" : "EN",
+
+        "text" : {
+
+        }
+    },
+
+    "es" : {
+        "Language Name" : "Español",
+        "Language Abbreviation" : "ES",
+
+        "text" : {
+
+        }
+    },
+
+    "fr" : {
+        "Language Name" : "Français",
+        "Language Abbreviation" : "FR",
+
+        "text" : {
+
+        }
+    }
+}

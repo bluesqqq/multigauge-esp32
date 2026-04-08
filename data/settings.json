@@ -1,0 +1,33 @@
+{
+    "brightness": 255,
+    "rotation": 0,
+    
+    "userColors" : {
+        "primary" : "white",
+        "accent" : "red",
+        "background" : "black"
+    },
+
+    "vehicle" : {
+        "RPMs" : {
+            "idle" : 1000,
+            "warning" : 6000,
+            "redline" : 6500,
+            "shift" : 5500
+        },
+
+        "topSpeed" : 180,
+        "fuelCapacity" : 50
+    },
+
+    "units": {
+        "temperature": "celcius",
+        "distance": 0,
+        "pressure": 0,
+        "velocity": 0,
+        "acceleration": 0,
+        "volume": 0,
+        "volumePerTime": 0,
+        "time": 0
+    }
+}
