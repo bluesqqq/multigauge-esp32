@@ -1,5 +1,3 @@
-#include <multigauge/graphics/gauge/GaugeFace.h>
-#include <multigauge/AssetManager.h>
 #include <multigauge/App.h>
 
 #include "platform/GraphicsContextLovyanGFX.h"
