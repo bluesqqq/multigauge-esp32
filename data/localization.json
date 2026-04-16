@@ -1,28 +1,17 @@
 {
-    "en" : {
-        "languageName" : "English",
-        "languageAbbreviation" : "EN",
-
-        "text" : {
-
-        }
+    "en": {
+        "languageName": "English",
+        "languageAbbreviation": "EN",
+        "text": {}
     },
-
-    "es" : {
-        "Language Name" : "Español",
-        "Language Abbreviation" : "ES",
-
-        "text" : {
-
-        }
+    "es": {
+        "languageName": "Espa\u00f1ol",
+        "languageAbbreviation": "ES",
+        "text": {}
     },
-
-    "fr" : {
-        "Language Name" : "Français",
-        "Language Abbreviation" : "FR",
-
-        "text" : {
-
-        }
+    "fr": {
+        "languageName": "Fran\u00e7ais",
+        "languageAbbreviation": "FR",
+        "text": {}
     }
 }
